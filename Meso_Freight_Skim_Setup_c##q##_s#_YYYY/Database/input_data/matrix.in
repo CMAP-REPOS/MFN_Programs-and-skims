@@ -1,0 +1,33 @@
+c  Craig Heither, 10-31-2012: modified to add mf40 to hold truck skim distances
+c  Craig Heither, 08-21-2015: modified so that mf40 now holds truck POE values (skimmed distances not actually needed)
+c  Lafayette Cruise, 02-17-2016:created matrices mf43-52 to hold information for domestic distance matrices
+c  Craig Heither, 06-17-2016: rename Egress time matrices to Auxiliary Transit Time (no longer egress only)
+c  Craig Heither, 10-03-2016: add matrices mf 33 & 34 to store truck and water linehaul distances
+c  Craig Heither, 05-16-2017: Aux. time for rail isn't needed: reuse matrices 3/7/11/15/19/23/27 for non-CMAP rail dwell time; add pipeline matrix storage
+c  Craig Heither, 05-25-2017: Add matrices to skim all rail as integrated; include domestic pipeline distances
+c  Craig Heither, 06-22-2017: Add mf80 to store LogNode (triple-index) for rail pass-through trips
+c  Karly Cazzato, 01-07-2025: Remove unused matrices following updates (removed individual rail line skims and additional path variablity)
+c
+t matrix init
+a mf29 Uno   1 Demand for skim generation
+a mf31  Ttt  0  Truck travel time
+a mf32  Wtt  0  Water travel time
+a mf33  Tivt  0  Truck Linehaul travel time
+a mf34  Wivtt  0  Water Linehaul travel time
+a mf40  Tpoe  0  Truck point of entry
+a mf41  Tdms  0 Domestic-Only Truck Miles
+a mf61  Alltt   0 Total travel distance - All Rail
+a mf62  Alivtt 0 In-vehicle travel time - All Rail
+a mf63  Aldwll 0 Non-CMAP rail dwell time - All Rail
+a mf64  Allpoe  0 Point of entry - All Rail
+a mf65  Allbrd  0 Transfers - All Rail
+a mf66  Alldms  0 Domestic-Only Route Miles - All Rail
+a mf71  Coiltt  0  Crude Oil Pipeline skim distance
+a mf72  Coildm  0  Crude Oil Pipeline domestic skim distance
+a mf73  Pprdtt  0  Petroleum Products Pipeline skim distance
+a mf74  Pprddm  0  Petroleum Products Pipeline domestic skim distance
+a mf75  Cnectt  0  Coal nec Pipeline skim distance
+a mf76  Cnecdm  0  Coal nec Pipeline domestic skim distance
+a mf80  RailYd  0  Intermediate rail yard - Pass-through trips
+
+a  mo1  CCDist  1  Centroid connector distance

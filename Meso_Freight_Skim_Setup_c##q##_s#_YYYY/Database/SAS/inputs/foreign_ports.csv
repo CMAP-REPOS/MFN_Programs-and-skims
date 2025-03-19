@@ -1,0 +1,219 @@
+Mesozone,Location,Region,Continent,Port_Ocean
+274,Afghanistan,International,5. Asia,Pacific
+275,Albania,International,6. Europe,Atlantic
+276,Algeria,International,4. Africa,Atlantic
+277,Andorra,International,6. Europe,Atlantic
+278,Angola,International,4. Africa,Atlantic
+279,Anguilla,International,3. North America balance,Atlantic
+280,Antigua and Barbuda,International,3. North America balance,Atlantic
+281,Argentina,International,8. South America,Atlantic
+282,Armenia,International,6. Europe,Atlantic
+283,Aruba,International,3. North America balance,Atlantic
+284,Australia,International,7. Oceania,Pacific
+285,Austria,International,6. Europe,Atlantic
+286,Azerbaijan,International,6. Europe,Atlantic
+287,Bahamas,International,3. North America balance,Atlantic
+288,Bahrain,International,5. Asia,Pacific
+289,Bangladesh,International,5. Asia,Pacific
+290,Barbados,International,3. North America balance,Atlantic
+291,Belarus,International,6. Europe,Atlantic
+292,Belgium,International,6. Europe,Atlantic
+293,Belize,International,3. North America balance,Atlantic
+294,Benin,International,4. Africa,Atlantic
+295,Bermuda,International,3. North America balance,Atlantic
+296,Bhutan,International,5. Asia,Pacific
+297,Bolivia,International,8. South America,Pacific
+298,Bosnia and Herzegovina,International,6. Europe,Atlantic
+299,Botswana,International,4. Africa,Atlantic
+300,Brazil,International,8. South America,Atlantic
+301,British Indian Ocean Territory,International,4. Africa,Atlantic
+302,British Virgin Islands,International,3. North America balance,Atlantic
+303,Brunei Darussalam,International,5. Asia,Pacific
+304,Bulgaria,International,6. Europe,Atlantic
+305,Burkina Faso,International,4. Africa,Atlantic
+306,Burundi,International,4. Africa,Atlantic
+307,C?te d'Ivoire,International,4. Africa,Atlantic
+308,Cambodia,International,5. Asia,Pacific
+309,Cameroon,International,4. Africa,Atlantic
+310,Canada,International,3. North America balance,AP
+311,Cape Verde,International,4. Africa,Atlantic
+312,Cayman Islands,International,3. North America balance,Atlantic
+313,Central African Republic,International,4. Africa,Atlantic
+314,Chad,International,4. Africa,Atlantic
+315,Chile,International,8. South America,Pacific
+316,China,International,5. Asia,Pacific
+317,Christmas Island,International,7. Oceania,Pacific
+318,Cocos Islands,International,5. Asia,Pacific
+319,Colombia,International,8. South America,AP
+320,Comoros,International,4. Africa,Atlantic
+321,Congo,International,4. Africa,Atlantic
+322,Cook Islands,International,7. Oceania,Pacific
+323,Costa Rica,International,3. North America balance,AP
+324,Croatia,International,6. Europe,Atlantic
+325,Cuba,International,3. North America balance,Atlantic
+326,Curacao,International,3. North America balance,Atlantic
+327,Cyprus,International,6. Europe,Atlantic
+328,Czech Republic,International,6. Europe,Atlantic
+329,Democratic Republic of the Congo,International,4. Africa,Atlantic
+330,Denmark,International,6. Europe,Atlantic
+331,Djibouti,International,4. Africa,Atlantic
+332,Dominica,International,3. North America balance,Atlantic
+333,Dominican Republic,International,3. North America balance,Atlantic
+334,Ecuador,International,8. South America,Pacific
+335,Egypt,International,4. Africa,Atlantic
+336,El Salvador,International,3. North America balance,Pacific
+337,Equatorial Guinea,International,4. Africa,Atlantic
+338,Eritrea,International,4. Africa,Atlantic
+339,Estonia,International,6. Europe,Atlantic
+340,Ethiopia,International,4. Africa,Atlantic
+341,Falkland Islands,International,8. South America,Atlantic
+342,Faroe Islands,International,6. Europe,Atlantic
+343,Fiji,International,7. Oceania,Pacific
+344,Finland,International,6. Europe,Atlantic
+345,France,International,6. Europe,Atlantic
+346,French Southern Territories,International,4. Africa,Atlantic
+347,Gabon,International,4. Africa,Atlantic
+348,Gambia,International,4. Africa,Atlantic
+349,Georgia,International,6. Europe,Atlantic
+350,Germany,International,6. Europe,Atlantic
+351,Ghana,International,4. Africa,Atlantic
+352,Gibraltar,International,6. Europe,Atlantic
+353,Greece,International,6. Europe,Atlantic
+354,Greenland,International,3. North America balance,Atlantic
+355,Grenada,International,3. North America balance,Atlantic
+356,Guatemala,International,3. North America balance,AP
+357,Guinea,International,4. Africa,Atlantic
+358,Guinea-Bissau,International,4. Africa,Atlantic
+359,Guyana,International,8. South America,Atlantic
+360,Haiti,International,3. North America balance,Atlantic
+361,Heard Island and McDonald Islands,International,7. Oceania,Pacific
+362,Holy See,International,6. Europe,Atlantic
+363,Honduras,International,3. North America balance,AP
+364,Hungary,International,6. Europe,Atlantic
+365,Iceland,International,6. Europe,Atlantic
+366,India,International,5. Asia,Pacific
+367,Indonesia,International,5. Asia,Pacific
+368,Iran,International,5. Asia,Pacific
+369,Iraq,International,5. Asia,Pacific
+370,Ireland,International,6. Europe,Atlantic
+371,Israel,International,5. Asia,Pacific
+372,Italy,International,6. Europe,Atlantic
+373,Jamaica,International,3. North America balance,Atlantic
+374,Japan,International,5. Asia,Pacific
+375,Jordan,International,5. Asia,Pacific
+376,Kazakhstan,International,5. Asia,Pacific
+377,Kenya,International,4. Africa,Atlantic
+378,Kiribati,International,7. Oceania,Pacific
+379,Kuwait,International,5. Asia,Pacific
+380,Kyrgyzstan,International,5. Asia,Pacific
+381,Laos,International,5. Asia,Pacific
+382,Latvia,International,6. Europe,Atlantic
+383,Lebanon,International,5. Asia,Pacific
+384,Lesotho,International,4. Africa,Atlantic
+385,Liberia,International,4. Africa,Atlantic
+386,Libya,International,4. Africa,Atlantic
+387,Liechtenstein,International,6. Europe,Atlantic
+388,Lithuania,International,6. Europe,Atlantic
+389,Luxembourg,International,6. Europe,Atlantic
+390,Madagascar,International,4. Africa,Atlantic
+391,Malawi,International,4. Africa,Atlantic
+392,Malaysia,International,5. Asia,Pacific
+393,Maldives,International,5. Asia,Pacific
+394,Mali,International,4. Africa,Atlantic
+395,Malta,International,6. Europe,Atlantic
+396,Marshall Islands,International,7. Oceania,Pacific
+397,Mauritania,International,4. Africa,Atlantic
+398,Mauritius,International,4. Africa,Atlantic
+399,Mexico,International,3. North America balance,AP
+400,Micronesia,International,7. Oceania,Pacific
+401,Moldova,International,6. Europe,Atlantic
+402,Monaco,International,6. Europe,Atlantic
+403,Mongolia,International,5. Asia,Pacific
+404,Montenegro,International,6. Europe,Atlantic
+405,Montserrat,International,3. North America balance,Atlantic
+406,Morocco,International,4. Africa,Atlantic
+407,Mozambique,International,4. Africa,Atlantic
+408,Myanmar,International,5. Asia,Pacific
+409,Namibia,International,4. Africa,Atlantic
+410,Nauru,International,7. Oceania,Pacific
+411,Nepal,International,5. Asia,Pacific
+412,Netherlands,International,6. Europe,Atlantic
+413,New Zealand,International,7. Oceania,Pacific
+414,Nicaragua,International,3. North America balance,AP
+415,Niger,International,4. Africa,Atlantic
+416,Nigeria,International,4. Africa,Atlantic
+417,Norfolk Island,International,7. Oceania,Pacific
+418,North Korea,International,5. Asia,Pacific
+419,Norway,International,6. Europe,Atlantic
+420,Oman,International,5. Asia,Pacific
+421,Pakistan,International,5. Asia,Pacific
+422,Palau,International,7. Oceania,Pacific
+423,Palestinian Territory,International,5. Asia,Pacific
+424,Panama,International,3. North America balance,AP
+425,Papua New Guinea,International,7. Oceania,Pacific
+426,Paraguay,International,8. South America,Atlantic
+427,Peru,International,8. South America,Pacific
+428,Philippines,International,5. Asia,Pacific
+429,Pitcairn,International,7. Oceania,Pacific
+430,Poland,International,6. Europe,Atlantic
+431,Portugal,International,6. Europe,Atlantic
+432,Qatar,International,5. Asia,Pacific
+433,R?union,International,4. Africa,Atlantic
+434,Romania,International,6. Europe,Atlantic
+435,Russian Federation,International,6. Europe,Atlantic
+436,Rwanda,International,4. Africa,Atlantic
+437,Saint Helena,International,4. Africa,Atlantic
+438,Saint Kitts and Nevis,International,3. North America balance,Atlantic
+439,Saint Lucia,International,3. North America balance,Atlantic
+440,Saint Vincent and the Grenadines,International,3. North America balance,Atlantic
+441,Samoa,International,7. Oceania,Pacific
+442,San Marino,International,6. Europe,Atlantic
+443,Sao Tome and Principe,International,4. Africa,Atlantic
+444,Saudi Arabia,International,5. Asia,Pacific
+445,Senegal,International,4. Africa,Atlantic
+446,Serbia,International,6. Europe,Atlantic
+447,Seychelles,International,4. Africa,Atlantic
+448,Sierra Leone,International,4. Africa,Atlantic
+449,Singapore,International,5. Asia,Pacific
+450,Sint Maarten,International,3. North America balance,Atlantic
+451,Slovakia,International,6. Europe,Atlantic
+452,Slovenia,International,6. Europe,Atlantic
+453,Solomon Islands,International,7. Oceania,Pacific
+454,Somalia,International,4. Africa,Atlantic
+455,South Africa,International,4. Africa,Atlantic
+456,South Korea,International,5. Asia,Pacific
+457,South Sudan,International,4. Africa,Atlantic
+458,Spain,International,6. Europe,Atlantic
+459,Sri Lanka,International,5. Asia,Pacific
+460,Sudan,International,4. Africa,Atlantic
+461,Suriname,International,8. South America,Atlantic
+462,Swaziland,International,4. Africa,Atlantic
+463,Sweden,International,6. Europe,Atlantic
+464,Switzerland,International,6. Europe,Atlantic
+465,Syria,International,5. Asia,Pacific
+466,Tajikistan,International,5. Asia,Pacific
+467,Tanzania,International,4. Africa,Atlantic
+468,Thailand,International,5. Asia,Pacific
+469,The Former Yugoslav Republic of Macedonia,International,6. Europe,Atlantic
+470,Timor-Leste,International,5. Asia,Pacific
+471,Togo,International,4. Africa,Atlantic
+472,Tokelau,International,7. Oceania,Pacific
+473,Tonga,International,7. Oceania,Pacific
+474,Trinidad and Tobago,International,3. North America balance,Atlantic
+475,Tunisia,International,4. Africa,Atlantic
+476,Turkey,International,5. Asia,Pacific
+477,Turkmenistan,International,5. Asia,Pacific
+478,Turks and Caicos Islands,International,3. North America balance,Atlantic
+479,Tuvalu,International,7. Oceania,Pacific
+480,Uganda,International,4. Africa,Atlantic
+481,Ukraine,International,6. Europe,Atlantic
+482,United Arab Emirates,International,5. Asia,Pacific
+483,United Kingdom,International,6. Europe,Atlantic
+484,Uruguay,International,8. South America,Atlantic
+485,Uzbekistan,International,5. Asia,Pacific
+486,Vanuatu,International,7. Oceania,Pacific
+487,Venezuela,International,8. South America,Atlantic
+488,Vietnam,International,5. Asia,Pacific
+489,Yemen,International,5. Asia,Pacific
+490,Zambia,International,4. Africa,Atlantic
+491,Zimbabwe,International,4. Africa,Atlantic

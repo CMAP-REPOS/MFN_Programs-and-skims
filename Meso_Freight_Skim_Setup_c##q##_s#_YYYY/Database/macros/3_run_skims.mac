@@ -1,0 +1,347 @@
+~# 3_RUN_SKIMS.MAC
+~#   Craig Heither, last revised 08-21-2015
+~#   Lafayette Cruise, last revised 02-19-2016
+~#   Craig Heither, last revised 05-17-2017
+~#
+~#  ************************************************************************************************
+~#    Macro runs the Meso Freight Model mode skims.
+~#    [Borrowed heavily from CS's original macro MesoSkims.mac]
+~#
+~#    Revisions:
+~#      01-13-2015: To ensure that the rail carrier-specific skims do not allow access to unwanted zones by merely 
+~#                  traversing auxiliary links, a new temporary rail access/egress mode (c) is added for each carrier skim.
+~#                  This mode is only applied to auxiliary links directly connected to the service of the specific carrier. 
+~#
+~#      01-30-2015: Added a refinement to the rail carrier-specific access/egress link calculation: the initial link flag 
+~#                  (ul1) is applied only to links with actual rail carrier service for the specified mode.
+~#
+~#      08-21-2015: Revised truck skim procedures to store POE value in mf40. Previously mf40 stored truck skim distance but it is not 
+~#                  needed: the skims use a speed of 60 MPH so skimmed time and distance are equivalent.
+~#
+~#      02-19-2016: Added process to calculate domestic distances between zone pairs on the rail and highway networks.
+~#
+~#      06-14-2016: Heither, implement extended transit assignment testing to address connector-only paths. 
+~#
+~#      10-03-2016: Heither, add extra skim for Truck & Water to get linehaul distance.
+~#
+~#      05-17-2017: Heither, comment out Extended Transit Assignment test code and restore L. Cruise code blocks;
+~#                   implement rail skimming for non-CMAP dwell times; skim pipeline network
+~#
+~#      06-22-2017: Heither, add logistics node 140 inclusion flag; code to use triple-indexing to assign logistics node to rail
+~#                   pass-through trips
+~#
+~#  - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+~#    Must provide 3-digit scenario and logistics node 140 inclusion flag when submitting macro. 
+~#          %1% = 3-digit scenario
+~#          %2% = include logistics node 140? 0: no (input file to delete 140 connectors), 1: yes
+~# 	(e.g. "~<macros\3_run_skims.mac 100 0")
+~#
+~#  ************************************************************************************************
+~# =================================================================================================
+~#
+~z=%0%
+~+;~?!z=2;~$>error
+~#
+~+;s=%1%;~?e;~$>bad_scen
+~/ Scenario number argument is valid.
+~#
+~# ##########################################################
+~#     --- Set Path to Output Folder ---
+~t1=output_data
+~r1=600                / rail interchange wait time factor
+~r2=300                / rail interchange boarding time (minutes)
+~# ##########################################################
+~#
+~/
+~o|39
+~#
+~!if not exist %t1%\%1% (md %t1%\%1%)
+~!del %t1%\%1%\*.* /Q
+~#
+~# ______________________________________________
+~/ ## -- Run Skims -- ##
+~# ______________________________________________
+~#
+~#     --- Set Report ---
+~t2=reports\matrix_in.rpt
+~!if exist %t2% (del %t2%)
+reports=%t2%
+~#  -- Initialize Matrices --
+~+;3.12;7;y;q
+batchin=input_data\matrix.in
+~+;3.11;2
+~#
+~#
+~+;~y=%1%;~y+1
+~x=1
+~# =============================================================================
+~# KC removed rail loop 1/7/2025
+~# =============================================================================
+~# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+~/ ## -- %y%: Copy of Scenario %1% for Truck Skimming -- ##
+~+;s=%y%;~?e;~$>new
+~+;1.22;2;%y%;y;q
+~:new
+~+;1.22;3;%1%;%y%;Skim Network for Trucks;y;q
+~# ## -- Truck Skims -- ##
+~# ## -- store length in ul3 for vdf -- ##
+~+|2.41|1|y|ul3|length| |all|4|q
+~#
+~#   --- Store POEs in matrix mf40 ---
+~+|5.11|1|~?q=2|2|3|T|5|mf29|||mf31|n|6|@poe|+||mf40|n|1||||
+~+|5.21|2
+~#
+~# ## -- Domestic distance Skims - MF41 -- ##
+~+|5.11|1|~?q=2|2|3|T|5|mf29||||6|@domestic|+||mf41|n|1||||
+~+|5.21|2
+~#
+~# KC removed 1/7/25 Extras below to look at path variability 
+~# =============================================================================
+~y+1
+~/ ## -- %y%: Copy of Scenario %1% for Water Skimming -- ##
+~+;s=%y%;~?e;~$>new
+~+;1.22;2;%y%;y;q
+~:new
+~+;1.22;3;%1%;%y%;Skim Network for Inland Waterways;y;q
+~# ## -- Water Skims -- ##
+~# ## -- store length in ul3 for vdf -- ##
+~+|2.41|1|y|ul3|length| |all|4|q
+~#
+~#    - Temporarily add T to water links, then delete after asmt -
+~#   --- Modified 10-03-2016 to store Water linehaul dist in mf34 ---
+~+|2.41|1|y|mod|1|T|mod=W||y|q
+~+|5.11|1|~?q=2|2|3|W|5|mf29|||mf32|n|6|@lhdist|+||mf34|n|1||||
+~+|5.21|2
+~+|2.41|1|y|mod|2|T|mod=W||y|q
+~#
+~# -- Export list of Water Links: will be usd to address intrazonal water movements - 09-08-2017
+~t3=%t1%\%1%\waterlinks.txt
+~!if exist %t3% (del %t3%)
+batchout=%t3%
+~+;2.14;5;n; ;n;mod=W; ;q
+~#
+~# =============================================================================
+~y+8                / scenario
+~+;~r1=%1%;~r1+10
+~+;~r2=%1%;~r2+11
+~+;~r3=%1%;~r3+12
+~+;~r4=%1%;~r4+13
+~:pipeline_loop
+~/ ## -- Scenario %y%: Pipeline Skimming -- ##
+s=%y%
+~#
+~?y=%r1%
+~+;~t3=mf71;~t4=mf72;~t5=L
+~?y=%r2%
+~+;~t3=mf73;~t4=mf74;~t5=D
+~?y=%r3%
+~+;~t3=mf75;~t4=mf76;~t5=G
+~#
+~# ## -- store length in ul3 for vdf -- ##
+~+|2.41|1|y|ul3|length| |all|4|q
+~#    - Temporarily add T to pipeline links, then delete after asmt -
+~+|2.41|1|y|mod|1|T|mod=%t5%||y|q
+~+|5.11|1|~?q=2|2|3|T|5|mf29|||%t3%|n|6|@domestic|+||%t4%|n|1||||
+~+|5.21|2
+~## ~+|2.41|1|y|mod|2|T|mod=%t5%||y|q
+~#
+~+;~y+1;~x+1;~z+1
+~+;~?y<%r4%;~$pipeline_loop
+~#
+~#
+~# =============================================================================
+s=%1%
+~/ ## -- Scenario %s%: Integrated Rail Network Skimming -- ##
+~+;~t3=BUXNpnKae;~t4=mf61;~t5=mf62;~t6=mf63;~t7=mf64;~t8=mf65;~#     -- All Rail options;
+~#
+~# ## -- Rail Skims -- ##
+~#    - Apply boarding time to dampen transfers to reasonable levels
+~#       * since adding boarding time: use add'l options asmt to capture distance 
+~#    - Determine point-of-entry to use for final trip table -
+5.11
+2                 / fixed demand transit assignment
+~+|~?q=2|2        / new assignment if asmt already performed
+mf29              / Transit demand matrix
+                  / Matrix to hold transit times
+~+|%t5%|n         / Matrix to hold in-vehicle times, don't change header
+                  / Matrix to hold auxiliary transit times , don't change header
+                  / Matrix to hold total waiting times 
+                  / Matrix to hold first  waiting times 
+                  / Matrix to hold boarding times 
+~+|%t8%|n         / Matrix to hold average number of boardings									
+%t3%
+y                 / Compute aux time/in-vehicle time/boardings on a subset of active modes only?
+%t3%
+1                 / Source for effective headways:  1= actual line headways
+1                 / Source for boarding times:  1= same value for entire network
+%r2%              / Boarding time (mins)
+1                 / Source for wait time factors:  1= same value for entire network
+1                 / Wait time factor
+%r1%              / Wait time weight [, spread factor]
+                  / Auxiliary transit time weight		  
+                  / Boarding time weight					  
+y                 / Perform additional options assignment?
+                  / Additional boarding attribute
+len               / Additional in-vehicle attribute
+                  / Additional alighting  attribute
+len               / Additional auxiliary transit attribute
+1                 / Retained part of strategies: 1= Complete strategies
++                 / Path operator
+                  / Sub-strategy combination operator(average)
+                  / Lower, upper threshold for active strategies
+~+|%t4%|n         / Matrix to hold additional strategy attributes 						  
+                  / Matrix to hold active transit demand   				  
+~+|5.31|2
+~#
+~#    -- A second skim to flag CMAP pass-through routes --
+~+|5.11|2|~?q=2|2|mf29||||||| 
+~+|%t3%|1|1|%r2%|1|1|%r1%||
+~+|y||@poe|||1|+|||%t7%|n|
+~+|5.31|2
+~#
+~#    -- A third skim to flag non-CMAP dwell time routes --
+~+|5.11|2|~?q=2|2|mf29||||||| 
+~+|%t3%|1|1|%r2%|1|1|%r1%||
+~+|y||@rdwell|||1|.max.|||%t6%|n|
+~+|5.31|2
+~#
+~t8=mf66
+~#    -- A fourth skim to collect domestic distances on routes --
+~+|5.11|2|~?q=2|2|mf29||||||| 
+~+|%t3%|1|1|%r2%|1|1|%r1%||
+~+|y||@domestic||@domestic|1|+|||%t8%|n|
+~+|5.31|2
+~#
+~#
+~# ## -- Convert total boardings to transfers -- ##
+~t8=mf65
+3.21
+~+;1;y;%t8%;n;(%t8%.lt.20)*%t8%; ; ;n;2
+~+;1;y;%t8%;n;(%t8% - 1).max.0; ; ;n;2;q
+~#
+~:skip_allRail
+~# =============================================================================
+~/ ## -- Triple-Indexing to Assign Logistics Node to Rail Pass-Through Trips -- ##
+batchin=input_data\mo80.txt
+~+;3.11;2
+~#
+~y=%2%
+~t2=151,399
+~+;~?!y=0;~$>run_LogNode140
+~# ## -- OPTION 1: Triple-Indexing excluding LogNode 140 -- ##
+3.23
+1             ~/ compute triple-index operation
+mf61          ~/ First operand matrix
++
+mf61          ~/ Second operand matrix 
+n             ~/ do not use transpose 
++             ~/ masking operator
+n             ~/ Same masking value for all intermediate zones?
+mo80          ~/ rail yard masking operator/cost
+ 
+.min.         ~/ contraction operator
+ 
+mf80          ~/ rail yard used
+n 
+y             ~/ submatrix
+%t2%          ~/ origin zones
+ 
+147,150       ~/ intermediate zones
+ 
+%t2%          ~/ destination zones
+  
+  
+n
+q
+~$>skip_LogNode140
+~#
+~# ## -- OPTION 2: Triple-Indexing including LogNode 140 -- ##
+~:run_LogNode140
+3.23
+1             ~/ compute triple-index operation
+mf61          ~/ First operand matrix
++
+mf61          ~/ Second operand matrix 
+n             ~/ do not use transpose 
++             ~/ masking operator
+n             ~/ Same masking value for all intermediate zones?
+mo80          ~/ rail yard masking operator/cost
+ 
+.min.         ~/ contraction operator
+ 
+mf80          ~/ rail yard used
+n 
+y             ~/ submatrix
+%t2%          ~/ origin zones
+ 
+140
+147,150       
+ 
+%t2%          ~/ destination zones
+  
+  
+n
+q
+~:skip_LogNode140
+~#
+~#
+~# =============================================================================
+~# ______________________________________________
+~/ ## -- Output Data -- ##
+~# ______________________________________________
+~#
+~#  -- Output Centroid Connector Distances --
+batchout=%t1%\%1%\CCdist.txt
+~+|2.41|1|n|len||i=1,399||3|q
+~#
+~#
+~#  -- Configure Matrix Output --
+~+|3.14|4|2|9,2|n|1|50,10|9,2|4|y|q
+~#
+~#
+~#  -- Batchout skim matrices --
+~+|batchout=%t1%/%1%/mf29.in||3.14|3|mf29|mf29|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf31.in||3.14|3|mf31|mf31|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf32.in||3.14|3|mf32|mf32|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf33.in||3.14|3|mf33|mf33|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf34.in||3.14|3|mf34|mf34|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf40.in||3.14|3|mf40|mf40|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf41.in||3.14|3|mf41|mf41|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf61.in||3.14|3|mf61|mf61|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf62.in||3.14|3|mf62|mf62|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf63.in||3.14|3|mf63|mf63|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf64.in||3.14|3|mf64|mf64|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf65.in||3.14|3|mf65|mf65|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf66.in||3.14|3|mf66|mf66|0,9999999,in|n|n|n|q
+~+|batchout=%t1%/%1%/mf80.in||3.14|3|mf80|mf80|0,9999999,in|n|n|y|%t2%| |%t2%| |q
+~#
+~#  ============================================================================
+~# ## -- Run SAS program to verify no connector-to-connecttor paths are being used -- ##
+~!"C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" macros/verify_rail_service -sysparm %1%
+~!if exist verify_rail_service.log (del verify_rail_service.log /Q)
+~#
+~#  ============================================================================
+~#
+~$>end
+~#
+~:error
+~/
+~/ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/   SUBMIT WITH 3-DIGIT SCENARIO & LOGISTICS NODE 140 INCLUSION FLAG !!!!!!
+~/ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~$>end
+~#
+~:bad_scen
+~/
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/   3-DIGIT SCENARIO DOES NOT MATCH EMMEBANK DATA!!!!!!!
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/
+~:end
+~o=6
+reports=
+batchin=
+batchout=
+~/ -- end of macro --
+q
+

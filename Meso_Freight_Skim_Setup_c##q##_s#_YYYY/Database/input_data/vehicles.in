@@ -1,0 +1,13 @@
+c Emme Module:    2.02(v5158)  Date: 11-04-25 13:02   User: E652/CSI.......msu
+c Project:        CMAP Mesoscale Freight Prototype v.08                       
+c Scenario    4:  Copy 3 Sat Morn #2                                          
+t vehicles init
+a   1 'BNSF      ' B      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   2 'UP        ' U      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   3 'CSXT      ' X      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   4 'NS        ' N      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   5 'KCMex     ' K      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   6 'CP        ' p      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   7 'CN        ' n      1     1     1   0.00   0.00   0.00   0.00   0.00
+a   8 'ShortLine ' s      1     1     1   0.00   0.00   0.00   0.00   0.00
+

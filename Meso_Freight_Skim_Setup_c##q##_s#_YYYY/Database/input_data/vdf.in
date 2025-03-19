@@ -1,0 +1,7 @@
+c Emme Module:    4.14(v5158)  Date: 11-04-22 15:38   User: E652/CSI.......msu
+c Project:        CMAP Mesoscale Freight Prototype v.08                       
+t  functions  init
+a fd10 =ul3
+a fd11 =ul3
+a ft10 =length*us1
+

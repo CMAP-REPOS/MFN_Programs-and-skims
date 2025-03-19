@@ -1,0 +1,391 @@
+
+~# ANALYZE_MODE_ACCESS.MAC
+~#   Craig Heither, last revised 08-21-2015
+~#
+~#  ************************************************************************************************
+~#    This macro skims the Meso Freight model network to check for inaccesssible zones for each transport mode:
+~#      - trucks
+~#      - water
+~#      - BNSF rail
+~#      - UP rail
+~#      - CSX rail
+~#      - NS rail
+~#      - CP rail
+~#      - CN rail
+~#      - KCS rail
+~#
+~#
+~#    Skims are run on temporary scenario 45.
+~#      - Time skims are temporarily stored in mf45 (overwritten for each mode).
+~#      - Distance skims are temporarily stored in mf46 (overwritten for each mode).
+~#      - Zones with no mode access are flagged in mo46 (overwritten for each mode).
+~#      - All temporary scenarios and matrices are deleted.
+~#
+~#
+~#    During processsing, the following zones do not exist in the network and are ignored:
+~#      - Zone 140: unused logistics node (if a scenario includes this node, the macro will need revision)
+~#      - Zone 179: Honolulu, HI MSA FAF zone
+~#      - Zone 180: Hawaii remainder FAF zone
+~#      - Zone 182: entire CMAP region (parts of FAF zones 171,181,551,559), not used with Mesozone setup
+~#      -- with the additions of Alaska (154), Canada (310) and Mexico (399) there are 271 total mesozones included in the network
+~#
+~#
+~#    Output Files:
+~#      - one file summarizes the number of zones connected to each origin for each mode
+~#      - for each mode, a detailed file is written listing each connected origin-destination zone pair
+~#
+~#
+~#    Revisions:
+~#      01-07-2015: The truck/water skimming logic was revised to account for intrazonal pairs and zonal disconnects
+~#                  both receiving a zero in the distance skims. True zonal disconnects are now flagged appropriately.   
+~#
+~#      01-13-2015: To ensure that the rail carrier-specific skims do not allow access to unwanted zones by merely 
+~#                  traversing auxiliary links, a new temporary rail access/egress mode (c) is added for each carrier skim.
+~#                  This mode is only applied to auxiliary links directly connected to the service of the specific carrier.    
+~#
+~#      01-30-2015: Added a refinement to the rail carrier-specific access/egress link calculation: the initial link flag 
+~#                  (ul1) is applied only to links with actual rail carrier service for the specified mode.
+~#
+~#      08-21-2015: Modified procedures to account for the additions of Alaska (154), Canada (310) and Mexico (399) to the MFN.
+~#
+~#
+~#  - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+~#    Must provide 3-digit scenario when submitting macro. 
+~# 	(e.g. "~<macros\analyze_mode_access.mac 100 ")
+~#
+~#  ************************************************************************************************
+~# =================================================================================================
+~#
+~z=%0%
+~+;~?!z=1;~$>error
+~#
+~+;s=%1%;~?e;~$>bad_scen
+~/ --> Scenario number argument is valid.
+~#
+~o|39
+~#**********************************************************************
+~#  Set files.
+~#**********************************************************************
+~r2=45                              /* storage matrix and skim scenario
+~+;~x=%r2%;~x+1
+~t5=reports\mode.skim.rpt
+~t6=reports\mode.access.results.rpt
+~!if exist %t5% (del %t5%)
+~!if exist %t6% (del %t6%)
+reports=%t5%
+~#
+~#
+~#**********************************************************************
+~#  Make temporary network copy for skimming.
+~#**********************************************************************
+1.22
+~+;2;%r2%
+~?e
+~+; ;~$>ready
+yes
+~:ready
+~+;3;%s%;%r2%;temp network for mode skimming;yes;q
+~#
+~#
+~#**********************************************************************
+~#  Start loop.
+~#**********************************************************************
+~z=1
+~t4=T
+~#
+~# =============================================================================
+~:startloop
+~t1=mf%x%
+~#
+~# -- Set Mode Attributes --
+~?z=2
+~+;~t4=W;~# -- Water;
+~?z=3
+~+;~t4=B;~# -- BNSF;
+~?z=4
+~+;~t4=U;~# -- UP;
+~?z=5
+~+;~t4=X;~# -- CSX;
+~?z=6
+~+;~t4=N;~# -- NS;
+~?z=7
+~+;~t4=p;~# -- CP;
+~?z=8
+~+;~t4=n;~# -- CN;
+~?z=9
+~+;~t4=K;~# -- KCS;
+~#
+~t2=%t4%time
+~t7=%t4%dist
+~#
+~#
+~#**********************************************************************
+~#  Initialize time and distance matrices and inaccessible zone matrix.
+~#   Create dummy demand matrix for assignment.
+~#**********************************************************************
+3.21
+~+;1;y;mf%r2%;y;%t2%;skim time - class %t4%;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;%t1%;y;%t7%;skim distance - class %t4%;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;mf1;y;jnk1;transit times;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;mf2;y;jnk2;in-vehicle times;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;mf3;y;jnk3;aux transit times;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;mo%x%;y;%t4%nacc;mode %t4% no access;~?q=1;y;0;0; ; ;n;1;
+~+;1;y;ms%r2%;y;dummy;dummy asmt demand;~?q=1;y;1;1; ; ;1;q
+~#
+~#
+~#**********************************************************************
+~#  Direct mode to appropriate skim procedures.
+~#**********************************************************************
+~# ## -- Truck -> run hwy skim --
+~+;~?z=1;~$>hwyskim
+~#
+~#
+~# ## -- Rail Carriers -> run transit skim --
+~+;~?z>2;~$>railskim
+~#
+~#
+~# ## -- Water -> add mode T (because W is auto auxiliary) then run hwy skim --
+~+;2.41;1;y;mod;1;T;mod=W; ;y;q
+~#
+~#
+~#**********************************************************************
+~#  Setup highway assignment.
+~#**********************************************************************
+~:hwyskim
+5.11
+1          / fixed demand auto assignment
+~+;~?q=2;2 / Do a new assignment (option 2) if there is one present
+3          / option 3 = multiclass asmt
+%t4%       / mode used by primary class
+5          / assign additional demand
+ms%r2%     / dummy matrix for assignment
+           / no veh occupancy matrix
+           / no additional demand matrix
+mf%r2%     / matrix to hold travel times  
+no         / don't change header
+4          / source for additional attrib = len
++          / path operator = addition
+           / threshold = none
+%t1%       / matrix to hold addl attrib (distance)   
+no         / don't change header
+1          / type of OD attrib = addl path attrib
+           / blank for no class 2 mode
+0          / number of iters
+           / default relative gap
+           / default normalized gap
+~#
+~#**********************************************************************
+~/  Run Highway Skim - scenario %s%, mode %t4%
+~#**********************************************************************
+~+;5.22;1;2
+~#
+~#
+~# ## -- Special Calculation for Highway Skim Results: Flag Values [evaluate to 1 (access) or 2 (no access)] --
+~# ##  --- In distance skims, intrazonal pairs and zonal disconnects are both represented by zero. This calculation
+~# ##  --- flags the true disconnects and ignores intrazonal movements.  Start be storing skimmed distance in mf1.
+3.21
+~+;1;y;mf1;y;jnk1;skimmed hwy dist;~?q=1;y;0;mf%x%; ; ;n;1;
+~+;1;y;mf%x%;y;%t7%;%t4% zone with no mode access;~?q=1;y;0;(p.ne.q)+(mf1.eq.0); ; ;n;1;q; /** set flag to 1/2
+~+;3.21;1;y;mf1;y;jnk1;connected zones mode %t4%;~?q=1;y;0;(mf%x%.eq.1); ; ;n;1;q;         /** flag connected zones
+~#
+~$>skiprail
+~#
+~#
+~#**********************************************************************
+~#  Setup transit assignment.
+~#**********************************************************************
+~:railskim
+~#
+~# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+~# ## -- Assign temporary mode c to auxiliary links connected to Carrier-Specific Rail Links -- ##
+2.41
+~# -- Calculate Link Flag for Specific Carrier 
+~+;1;y;ul1;0; ;all;4
+~+;1;y;ul1;(hdwy.gt.0); ;2;mod=%t4%; ;mod=%t4%; ;4
+~# -- Transfer Flag Value to Node
+~+;1;y;uj1;0; ;2;all;4
+~+;1;y;uj1;ul1; ;2;all;4
+~# -- Transfer Flag Value to Auxiliary Links
+~+;1;y;ul2;(typ.eq.5 .or. typ.eq.8).and.(ui1.eq.1 .or. uj1.eq.1); ;all;2;2
+~# -- Add temporary mode c: Carrier-specific Auxiliary 
+~+;1;y;mod;1;c;ul2=1; ;y;q
+~# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+~#
+~#
+5.11
+2          / fixed demand transit assignment
+~+;~?q=2;2 / Do a new assignment (option 2) if there is one present
+ms%r2%     / dummy matrix for assignment
+mf1        / matrix to hold transit times
+n          / do not change matrix header information
+mf2        / matrix to hold in-vehicle times
+n          / do not change matrix header information
+mf3        / matrix to hold auxiliary transit times
+n          / do not change matrix header information
+           / do not store total waiting times
+           / do not store first waiting times
+           / do not store boarding times
+           / do not store average number of boardings, next line: active transit and auxiliary modes
+%t4%c
+y          / compute aux. transit time,in-veh time,boardings on a subset of modes?, next line: modes subset
+%t4%c
+1          / source for effective headways: 1=actual line headways
+1          / source for boarding times: 1=same value for entire network
+.01        / boarding time (minutes)
+1          / source for wait time factors: 1=same value for entire network
+.01        / wait time factor
+           / wait time weight
+           / auxiliary transit time weight
+           / boarding time weight
+y          / perform additional options assignment?
+           / additional boarding attribute
+@poe       / additional in-vehicle attribute
+           / additional alighting attribute
+           / additional auxiliary transit attribute
+1          / retained part of strategies: 1=complete strategies
++          / path operator
+           / sub-strategy combination operator (default=average)       
+           / lower,upper thresholds for active strategies
+%t1%       / matrix to hold additional strategy attributes
+n          / do not change matrix header information
+           / do not store active transit demand
+~#
+~#**********************************************************************
+~/  Run Transit Skim - scenario %s%, mode %t4%
+~#**********************************************************************
+~+;5.31;2
+~#
+~#
+~# ## -- Remove temporary mode c -- ##
+~+;2.41;1;y;mod;2;c;all;y;q
+~#
+~# ## -- Special Calculation for Transit Skim Results: Flag Values [evaluate to 1 (access) or 2 (no access)] in mf%x% --
+~# ##  --- Put final access values in mf1.
+~+;3.21;1;y;mf%x%;y;%t7%;%t4% zone access;~?q=1;y;0;(mf1.le.9999)+(mf1.gt.9999)*2; ; ;n;1;q; /** set flag to 1/2
+~+;3.21;1;y;mf1;y;jnk1;connected zones mode %t4%;~?q=1;y;0;(mf%x%.eq.1); ; ;n;1;q;           /** flag connected zones
+~#
+~#
+~#**********************************************************************
+~#  Loop over data to find connected zones - mode %t4%
+~#    Store Distance Skim Matrix Data in Scalar Matrix
+~#**********************************************************************
+~:skiprail
+~y=1
+~r3=0   /* Flag for first call to output file by mode
+~t3=reports\mode_%t4%.txt
+~!if exist %t3% (del %t3%)
+~#
+~#
+~:not_connected
+~#
+~+;3.21;1;y;ms%x%;y;acc;connected zones;~?q=1;y;0;mf1; ; ;y;%y%; ;all;+;+;1;q
+~#
+~r1=%msx%
+~r5=%msx%  / store total zones origin connected to for mode
+~# ## -- Write Report of Number of Zones Connected to Origin Mesozone --
+~?r3=0
+~+;~>>%t6%;~"Mode %t4% zone summary:;~"Origin,Number of Connected Zones;~>
+~+;~>>%t6%;~"%y%,%msx%;~>
+~#
+~# ## -- Write Detailed Report of Zones Connected to Origin Mesozone (do not write if zone is connected to all other zones) --
+~?r3=0
+~+;~>>%t3%;~"Origin,Destination;~>
+~#
+~r3=1
+~#
+~r4=1
+~# ## -- If Origin Zone Connected to ALL Zones or only 1 Zone (i.e., itself), skip to next Origin Zone (do not write out detail) -- ##
+~+;~?r1=271;~$>next_y
+~+;~?r1=1;~$>next_y
+~#
+~# -- ========================================================================== --
+~r6=0  / counter of accessible zones processed for origin
+~#
+~:report_detail
+~#
+~# ## -- Skip reporting intrazonal pairs, Increment Counter --
+~?y=%r4%
+~+;~r6+1;~$>next_one
+~#
+~/ -- Mode %t4%: Origin %y%, Destination %r4% --
+~+;3.21;1;y;ms%x%;y;acc;connected zones;~?q=1;y;0;mf1; ; ;y;%y%; ;%r4%; ;+;+;1;q
+~r1=%msx%
+~+;~?r1=0;~$>next_one
+~#
+~r6+1
+~+;~>>%t3%;~"%y%,%r4%;~>
+~#
+~+;~?r6=%r5%;~$>next_y
+~#
+~:next_one
+~#
+~#  ## Iterate Counter
+~r4+1
+~#
+~# ## -- Skip Non-existent Zones --
+~+;~?r4=140;~r4+1
+~+;~?r4=179;~r4+2
+~+;~?r4=182;~r4+1
+~+;~?r4=274;~r4+36
+~+;~?r4=311;~r4+88
+~#
+~+;~?r4<400;~$report_detail
+~# -- ========================================================================== --
+~#
+~#
+~:next_y
+~y+1
+~#
+~# ## -- Skip Non-existent Zones --
+~+;~?y=140;~y+1
+~+;~?y=179;~y+2
+~+;~?y=182;~y+1
+~+;~?y=274;~y+36
+~+;~?y=311;~y+88
+~#
+~+;~?y<400;~$not_connected
+~#
+~#
+~#********************************************************************** 
+~#  Increment counter and check for more modes to skim.
+~#**********************************************************************
+~# ## -- Next line prevents Mode N file from being deleted when mode n is run --
+~+;~?z=6;~!"copy %t3% reports\mode_%t4%S.txt /y"
+~#
+~z+1
+~+;~?z<10;~$startloop
+~#
+~# =============================================================================
+~#
+~#
+~#**********************************************************************
+~#  Delete Temporary Scenario %r2% and Reset Matrices
+~#**********************************************************************
+s=%1%
+~+;1.22;2;%r2%;yes;q
+~/
+~/ -- Reset Matrices to Initial Condition --
+batchin=input_data\matrix.in
+~+;3.11;2
+~#
+~#
+~$>end
+~#
+~:error
+~/ +++++++++++++++++++++++++++++++++++++++
+~/   SUBMIT WITH 3-DIGIT SCENARIO!!!!!!!
+~/ +++++++++++++++++++++++++++++++++++++++
+~$>end
+~#
+~:bad_scen
+~/
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/   3-DIGIT SCENARIO DOES NOT MATCH EMMEBANK DATA!!!!!!!
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/
+~:end
+~o=6
+batchin=
+reports=
+~/ -- end of macro --
+

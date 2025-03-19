@@ -1,0 +1,138 @@
+
+~# 1_REMOVE_OLD_SCENARIOS.MAC
+~#   Craig Heither, last revised 08-21-2015
+~#
+~#  ************************************************************************************************
+~#    This macro deletes a range of old scenarios from the Meso Freight model setup. The following
+~#    are deleted:
+~#      - The range of scenarios entered (inclusive).
+~#      - The folder output_data\<scenario>.
+~#      - The folder output_data\shapefiles\Scenario_<scenario>.
+~#      - The file reports\build_scenario_<scenario>.rpt.
+~#      - The file reports\skim_scenario_<scenario>.rpt.
+~#      - The folder SAS\outputs\<scenario>.
+~#      - The matrix directory is initialized.
+~#
+~#    A range of scenarios must be provided: they can be the same number but the second argument
+~#    cannot be lower than the first.
+~#
+~#    Revisions
+~#      08-21-2015: Added code to initialize all matrices to avoid confusion about whether they were still relevant.
+~#              
+~#
+~#  - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+~#    Must provide a lower 3-digit scenario and an upper 3-digit scenario when submitting macro. 
+~# 	(e.g. "~<macros\1_remove_old_scenarios.mac 100 112 ")
+~#
+~#  ************************************************************************************************
+~# =================================================================================================
+~#
+~z=%0%
+~+;~?!z=2;~$>error
+~#
+~y=%1%
+~z=%2%
+~+;~?z<%y%;~$>too_low
+~#
+~z+1
+~x=%1%
+~#
+~o|39
+~#
+~#
+~#**********************************************************************
+~#  Confirm User really wants to proceed.
+~#**********************************************************************
+~#+;~t2=~*This will delete scenarios and output data, do you really want to proceed (y/n)?;~t2=%%%t2.1%%%;~?t2=n;~$>stop
+~#
+~#
+~#**********************************************************************
+~#  Just to be safe, create an empty scenario.
+~#**********************************************************************
+1.22
+~+;2;1;~?e
+~+; ;q;~$>next
+yes
+q
+~:next
+~+;1.22;1;1;empty scenario;n;q
+~#
+~#
+~#**********************************************************************
+~#  Initialize all Matrices.
+~#**********************************************************************
+~+;3.12;7;y;q
+~#
+~#
+~#**********************************************************************
+~#  Start loop.
+~#**********************************************************************
+~:startloop
+~#
+~# ## -- Delete Scenario -- ##
+1.22
+~+;2;%x%;~?e
+~+; ;q;~$>next
+yes
+q
+~:next
+~#
+~#
+~# ## -- Delete Output_data folder -- ##
+~t1=output_data\%x%
+~!if exist %t1%\nul (rmdir %t1% /S /Q)
+~#
+~#
+~# ## -- Delete Output_data\shapefiles\Scenario folder -- ##
+~t1=output_data\shapefiles\Scenario_%x%
+~!if exist %t1%\nul (rmdir %t1% /S /Q)
+~#
+~#
+~# ## -- Delete reports\build_scenario file -- ##
+~t1=reports\build_scenario_%x%.rpt
+~!if exist %t1% (del %t1%)
+~#
+~#
+~# ## -- Delete reports\skim_scenario file -- ##
+~t1=reports\skim_scenario_%x%.rpt
+~!if exist %t1% (del %t1%)
+~#
+~#
+~# ## -- Delete SAS\outputs\Scenario folder -- ##
+~t1=SAS\outputs\%x%
+~!if exist %t1%\nul (rmdir %t1% /S /Q)
+~#
+~#
+~x+1
+~+;~?x<%z%;~$startloop
+~# =================================================================================================
+~#
+~$>end
+~#
+~:error
+~/
+~/ +++++++++++++++++++++++++++++++++++++++
+~/   SUBMIT WITH A RANGE OF SCENARIOS!!!
+~/ +++++++++++++++++++++++++++++++++++++++
+~$>end
+~#
+~#
+~:too_low
+~/
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/   THE SECOND ARGUMENT MUST BE LARGER THAN THE FIRST!!!
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~$>end
+~#
+~#
+~:stop
+~/
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/   MACRO DID NOT EXECUTE!!!
+~/ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+~/
+~:end
+~o=6
+~/ -- end of macro --
+q
+

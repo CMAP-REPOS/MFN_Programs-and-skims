@@ -1,0 +1,23 @@
+c Emme Module:    2.01(v15120)  Date: 2015JA13 10:00   User: E170/CMAP......cmh
+c Project:        Meso Freight Network    
+c Heither, 01-13-2015: revised Meso modes (c added, w dropped, R/s/i not used)    
+c Heither, 05-17-2017: added pipeline modes (as auxiliary since only 1 auto mode allowed)                                     
+t modes init
+a T 'Truck     ' 1   1   0.00   0.00   0.00   0.00
+a R 'Rail      ' 2   2
+a B 'BNSF      ' 2   3
+a U 'UP        ' 2   4
+a X 'CSXT      ' 2   3
+a N 'NS        ' 2   4
+a p 'CP        ' 2   5
+a n 'CN        ' 2   6
+a K 'KCMex     ' 2   2
+a s 'ShortLine ' 2   4
+a i 'IMXChassis' 2   1
+a a 'AccessMode' 3   7   1.00   1.00   1.00   1.00        60.00
+a e 'EgressMode' 3   7   1.00   1.00   1.00   1.00        60.00
+a c 'Railconnct' 3   7   1.00   1.00   1.00   1.00        60.00
+a W 'W         ' 4   1
+a L 'CrudeOilPi' 4   1
+a D 'PetroPrdPi' 4   2
+a G 'CoalNecPi' 4   1

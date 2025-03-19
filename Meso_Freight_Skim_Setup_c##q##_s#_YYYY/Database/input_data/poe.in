@@ -1,0 +1,31 @@
+c Heither, 07-31-2015
+c Cazzato, 01-07-2025: Updated truck POE to zn17 system
+c This assigns unique codes to nodes that serve as transitions between the CMAP and National networks. 
+c These can be used in the skimming process to identify the specific highway and rail entry/exit points for zonal interchanges. 
+c node @poecd rail/truck
+694 1 R
+696 2 R
+698 4 R
+699 8 R
+700 16 R
+701 32 R
+702 64 R
+704 128 R
+705 256 R
+709 512 R
+710 1024 R
+711 2048 R
+717 4096 R
+721 8192 R
+722 16384 R
+723 32768 R
+3634 1 T
+3636 2 T
+3639 4 T
+3640 8 T
+3641 16 T
+3642 32 T
+3643 64 T
+3644 128 T
+3647 256 T
+3648 512 T

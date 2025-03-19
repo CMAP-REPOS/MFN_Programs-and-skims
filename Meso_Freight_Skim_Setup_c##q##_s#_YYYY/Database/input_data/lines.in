@@ -1,0 +1,4269 @@
+c MESO FREIGHT RAIL ITINERARY BATCHIN FILE
+c 12DEC18
+c us1 holds segment travel time, us2 holds zone fare
+c Heither, 02-08-2019: 766-765 manually added to 'N128ENat' & 'N128WNat'
+t lines init
+a 'B01ENa'   B   1   0.01   60   B01ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=19.31  us2=0
+    dwt=0.01   793   ttf=10   us1=6.77   us2=0
+               606   lay=3
+a 'B01WNa'   B   1   0.01   60   B01WNa
+  path=no
+    dwt=0.01   606   ttf=10   us1=6.77   us2=0
+    dwt=0.01   793   ttf=10   us1=19.31  us2=0
+               795   lay=3
+a 'B02ENa'   B   1   0.01   60   B02ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=15.35  us2=0
+               623   lay=3
+a 'B02WNa'   B   1   0.01   60   B02WNa
+  path=no
+    dwt=0.01   623   ttf=10   us1=15.35  us2=0
+               795   lay=3
+a 'B03ENa'   B   1   0.01   60   B03ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=6.78   us2=0
+               632   lay=3
+a 'B03WNa'   B   1   0.01   60   B03WNa
+  path=no
+    dwt=0.01   632   ttf=10   us1=6.78   us2=0
+               795   lay=3
+a 'B04ENa'   B   1   0.01   60   B04ENa
+  path=no
+    dwt=0.01   615   ttf=10   us1=21.15  us2=0
+               806   lay=3
+a 'B04WNa'   B   1   0.01   60   B04WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=21.15  us2=0
+               615   lay=3
+a 'B05ENa'   B   1   0.01   60   B05ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=3.68   us2=0
+               674   lay=3
+a 'B05WNa'   B   1   0.01   60   B05WNa
+  path=no
+    dwt=0.01   674   ttf=10   us1=3.68   us2=0
+               806   lay=3
+a 'B06ENa'   B   1   0.01   60   B06ENa
+  path=no
+    dwt=0.01   614   ttf=10   us1=1.55   us2=0
+               615   lay=3
+a 'B06WNa'   B   1   0.01   60   B06WNa
+  path=no
+    dwt=0.01   615   ttf=10   us1=1.55   us2=0
+               614   lay=3
+a 'B109ENat'   B   1   0.01   60   B109ENat
+  path=no
+    dwt=0.01   788   ttf=10   us1=1.16   us2=0
+    dwt=0.01   818   ttf=10   us1=1.08   us2=0
+    dwt=0.01   820   ttf=10   us1=0.61   us2=0
+               787   lay=3
+a 'B109WNat'   B   1   0.01   60   B109WNat
+  path=no
+    dwt=0.01   787   ttf=10   us1=0.61   us2=0
+    dwt=0.01   820   ttf=10   us1=1.08   us2=0
+    dwt=0.01   818   ttf=10   us1=1.16   us2=0
+               788   lay=3
+a 'B110ENat'   B   1   0.01   60   B110ENat
+  path=no
+    dwt=0.01   679   ttf=10   us1=4.12   us2=0
+               718   lay=3
+a 'B110WNat'   B   1   0.01   60   B110WNat
+  path=no
+    dwt=0.01   718   ttf=10   us1=4.12   us2=0
+               679   lay=3
+a 'B112ENat'   B   1   0.01   60   B112ENat
+  path=no
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+    dwt=0.01   719   ttf=10   us1=0.34   us2=0
+               718   lay=3
+a 'B112WNat'   B   1   0.01   60   B112WNat
+  path=no
+    dwt=0.01   718   ttf=10   us1=0.34   us2=0
+    dwt=0.01   719   ttf=10   us1=3.27   us2=0
+               714   lay=3
+a 'B114ENat'   B   1   0.01   60   B114ENat
+  path=no
+    dwt=0.01   670   ttf=10   us1=1.46   us2=0
+    dwt=0.01   669   ttf=10   us1=2.99   us2=0
+               687   lay=3
+a 'B114WNat'   B   1   0.01   60   B114WNat
+  path=no
+    dwt=0.01   687   ttf=10   us1=2.99   us2=0
+    dwt=0.01   669   ttf=10   us1=1.46   us2=0
+               670   lay=3
+a 'B115ENat'   B   1   0.01   60   B115ENat
+  path=no
+    dwt=0.01   607   ttf=10   us1=0.65   us2=0
+               602   lay=3
+a 'B115WNat'   B   1   0.01   60   B115WNat
+  path=no
+    dwt=0.01   602   ttf=10   us1=0.65   us2=0
+               607   lay=3
+a 'B116ENat'   B   1   0.01   60   B116ENat
+  path=no
+    dwt=0.01   838   ttf=10   us1=1.89   us2=0
+               651   lay=3
+a 'B116WNat'   B   1   0.01   60   B116WNat
+  path=no
+    dwt=0.01   651   ttf=10   us1=1.89   us2=0
+               838   lay=3
+a 'B117ENat'   B   1   0.01   60   B117ENat
+  path=no
+    dwt=0.01   612   ttf=10   us1=0.5    us2=0
+               842   lay=3
+a 'B117WNat'   B   1   0.01   60   B117WNat
+  path=no
+    dwt=0.01   842   ttf=10   us1=0.5    us2=0
+               612   lay=3
+a 'B118ENat'   B   1   0.01   60   B118ENat
+  path=no
+    dwt=0.01   613   ttf=10   us1=0.25   us2=0
+               620   lay=3
+a 'B118WNat'   B   1   0.01   60   B118WNat
+  path=no
+    dwt=0.01   620   ttf=10   us1=0.25   us2=0
+               613   lay=3
+a 'B119ENat'   B   1   0.01   60   B119ENat
+  path=no
+    dwt=0.01   846   ttf=10   us1=0.26   us2=0
+               627   lay=3
+a 'B119WNat'   B   1   0.01   60   B119WNat
+  path=no
+    dwt=0.01   627   ttf=10   us1=0.26   us2=0
+               846   lay=3
+a 'B120ENat'   B   1   0.01   60   B120ENat
+  path=no
+    dwt=0.01   834   ttf=10   us1=0.59   us2=0
+               642   lay=3
+a 'B120WNat'   B   1   0.01   60   B120WNat
+  path=no
+    dwt=0.01   642   ttf=10   us1=0.59   us2=0
+               834   lay=3
+a 'B121ENat'   B   1   0.01   60   B121ENat
+  path=no
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+               656   lay=3
+a 'B121WNat'   B   1   0.01   60   B121WNat
+  path=no
+    dwt=0.01   656   ttf=10   us1=3.3    us2=0
+               642   lay=3
+a 'B122ENat'   B   1   0.01   60   B122ENat
+  path=no
+    dwt=0.01   832   ttf=10   us1=0.31   us2=0
+               668   lay=3
+a 'B122WNat'   B   1   0.01   60   B122WNat
+  path=no
+    dwt=0.01   668   ttf=10   us1=0.31   us2=0
+               832   lay=3
+a 'B123ENat'   B   1   0.01   60   B123ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'B123WNat'   B   1   0.01   60   B123WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'B124ENat'   B   1   0.01   60   B124ENat
+  path=no
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+               716   lay=3
+a 'B124WNat'   B   1   0.01   60   B124WNat
+  path=no
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+               715   lay=3
+a 'B126ENat'   B   1   0.01   60   B126ENat
+  path=no
+    dwt=0.01   848   ttf=10   us1=0.03   us2=0
+               658   lay=3
+a 'B126WNat'   B   1   0.01   60   B126WNat
+  path=no
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               848   lay=3
+a 'B127ENat'   B   1   0.01   60   B127ENat
+  path=no
+    dwt=0.01   660   ttf=10   us1=2.76   us2=0
+               670   lay=3
+a 'B127WNat'   B   1   0.01   60   B127WNat
+  path=no
+    dwt=0.01   670   ttf=10   us1=2.76   us2=0
+               660   lay=3
+a 'B128ENat'   B   1   0.01   60   B128ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'B128WNat'   B   1   0.01   60   B128WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'B34ENa'   B   1   0.01   60   B34ENa
+  path=no
+    dwt=0.01   606   ttf=10   us1=1.51   us2=0
+               608   lay=3
+a 'B34WNa'   B   1   0.01   60   B34WNa
+  path=no
+    dwt=0.01   608   ttf=10   us1=1.51   us2=0
+               606   lay=3
+a 'B35ENa'   B   1   0.01   60   B35ENa
+  path=no
+    dwt=0.01   627   ttf=10   us1=9.55   us2=0
+    dwt=0.01   649   ttf=10   us1=1.22   us2=0
+               659   lay=3
+a 'B35WNa'   B   1   0.01   60   B35WNa
+  path=no
+    dwt=0.01   659   ttf=10   us1=1.22   us2=0
+    dwt=0.01   649   ttf=10   us1=9.55   us2=0
+               627   lay=3
+a 'B37ENa'   B   1   0.01   60   B37ENa
+  path=no
+    dwt=0.01   602   ttf=10   us1=6.75   us2=0
+    dwt=0.01   608   ttf=10   us1=0.23   us2=0
+    dwt=0.01   609   ttf=10   us1=6.98   us2=0
+    dwt=0.01   787   ttf=10   us1=7.54   us2=0
+    dwt=0.01   625   ttf=10   us1=4.06   us2=0
+    dwt=0.01   628   ttf=10   us1=0.03   us2=0
+    dwt=0.01   630   ttf=10   us1=8.99   us2=0
+    dwt=0.01   658   ttf=10   us1=0.1    us2=0
+    dwt=0.01   663   ttf=10   us1=0      us2=0
+    dwt=0.01   664   ttf=10   us1=0.16   us2=0
+    dwt=0.01   666   ttf=10   us1=4.15   us2=0
+    dwt=0.01   678   ttf=10   us1=0.16   us2=0
+    dwt=0.01   681   ttf=10   us1=0.62   us2=0
+    dwt=0.01   692   ttf=10   us1=0.8    us2=0
+               702   lay=3
+a 'B37WNa'   B   1   0.01   60   B37WNa
+  path=no
+    dwt=0.01   702   ttf=10   us1=0.8    us2=0
+    dwt=0.01   692   ttf=10   us1=0.62   us2=0
+    dwt=0.01   681   ttf=10   us1=0.16   us2=0
+    dwt=0.01   678   ttf=10   us1=4.15   us2=0
+    dwt=0.01   666   ttf=10   us1=0.16   us2=0
+    dwt=0.01   664   ttf=10   us1=0      us2=0
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   658   ttf=10   us1=8.99   us2=0
+    dwt=0.01   630   ttf=10   us1=0.03   us2=0
+    dwt=0.01   628   ttf=10   us1=4.06   us2=0
+    dwt=0.01   625   ttf=10   us1=7.54   us2=0
+    dwt=0.01   787   ttf=10   us1=6.98   us2=0
+    dwt=0.01   609   ttf=10   us1=0.23   us2=0
+    dwt=0.01   608   ttf=10   us1=6.75   us2=0
+               602   lay=3
+a 'B42ENa'   B   1   0.01   60   B42ENa
+  path=no
+    dwt=0.01   602   ttf=10   us1=0.85   us2=0
+    dwt=0.01   603   ttf=10   us1=0.88   us2=0
+    dwt=0.01   604   ttf=10   us1=12.72  us2=0
+    dwt=0.01   621   ttf=10   us1=0.63   us2=0
+    dwt=0.01   620   ttf=10   us1=9.8    us2=0
+               627   lay=3
+a 'B42WNa'   B   1   0.01   60   B42WNa
+  path=no
+    dwt=0.01   627   ttf=10   us1=9.8    us2=0
+    dwt=0.01   620   ttf=10   us1=0.63   us2=0
+    dwt=0.01   621   ttf=10   us1=12.72  us2=0
+    dwt=0.01   604   ttf=10   us1=0.88   us2=0
+    dwt=0.01   603   ttf=10   us1=0.85   us2=0
+               602   lay=3
+a 'B46ENa'   B   1   0.01   60   B46ENa
+  path=no
+    dwt=0.01   610   ttf=10   us1=0.98   us2=0
+    dwt=0.01   614   ttf=10   us1=5.19   us2=0
+    dwt=0.01   616   ttf=10   us1=1.2    us2=0
+    dwt=0.01   617   ttf=10   us1=0.73   us2=0
+    dwt=0.01   618   ttf=10   us1=14.23  us2=0
+    dwt=0.01   636   ttf=10   us1=3.58   us2=0
+    dwt=0.01   647   ttf=10   us1=4.22   us2=0
+    dwt=0.01   671   ttf=10   us1=0.17   us2=0
+    dwt=0.01   672   ttf=10   us1=0.2    us2=0
+    dwt=0.01   673   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   680   ttf=10   us1=0.5    us2=0
+    dwt=0.01   686   ttf=10   us1=0.72   us2=0
+               698   lay=3
+a 'B46WNa'   B   1   0.01   60   B46WNa
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.72   us2=0
+    dwt=0.01   686   ttf=10   us1=0.5    us2=0
+    dwt=0.01   680   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   673   ttf=10   us1=0.2    us2=0
+    dwt=0.01   672   ttf=10   us1=0.17   us2=0
+    dwt=0.01   671   ttf=10   us1=4.22   us2=0
+    dwt=0.01   647   ttf=10   us1=3.58   us2=0
+    dwt=0.01   636   ttf=10   us1=14.23  us2=0
+    dwt=0.01   618   ttf=10   us1=0.73   us2=0
+    dwt=0.01   617   ttf=10   us1=1.2    us2=0
+    dwt=0.01   616   ttf=10   us1=5.19   us2=0
+    dwt=0.01   614   ttf=10   us1=0.98   us2=0
+               610   lay=3
+a 'B48ENa'   B   1   0.01   60   B48ENa
+  path=no
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+    dwt=0.01   659   ttf=10   us1=0.01   us2=0
+               661   lay=3
+a 'B48WNa'   B   1   0.01   60   B48WNa
+  path=no
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   659   ttf=10   us1=0.03   us2=0
+               658   lay=3
+a 'B50ENa'   B   1   0.01   60   B50ENa
+  path=no
+    dwt=0.01   604   ttf=10   us1=10.42  us2=0
+    dwt=0.01   611   ttf=10   us1=0      us2=0
+    dwt=0.01   612   ttf=10   us1=4.79   us2=0
+               616   lay=3
+a 'B50WNa'   B   1   0.01   60   B50WNa
+  path=no
+    dwt=0.01   616   ttf=10   us1=4.79   us2=0
+    dwt=0.01   612   ttf=10   us1=0      us2=0
+    dwt=0.01   611   ttf=10   us1=10.42  us2=0
+               604   lay=3
+a 'B51ENa'   B   1   0.01   60   B51ENa
+  path=no
+    dwt=0.01   610   ttf=10   us1=4.52   us2=0
+               611   lay=3
+a 'B51WNa'   B   1   0.01   60   B51WNa
+  path=no
+    dwt=0.01   611   ttf=10   us1=4.52   us2=0
+               610   lay=3
+a 'B54ENa'   B   1   0.01   60   B54ENa
+  path=no
+    dwt=0.01   617   ttf=10   us1=10.21  us2=0
+    dwt=0.01   626   ttf=10   us1=9.15   us2=0
+    dwt=0.01   629   ttf=10   us1=2.71   us2=0
+               627   lay=3
+a 'B54WNa'   B   1   0.01   60   B54WNa
+  path=no
+    dwt=0.01   627   ttf=10   us1=2.71   us2=0
+    dwt=0.01   629   ttf=10   us1=9.15   us2=0
+    dwt=0.01   626   ttf=10   us1=10.21  us2=0
+               617   lay=3
+a 'B55ENa'   B   1   0.01   60   B55ENa
+  path=no
+    dwt=0.01   629   ttf=10   us1=3.92   us2=0
+    dwt=0.01   638   ttf=10   us1=2.05   us2=0
+    dwt=0.01   646   ttf=10   us1=0.86   us2=0
+    dwt=0.01   650   ttf=10   us1=2.53   us2=0
+    dwt=0.01   670   ttf=10   us1=2.69   us2=0
+               678   lay=3
+a 'B55WNa'   B   1   0.01   60   B55WNa
+  path=no
+    dwt=0.01   678   ttf=10   us1=2.69   us2=0
+    dwt=0.01   670   ttf=10   us1=2.53   us2=0
+    dwt=0.01   650   ttf=10   us1=0.86   us2=0
+    dwt=0.01   646   ttf=10   us1=2.05   us2=0
+    dwt=0.01   638   ttf=10   us1=3.92   us2=0
+               629   lay=3
+a 'B56ENa'   B   1   0.01   60   B56ENa
+  path=no
+    dwt=0.01   681   ttf=10   us1=2.14   us2=0
+    dwt=0.01   689   ttf=10   us1=1.17   us2=0
+    dwt=0.01   684   ttf=10   us1=1.47   us2=0
+    dwt=0.01   695   ttf=10   us1=2.88   us2=0
+    dwt=0.01   676   ttf=10   us1=1.51   us2=0
+    dwt=0.01   685   ttf=10   us1=3.11   us2=0
+    dwt=0.01   715   ttf=10   us1=1.42   us2=0
+               718   lay=3
+a 'B56WNa'   B   1   0.01   60   B56WNa
+  path=no
+    dwt=0.01   718   ttf=10   us1=1.42   us2=0
+    dwt=0.01   715   ttf=10   us1=3.11   us2=0
+    dwt=0.01   685   ttf=10   us1=1.51   us2=0
+    dwt=0.01   676   ttf=10   us1=2.88   us2=0
+    dwt=0.01   695   ttf=10   us1=1.47   us2=0
+    dwt=0.01   684   ttf=10   us1=1.17   us2=0
+    dwt=0.01   689   ttf=10   us1=2.14   us2=0
+               681   lay=3
+a 'B57ENa'   B   1   0.01   60   B57ENa
+  path=no
+    dwt=0.01   681   ttf=10   us1=0      us2=0
+    dwt=0.01   682   ttf=10   us1=1.33   us2=0
+    dwt=0.01   687   ttf=10   us1=0.26   us2=0
+               686   lay=3
+a 'B57WNa'   B   1   0.01   60   B57WNa
+  path=no
+    dwt=0.01   686   ttf=10   us1=0.26   us2=0
+    dwt=0.01   687   ttf=10   us1=1.33   us2=0
+    dwt=0.01   682   ttf=10   us1=0      us2=0
+               681   lay=3
+a 'B58ENa'   B   1   0.01   60   B58ENa
+  path=no
+    dwt=0.01   682   ttf=10   us1=0.73   us2=0
+    dwt=0.01   690   ttf=10   us1=0.37   us2=0
+               699   lay=3
+a 'B58WNa'   B   1   0.01   60   B58WNa
+  path=no
+    dwt=0.01   699   ttf=10   us1=0.37   us2=0
+    dwt=0.01   690   ttf=10   us1=0.73   us2=0
+               682   lay=3
+a 'B59ENa'   B   1   0.01   60   B59ENa
+  path=no
+    dwt=0.01   628   ttf=10   us1=5.63   us2=0
+    dwt=0.01   641   ttf=10   us1=0.02   us2=0
+    dwt=0.01   642   ttf=10   us1=2.14   us2=0
+    dwt=0.01   639   ttf=10   us1=0.74   us2=0
+    dwt=0.01   644   ttf=10   us1=1.81   us2=0
+    dwt=0.01   645   ttf=10   us1=0.53   us2=0
+               648   lay=3
+a 'B59WNa'   B   1   0.01   60   B59WNa
+  path=no
+    dwt=0.01   648   ttf=10   us1=0.53   us2=0
+    dwt=0.01   645   ttf=10   us1=1.81   us2=0
+    dwt=0.01   644   ttf=10   us1=0.74   us2=0
+    dwt=0.01   639   ttf=10   us1=2.14   us2=0
+    dwt=0.01   642   ttf=10   us1=0.02   us2=0
+    dwt=0.01   641   ttf=10   us1=5.63   us2=0
+               628   lay=3
+a 'B60ENa'   B   1   0.01   60   B60ENa
+  path=no
+    dwt=0.01   648   ttf=10   us1=2.38   us2=0
+    dwt=0.01   668   ttf=10   us1=3.79   us2=0
+               683   lay=3
+a 'B60WNa'   B   1   0.01   60   B60WNa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.79   us2=0
+    dwt=0.01   668   ttf=10   us1=2.38   us2=0
+               648   lay=3
+a 'B61ENa'   B   1   0.01   60   B61ENa
+  path=no
+    dwt=0.01   627   ttf=10   us1=7.54   us2=0
+               630   lay=3
+a 'B61WNa'   B   1   0.01   60   B61WNa
+  path=no
+    dwt=0.01   630   ttf=10   us1=7.54   us2=0
+               627   lay=3
+a 'B62ENa'   B   1   0.01   60   B62ENa
+  path=no
+    dwt=0.01   623   ttf=10   us1=3.91   us2=0
+               625   lay=3
+a 'B62WNa'   B   1   0.01   60   B62WNa
+  path=no
+    dwt=0.01   625   ttf=10   us1=3.91   us2=0
+               623   lay=3
+a 'B63ENa'   B   1   0.01   60   B63ENa
+  path=no
+    dwt=0.01   641   ttf=10   us1=4.35   us2=0
+    dwt=0.01   651   ttf=10   us1=0.93   us2=0
+    dwt=0.01   653   ttf=10   us1=0.85   us2=0
+    dwt=0.01   662   ttf=10   us1=0.96   us2=0
+    dwt=0.01   657   ttf=10   us1=1.27   us2=0
+    dwt=0.01   655   ttf=10   us1=0.69   us2=0
+               658   lay=3
+a 'B63WNa'   B   1   0.01   60   B63WNa
+  path=no
+    dwt=0.01   658   ttf=10   us1=0.69   us2=0
+    dwt=0.01   655   ttf=10   us1=1.27   us2=0
+    dwt=0.01   657   ttf=10   us1=0.96   us2=0
+    dwt=0.01   662   ttf=10   us1=0.85   us2=0
+    dwt=0.01   653   ttf=10   us1=0.93   us2=0
+    dwt=0.01   651   ttf=10   us1=4.35   us2=0
+               641   lay=3
+a 'B69ENa'   B   1   0.01   60   B69ENa
+  path=no
+    dwt=0.01   646   ttf=10   us1=3.44   us2=0
+    dwt=0.01   660   ttf=10   us1=0.01   us2=0
+               661   lay=3
+a 'B69WNa'   B   1   0.01   60   B69WNa
+  path=no
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   660   ttf=10   us1=3.44   us2=0
+               646   lay=3
+a 'B70ENa'   B   1   0.01   60   B70ENa
+  path=no
+    dwt=0.01   650   ttf=10   us1=0.69   us2=0
+    dwt=0.01   652   ttf=10   us1=6.57   us2=0
+               672   lay=3
+a 'B70WNa'   B   1   0.01   60   B70WNa
+  path=no
+    dwt=0.01   672   ttf=10   us1=6.57   us2=0
+    dwt=0.01   652   ttf=10   us1=0.69   us2=0
+               650   lay=3
+a 'B71ENa'   B   1   0.01   60   B71ENa
+  path=no
+    dwt=0.01   674   ttf=10   us1=4.9    us2=0
+               671   lay=3
+a 'B71WNa'   B   1   0.01   60   B71WNa
+  path=no
+    dwt=0.01   671   ttf=10   us1=4.9    us2=0
+               674   lay=3
+a 'B72ENa'   B   1   0.01   60   B72ENa
+  path=no
+    dwt=0.01   626   ttf=10   us1=10.07  us2=0
+               647   lay=3
+a 'B72WNa'   B   1   0.01   60   B72WNa
+  path=no
+    dwt=0.01   647   ttf=10   us1=10.07  us2=0
+               626   lay=3
+a 'B73ENa'   B   1   0.01   60   B73ENa
+  path=no
+    dwt=0.01   632   ttf=10   us1=2.26   us2=0
+    dwt=0.01   637   ttf=10   us1=1.37   us2=0
+    dwt=0.01   643   ttf=10   us1=2.4    us2=0
+               648   lay=3
+a 'B73WNa'   B   1   0.01   60   B73WNa
+  path=no
+    dwt=0.01   648   ttf=10   us1=2.4    us2=0
+    dwt=0.01   643   ttf=10   us1=1.37   us2=0
+    dwt=0.01   637   ttf=10   us1=2.26   us2=0
+               632   lay=3
+a 'B74ENa'   B   1   0.01   60   B74ENa
+  path=no
+    dwt=0.01   634   ttf=10   us1=0.13   us2=0
+    dwt=0.01   635   ttf=10   us1=2.52   us2=0
+               644   lay=3
+a 'B74WNa'   B   1   0.01   60   B74WNa
+  path=no
+    dwt=0.01   644   ttf=10   us1=2.52   us2=0
+    dwt=0.01   635   ttf=10   us1=0.13   us2=0
+               634   lay=3
+a 'B76ENa'   B   1   0.01   60   B76ENa
+  path=no
+    dwt=0.01   631   ttf=10   us1=3.3    us2=0
+               642   lay=3
+a 'B76WNa'   B   1   0.01   60   B76WNa
+  path=no
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+               631   lay=3
+a 'B78ENa'   B   1   0.01   60   B78ENa
+  path=no
+    dwt=0.01   662   ttf=10   us1=4.5    us2=0
+    dwt=0.01   676   ttf=10   us1=1.96   us2=0
+    dwt=0.01   675   ttf=10   us1=2.45   us2=0
+    dwt=0.01   665   ttf=10   us1=0.85   us2=0
+    dwt=0.01   656   ttf=10   us1=0.69   us2=0
+    dwt=0.01   667   ttf=10   us1=2.97   us2=0
+               668   lay=3
+a 'B78WNa'   B   1   0.01   60   B78WNa
+  path=no
+    dwt=0.01   668   ttf=10   us1=2.97   us2=0
+    dwt=0.01   667   ttf=10   us1=0.69   us2=0
+    dwt=0.01   656   ttf=10   us1=0.85   us2=0
+    dwt=0.01   665   ttf=10   us1=2.45   us2=0
+    dwt=0.01   675   ttf=10   us1=1.96   us2=0
+    dwt=0.01   676   ttf=10   us1=4.5    us2=0
+               662   lay=3
+a 'B81ECma'   B   1   0.01   60   B81ECma
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.2    us2=0
+    dwt=0.01   905   ttf=10   us1=0.04   us2=0
+    dwt=0.01   907   ttf=10   us1=0.31   us2=0
+    dwt=0.01   914   ttf=10   us1=0.44   us2=0
+    dwt=0.01   919   ttf=10   us1=0.03   us2=0
+    dwt=0.01   920   ttf=10   us1=0.06   us2=0
+    dwt=0.01   925   ttf=10   us1=0.33   us2=0
+    dwt=0.01   946   ttf=10   us1=0.07   us2=0
+    dwt=0.01   954   ttf=10   us1=0.04   us2=0
+    dwt=0.01   960   ttf=10   us1=0.05   us2=0
+    dwt=0.01   975   ttf=10   us1=0.04   us2=0
+    dwt=0.01   986   ttf=10   us1=0.01   us2=0
+    dwt=0.01   992   ttf=10   us1=0      us2=0
+    dwt=0.01   995   ttf=10   us1=0.02   us2=0
+               997   lay=3
+a 'B81WCma'   B   1   0.01   60   B81WCma
+  path=no
+    dwt=0.01   997   ttf=10   us1=0.02   us2=0
+    dwt=0.01   995   ttf=10   us1=0      us2=0
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   986   ttf=10   us1=0.04   us2=0
+    dwt=0.01   975   ttf=10   us1=0.05   us2=0
+    dwt=0.01   960   ttf=10   us1=0.04   us2=0
+    dwt=0.01   954   ttf=10   us1=0.07   us2=0
+    dwt=0.01   946   ttf=10   us1=0.33   us2=0
+    dwt=0.01   925   ttf=10   us1=0.06   us2=0
+    dwt=0.01   920   ttf=10   us1=0.03   us2=0
+    dwt=0.01   919   ttf=10   us1=0.44   us2=0
+    dwt=0.01   914   ttf=10   us1=0.31   us2=0
+    dwt=0.01   907   ttf=10   us1=0.04   us2=0
+    dwt=0.01   905   ttf=10   us1=0.2    us2=0
+               698   lay=3
+a 'B82ECma'   B   1   0.01   60   B82ECma
+  path=no
+    dwt=0.01   699   ttf=10   us1=0.38   us2=0
+    dwt=0.01   909   ttf=10   us1=0.53   us2=0
+    dwt=0.01   917   ttf=10   us1=0.04   us2=0
+               919   lay=3
+a 'B82WCma'   B   1   0.01   60   B82WCma
+  path=no
+    dwt=0.01   919   ttf=10   us1=0.04   us2=0
+    dwt=0.01   917   ttf=10   us1=0.53   us2=0
+    dwt=0.01   909   ttf=10   us1=0.38   us2=0
+               699   lay=3
+a 'B83ECma'   B   1   0.01   60   B83ECma
+  path=no
+    dwt=0.01   702   ttf=10   us1=0.03   us2=0
+    dwt=0.01   913   ttf=10   us1=0.52   us2=0
+    dwt=0.01   921   ttf=10   us1=0.35   us2=0
+    dwt=0.01   929   ttf=10   us1=0.04   us2=0
+    dwt=0.01   930   ttf=10   us1=0.37   us2=0
+    dwt=0.01   949   ttf=10   us1=0.09   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+               976   lay=3
+a 'B83WCma'   B   1   0.01   60   B83WCma
+  path=no
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.09   us2=0
+    dwt=0.01   949   ttf=10   us1=0.37   us2=0
+    dwt=0.01   930   ttf=10   us1=0.04   us2=0
+    dwt=0.01   929   ttf=10   us1=0.35   us2=0
+    dwt=0.01   921   ttf=10   us1=0.52   us2=0
+    dwt=0.01   913   ttf=10   us1=0.03   us2=0
+               702   lay=3
+a 'B84ECma'   B   1   0.01   60   B84ECma
+  path=no
+    dwt=0.01   911   ttf=10   us1=0.67   us2=0
+               917   lay=3
+a 'B84WCma'   B   1   0.01   60   B84WCma
+  path=no
+    dwt=0.01   917   ttf=10   us1=0.67   us2=0
+               911   lay=3
+a 'B85ECma'   B   1   0.01   60   B85ECma
+  path=no
+    dwt=0.01   920   ttf=10   us1=0.2    us2=0
+               926   lay=3
+a 'B85WCma'   B   1   0.01   60   B85WCma
+  path=no
+    dwt=0.01   926   ttf=10   us1=0.2    us2=0
+               920   lay=3
+a 'B86ECma'   B   1   0.01   60   B86ECma
+  path=no
+    dwt=0.01   925   ttf=10   us1=0.19   us2=0
+    dwt=0.01   927   ttf=10   us1=0.14   us2=0
+               930   lay=3
+a 'B86WCma'   B   1   0.01   60   B86WCma
+  path=no
+    dwt=0.01   930   ttf=10   us1=0.14   us2=0
+    dwt=0.01   927   ttf=10   us1=0.19   us2=0
+               925   lay=3
+a 'B88ECma'   B   1   0.01   60   B88ECma
+  path=no
+    dwt=0.01   946   ttf=10   us1=0.04   us2=0
+    dwt=0.01   949   ttf=10   us1=0.03   us2=0
+    dwt=0.01   953   ttf=10   us1=0.09   us2=0
+    dwt=0.01   955   ttf=10   us1=0.07   us2=0
+    dwt=0.01   971   ttf=10   us1=0.03   us2=0
+               983   lay=3
+a 'B88WCma'   B   1   0.01   60   B88WCma
+  path=no
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   971   ttf=10   us1=0.07   us2=0
+    dwt=0.01   955   ttf=10   us1=0.09   us2=0
+    dwt=0.01   953   ttf=10   us1=0.03   us2=0
+    dwt=0.01   949   ttf=10   us1=0.04   us2=0
+               946   lay=3
+a 'B89ECma'   B   1   0.01   60   B89ECma
+  path=no
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.01   us2=0
+               960   lay=3
+a 'B89WCma'   B   1   0.01   60   B89WCma
+  path=no
+    dwt=0.01   960   ttf=10   us1=0.01   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+               963   lay=3
+a 'B90ECma'   B   1   0.01   60   B90ECma
+  path=no
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+    dwt=0.01   982   ttf=10   us1=0.01   us2=0
+               981   lay=3
+a 'B90WCma'   B   1   0.01   60   B90WCma
+  path=no
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   982   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+               967   lay=3
+a 'B92ECma'   B   1   0.01   60   B92ECma
+  path=no
+    dwt=0.01   985   ttf=10   us1=0.03   us2=0
+    dwt=0.01   993   ttf=10   us1=0.01   us2=0
+    dwt=0.01   992   ttf=10   us1=0.03   us2=0
+               988   lay=3
+a 'B92WCma'   B   1   0.01   60   B92WCma
+  path=no
+    dwt=0.01   988   ttf=10   us1=0.03   us2=0
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   993   ttf=10   us1=0.03   us2=0
+               985   lay=3
+a 'K01ENa'   K   5   0.01   60   K01ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=6.78   us2=0
+               632   lay=3
+a 'K01WNa'   K   5   0.01   60   K01WNa
+  path=no
+    dwt=0.01   632   ttf=10   us1=6.78   us2=0
+               795   lay=3
+a 'K100ENat'   K   5   0.01   60   K100ENat
+  path=no
+    dwt=0.01   669   ttf=10   us1=2.99   us2=0
+               687   lay=3
+a 'K100WNat'   K   5   0.01   60   K100WNat
+  path=no
+    dwt=0.01   687   ttf=10   us1=2.99   us2=0
+               669   lay=3
+a 'K101ENat'   K   5   0.01   60   K101ENat
+  path=no
+    dwt=0.01   834   ttf=10   us1=0.59   us2=0
+               642   lay=3
+a 'K101WNat'   K   5   0.01   60   K101WNat
+  path=no
+    dwt=0.01   642   ttf=10   us1=0.59   us2=0
+               834   lay=3
+a 'K102ENat'   K   5   0.01   60   K102ENat
+  path=no
+    dwt=0.01   832   ttf=10   us1=0.31   us2=0
+               668   lay=3
+a 'K102WNat'   K   5   0.01   60   K102WNat
+  path=no
+    dwt=0.01   668   ttf=10   us1=0.31   us2=0
+               832   lay=3
+a 'K103ENat'   K   5   0.01   60   K103ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'K103WNat'   K   5   0.01   60   K103WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'K104ENat'   K   5   0.01   60   K104ENat
+  path=no
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+    dwt=0.01   719   ttf=10   us1=0.34   us2=0
+               718   lay=3
+a 'K104WNat'   K   5   0.01   60   K104WNat
+  path=no
+    dwt=0.01   718   ttf=10   us1=0.34   us2=0
+    dwt=0.01   719   ttf=10   us1=3.27   us2=0
+               714   lay=3
+a 'K105ENat'   K   5   0.01   60   K105ENat
+  path=no
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+               716   lay=3
+a 'K105WNat'   K   5   0.01   60   K105WNat
+  path=no
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+               715   lay=3
+a 'K106ENat'   K   5   0.01   60   K106ENat
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.11   us2=0
+               715   lay=3
+a 'K106WNat'   K   5   0.01   60   K106WNat
+  path=no
+    dwt=0.01   715   ttf=10   us1=3.11   us2=0
+               685   lay=3
+a 'K107ENat'   K   5   0.01   60   K107ENat
+  path=no
+    dwt=0.01   654   ttf=10   us1=3.05   us2=0
+               675   lay=3
+a 'K107WNat'   K   5   0.01   60   K107WNat
+  path=no
+    dwt=0.01   675   ttf=10   us1=3.05   us2=0
+               654   lay=3
+a 'K108ENat'   K   5   0.01   60   K108ENat
+  path=no
+    dwt=0.01   654   ttf=10   us1=1.97   us2=0
+               662   lay=3
+a 'K108WNat'   K   5   0.01   60   K108WNat
+  path=no
+    dwt=0.01   662   ttf=10   us1=1.97   us2=0
+               654   lay=3
+a 'K109ENat'   K   5   0.01   60   K109ENat
+  path=no
+    dwt=0.01   838   ttf=10   us1=1.89   us2=0
+               651   lay=3
+a 'K109WNat'   K   5   0.01   60   K109WNat
+  path=no
+    dwt=0.01   651   ttf=10   us1=1.89   us2=0
+               838   lay=3
+a 'K110ENat'   K   5   0.01   60   K110ENat
+  path=no
+    dwt=0.01   848   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               659   lay=3
+a 'K110WNat'   K   5   0.01   60   K110WNat
+  path=no
+    dwt=0.01   659   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               848   lay=3
+a 'K111ENat'   K   5   0.01   60   K111ENat
+  path=no
+    dwt=0.01   671   ttf=10   us1=0.17   us2=0
+               672   lay=3
+a 'K111WNat'   K   5   0.01   60   K111WNat
+  path=no
+    dwt=0.01   672   ttf=10   us1=0.17   us2=0
+               671   lay=3
+a 'K113ENat'   K   5   0.01   60   K113ENat
+  path=no
+    dwt=0.01   654   ttf=10   us1=0.82   us2=0
+    dwt=0.01   651   ttf=10   us1=0.93   us2=0
+    dwt=0.01   653   ttf=10   us1=0.85   us2=0
+               662   lay=3
+a 'K113WNat'   K   5   0.01   60   K113WNat
+  path=no
+    dwt=0.01   662   ttf=10   us1=0.85   us2=0
+    dwt=0.01   653   ttf=10   us1=0.93   us2=0
+    dwt=0.01   651   ttf=10   us1=0.82   us2=0
+               654   lay=3
+a 'K114ENat'   K   5   0.01   60   K114ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'K114WNat'   K   5   0.01   60   K114WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'K22ENa'   K   5   0.01   60   K22ENa
+  path=no
+    dwt=0.01   672   ttf=10   us1=0.2    us2=0
+    dwt=0.01   673   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   680   ttf=10   us1=0.5    us2=0
+               686   lay=3
+a 'K22WNa'   K   5   0.01   60   K22WNa
+  path=no
+    dwt=0.01   686   ttf=10   us1=0.5    us2=0
+    dwt=0.01   680   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   673   ttf=10   us1=0.2    us2=0
+               672   lay=3
+a 'K25ENa'   K   5   0.01   60   K25ENa
+  path=no
+    dwt=0.01   668   ttf=10   us1=3.79   us2=0
+               683   lay=3
+a 'K25WNa'   K   5   0.01   60   K25WNa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.79   us2=0
+               668   lay=3
+a 'K27ENa'   K   5   0.01   60   K27ENa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.29   us2=0
+    dwt=0.01   679   ttf=10   us1=3.7    us2=0
+               685   lay=3
+a 'K27WNa'   K   5   0.01   60   K27WNa
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.7    us2=0
+    dwt=0.01   679   ttf=10   us1=3.29   us2=0
+               683   lay=3
+a 'K30ENa'   K   5   0.01   60   K30ENa
+  path=no
+    dwt=0.01   652   ttf=10   us1=0.69   us2=0
+    dwt=0.01   650   ttf=10   us1=0.86   us2=0
+    dwt=0.01   646   ttf=10   us1=3.44   us2=0
+    dwt=0.01   660   ttf=10   us1=0.01   us2=0
+               661   lay=3
+a 'K30WNa'   K   5   0.01   60   K30WNa
+  path=no
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   660   ttf=10   us1=3.44   us2=0
+    dwt=0.01   646   ttf=10   us1=0.86   us2=0
+    dwt=0.01   650   ttf=10   us1=0.69   us2=0
+               652   lay=3
+a 'K31ENa'   K   5   0.01   60   K31ENa
+  path=no
+    dwt=0.01   649   ttf=10   us1=1.22   us2=0
+    dwt=0.01   659   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.1    us2=0
+    dwt=0.01   663   ttf=10   us1=0      us2=0
+               664   lay=3
+a 'K31WNa'   K   5   0.01   60   K31WNa
+  path=no
+    dwt=0.01   664   ttf=10   us1=0      us2=0
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   659   ttf=10   us1=1.22   us2=0
+               649   lay=3
+a 'K35ENa'   K   5   0.01   60   K35ENa
+  path=no
+    dwt=0.01   666   ttf=10   us1=4.56   us2=0
+    dwt=0.01   684   ttf=10   us1=1.17   us2=0
+    dwt=0.01   689   ttf=10   us1=0.39   us2=0
+               691   lay=3
+a 'K35WNa'   K   5   0.01   60   K35WNa
+  path=no
+    dwt=0.01   691   ttf=10   us1=0.39   us2=0
+    dwt=0.01   689   ttf=10   us1=1.17   us2=0
+    dwt=0.01   684   ttf=10   us1=4.56   us2=0
+               666   lay=3
+a 'K39ENa'   K   5   0.01   60   K39ENa
+  path=no
+    dwt=0.01   632   ttf=10   us1=2.26   us2=0
+    dwt=0.01   637   ttf=10   us1=1.37   us2=0
+    dwt=0.01   643   ttf=10   us1=1.47   us2=0
+    dwt=0.01   640   ttf=10   us1=1.4    us2=0
+    dwt=0.01   645   ttf=10   us1=0.53   us2=0
+    dwt=0.01   648   ttf=10   us1=2.38   us2=0
+    dwt=0.01   668   ttf=10   us1=2.97   us2=0
+    dwt=0.01   667   ttf=10   us1=0.69   us2=0
+    dwt=0.01   656   ttf=10   us1=0.85   us2=0
+    dwt=0.01   665   ttf=10   us1=3.31   us2=0
+    dwt=0.01   654   ttf=10   us1=1.97   us2=0
+    dwt=0.01   662   ttf=10   us1=0.96   us2=0
+    dwt=0.01   657   ttf=10   us1=1.82   us2=0
+    dwt=0.01   664   ttf=10   us1=0.16   us2=0
+    dwt=0.01   666   ttf=10   us1=4.15   us2=0
+    dwt=0.01   678   ttf=10   us1=0.16   us2=0
+    dwt=0.01   681   ttf=10   us1=0      us2=0
+    dwt=0.01   682   ttf=10   us1=1.33   us2=0
+    dwt=0.01   687   ttf=10   us1=0.26   us2=0
+    dwt=0.01   686   ttf=10   us1=0.72   us2=0
+               698   lay=3
+a 'K39WNa'   K   5   0.01   60   K39WNa
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.72   us2=0
+    dwt=0.01   686   ttf=10   us1=0.26   us2=0
+    dwt=0.01   687   ttf=10   us1=1.33   us2=0
+    dwt=0.01   682   ttf=10   us1=0      us2=0
+    dwt=0.01   681   ttf=10   us1=0.16   us2=0
+    dwt=0.01   678   ttf=10   us1=4.15   us2=0
+    dwt=0.01   666   ttf=10   us1=0.16   us2=0
+    dwt=0.01   664   ttf=10   us1=1.82   us2=0
+    dwt=0.01   657   ttf=10   us1=0.96   us2=0
+    dwt=0.01   662   ttf=10   us1=1.97   us2=0
+    dwt=0.01   654   ttf=10   us1=3.31   us2=0
+    dwt=0.01   665   ttf=10   us1=0.85   us2=0
+    dwt=0.01   656   ttf=10   us1=0.69   us2=0
+    dwt=0.01   667   ttf=10   us1=2.97   us2=0
+    dwt=0.01   668   ttf=10   us1=2.38   us2=0
+    dwt=0.01   648   ttf=10   us1=0.53   us2=0
+    dwt=0.01   645   ttf=10   us1=1.4    us2=0
+    dwt=0.01   640   ttf=10   us1=1.47   us2=0
+    dwt=0.01   643   ttf=10   us1=1.37   us2=0
+    dwt=0.01   637   ttf=10   us1=2.26   us2=0
+               632   lay=3
+a 'K41ENa'   K   5   0.01   60   K41ENa
+  path=no
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+               656   lay=3
+a 'K41WNa'   K   5   0.01   60   K41WNa
+  path=no
+    dwt=0.01   656   ttf=10   us1=3.3    us2=0
+               642   lay=3
+a 'K42ENa'   K   5   0.01   60   K42ENa
+  path=no
+    dwt=0.01   667   ttf=10   us1=3.64   us2=0
+    dwt=0.01   679   ttf=10   us1=4.12   us2=0
+               718   lay=3
+a 'K42WNa'   K   5   0.01   60   K42WNa
+  path=no
+    dwt=0.01   718   ttf=10   us1=4.12   us2=0
+    dwt=0.01   679   ttf=10   us1=3.64   us2=0
+               667   lay=3
+a 'K61ECma'   K   5   0.01   60   K61ECma
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.2    us2=0
+    dwt=0.01   905   ttf=10   us1=0.04   us2=0
+    dwt=0.01   907   ttf=10   us1=0.31   us2=0
+    dwt=0.01   914   ttf=10   us1=0.44   us2=0
+    dwt=0.01   919   ttf=10   us1=0.03   us2=0
+    dwt=0.01   920   ttf=10   us1=0.06   us2=0
+    dwt=0.01   925   ttf=10   us1=0.33   us2=0
+    dwt=0.01   946   ttf=10   us1=0.07   us2=0
+    dwt=0.01   954   ttf=10   us1=0.04   us2=0
+    dwt=0.01   960   ttf=10   us1=0.01   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+               968   lay=3
+a 'K61WCma'   K   5   0.01   60   K61WCma
+  path=no
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.01   us2=0
+    dwt=0.01   960   ttf=10   us1=0.04   us2=0
+    dwt=0.01   954   ttf=10   us1=0.07   us2=0
+    dwt=0.01   946   ttf=10   us1=0.33   us2=0
+    dwt=0.01   925   ttf=10   us1=0.06   us2=0
+    dwt=0.01   920   ttf=10   us1=0.03   us2=0
+    dwt=0.01   919   ttf=10   us1=0.44   us2=0
+    dwt=0.01   914   ttf=10   us1=0.31   us2=0
+    dwt=0.01   907   ttf=10   us1=0.04   us2=0
+    dwt=0.01   905   ttf=10   us1=0.2    us2=0
+               698   lay=3
+a 'K62ECma'   K   5   0.01   60   K62ECma
+  path=no
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   978   ttf=10   us1=0.02   us2=0
+               985   lay=3
+a 'K62WCma'   K   5   0.01   60   K62WCma
+  path=no
+    dwt=0.01   985   ttf=10   us1=0.02   us2=0
+    dwt=0.01   978   ttf=10   us1=0.02   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+               967   lay=3
+a 'N01ENa'   N   4   0.01   60   N01ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=13.31  us2=0
+    dwt=0.01   810   ttf=10   us1=5.23   us2=0
+               762   lay=3
+a 'N01WNa'   N   4   0.01   60   N01WNa
+  path=no
+    dwt=0.01   762   ttf=10   us1=5.23   us2=0
+    dwt=0.01   810   ttf=10   us1=13.31  us2=0
+               806   lay=3
+a 'N02ENa'   N   4   0.01   60   N02ENa
+  path=no
+    dwt=0.01   810   ttf=10   us1=6.86   us2=0
+               783   lay=3
+a 'N02WNa'   N   4   0.01   60   N02WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=6.86   us2=0
+               810   lay=3
+a 'N104ENat'   N   4   0.01   60   N104ENat
+  path=no
+    dwt=0.01   752   ttf=10   us1=0.46   us2=0
+               756   lay=3
+a 'N104WNat'   N   4   0.01   60   N104WNat
+  path=no
+    dwt=0.01   756   ttf=10   us1=0.46   us2=0
+               752   lay=3
+a 'N105ENat'   N   4   0.01   60   N105ENat
+  path=no
+    dwt=0.01   829   ttf=10   us1=0.58   us2=0
+               755   lay=3
+a 'N105WNat'   N   4   0.01   60   N105WNat
+  path=no
+    dwt=0.01   755   ttf=10   us1=0.58   us2=0
+               829   lay=3
+a 'N106ENat'   N   4   0.01   60   N106ENat
+  path=no
+    dwt=0.01   776   ttf=10   us1=0.28   us2=0
+               819   lay=3
+a 'N106WNat'   N   4   0.01   60   N106WNat
+  path=no
+    dwt=0.01   819   ttf=10   us1=0.28   us2=0
+               776   lay=3
+a 'N107ENat'   N   4   0.01   60   N107ENat
+  path=no
+    dwt=0.01   783   ttf=10   us1=1.16   us2=0
+               821   lay=3
+a 'N107WNat'   N   4   0.01   60   N107WNat
+  path=no
+    dwt=0.01   821   ttf=10   us1=1.16   us2=0
+               783   lay=3
+a 'N108ENat'   N   4   0.01   60   N108ENat
+  path=no
+    dwt=0.01   782   ttf=10   us1=0.53   us2=0
+    dwt=0.01   827   ttf=10   us1=0.93   us2=0
+    dwt=0.01   826   ttf=10   us1=0.72   us2=0
+    dwt=0.01   824   ttf=10   us1=0.52   us2=0
+               785   lay=3
+a 'N108WNat'   N   4   0.01   60   N108WNat
+  path=no
+    dwt=0.01   785   ttf=10   us1=0.52   us2=0
+    dwt=0.01   824   ttf=10   us1=0.72   us2=0
+    dwt=0.01   826   ttf=10   us1=0.93   us2=0
+    dwt=0.01   827   ttf=10   us1=0.53   us2=0
+               782   lay=3
+a 'N109ENat'   N   4   0.01   60   N109ENat
+  path=no
+    dwt=0.01   822   ttf=10   us1=0.85   us2=0
+    dwt=0.01   784   ttf=10   us1=2.56   us2=0
+    dwt=0.01   785   ttf=10   us1=0.42   us2=0
+    dwt=0.01   790   ttf=10   us1=0.27   us2=0
+    dwt=0.01   823   ttf=10   us1=0.4    us2=0
+               825   lay=3
+a 'N109WNat'   N   4   0.01   60   N109WNat
+  path=no
+    dwt=0.01   825   ttf=10   us1=0.4    us2=0
+    dwt=0.01   823   ttf=10   us1=0.27   us2=0
+    dwt=0.01   790   ttf=10   us1=0.42   us2=0
+    dwt=0.01   785   ttf=10   us1=2.56   us2=0
+    dwt=0.01   784   ttf=10   us1=0.85   us2=0
+               822   lay=3
+a 'N110ENat'   N   4   0.01   60   N110ENat
+  path=no
+    dwt=0.01   780   ttf=10   us1=0.39   us2=0
+    dwt=0.01   809   ttf=10   us1=0.44   us2=0
+               830   lay=3
+a 'N110WNat'   N   4   0.01   60   N110WNat
+  path=no
+    dwt=0.01   830   ttf=10   us1=0.44   us2=0
+    dwt=0.01   809   ttf=10   us1=0.39   us2=0
+               780   lay=3
+a 'N111ENat'   N   4   0.01   60   N111ENat
+  path=no
+    dwt=0.01   778   ttf=10   us1=0.57   us2=0
+    dwt=0.01   807   ttf=10   us1=0.48   us2=0
+               808   lay=3
+a 'N111WNat'   N   4   0.01   60   N111WNat
+  path=no
+    dwt=0.01   808   ttf=10   us1=0.48   us2=0
+    dwt=0.01   807   ttf=10   us1=0.57   us2=0
+               778   lay=3
+a 'N112ENat'   N   4   0.01   60   N112ENat
+  path=no
+    dwt=0.01   831   ttf=10   us1=0.14   us2=0
+               775   lay=3
+a 'N112WNat'   N   4   0.01   60   N112WNat
+  path=no
+    dwt=0.01   775   ttf=10   us1=0.14   us2=0
+               831   lay=3
+a 'N113ENat'   N   4   0.01   60   N113ENat
+  path=no
+    dwt=0.01   766   ttf=10   us1=2.03   us2=0
+    dwt=0.01   771   ttf=10   us1=1.38   us2=0
+               779   lay=3
+a 'N113WNat'   N   4   0.01   60   N113WNat
+  path=no
+    dwt=0.01   779   ttf=10   us1=1.38   us2=0
+    dwt=0.01   771   ttf=10   us1=2.03   us2=0
+               766   lay=3
+a 'N114ENat'   N   4   0.01   60   N114ENat
+  path=no
+    dwt=0.01   767   ttf=10   us1=1.77   us2=0
+    dwt=0.01   769   ttf=10   us1=0.29   us2=0
+               828   lay=3
+a 'N114WNat'   N   4   0.01   60   N114WNat
+  path=no
+    dwt=0.01   828   ttf=10   us1=0.29   us2=0
+    dwt=0.01   769   ttf=10   us1=1.77   us2=0
+               767   lay=3
+a 'N115ENat'   N   4   0.01   60   N115ENat
+  path=no
+    dwt=0.01   669   ttf=10   us1=1.46   us2=0
+               670   lay=3
+a 'N115WNat'   N   4   0.01   60   N115WNat
+  path=no
+    dwt=0.01   670   ttf=10   us1=1.46   us2=0
+               669   lay=3
+a 'N116ENat'   N   4   0.01   60   N116ENat
+  path=no
+    dwt=0.01   834   ttf=10   us1=0.59   us2=0
+               642   lay=3
+a 'N116WNat'   N   4   0.01   60   N116WNat
+  path=no
+    dwt=0.01   642   ttf=10   us1=0.59   us2=0
+               834   lay=3
+a 'N117ENat'   N   4   0.01   60   N117ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'N117WNat'   N   4   0.01   60   N117WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'N118ENat'   N   4   0.01   60   N118ENat
+  path=no
+    dwt=0.01   740   ttf=10   us1=0.69   us2=0
+               742   lay=3
+a 'N118WNat'   N   4   0.01   60   N118WNat
+  path=no
+    dwt=0.01   742   ttf=10   us1=0.69   us2=0
+               740   lay=3
+a 'N119ENat'   N   4   0.01   60   N119ENat
+  path=no
+    dwt=0.01   732   ttf=10   us1=0.27   us2=0
+               726   lay=3
+a 'N119WNat'   N   4   0.01   60   N119WNat
+  path=no
+    dwt=0.01   726   ttf=10   us1=0.27   us2=0
+               732   lay=3
+a 'N120ENat'   N   4   0.01   60   N120ENat
+  path=no
+    dwt=0.01   675   ttf=10   us1=1.96   us2=0
+               676   lay=3
+a 'N120WNat'   N   4   0.01   60   N120WNat
+  path=no
+    dwt=0.01   676   ttf=10   us1=1.96   us2=0
+               675   lay=3
+a 'N121ENat'   N   4   0.01   60   N121ENat
+  path=no
+    dwt=0.01   848   ttf=10   us1=0.03   us2=0
+               658   lay=3
+a 'N121WNat'   N   4   0.01   60   N121WNat
+  path=no
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               848   lay=3
+a 'N122ENat'   N   4   0.01   60   N122ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'N122WNat'   N   4   0.01   60   N122WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'N128ENat'   N   4   0.01   60   N128ENat
+  path=no
+    dwt=0.01   718   ttf=10   us1=2.48   us2=0
+    dwt=0.01   727   ttf=10   us1=6.64   us2=0
+    dwt=0.01   766   ttf=10   us1=0.06   us2=0	
+               765   lay=3
+a 'N128WNat'   N   4   0.01   60   N128WNat
+  path=no
+    dwt=0.01   765   ttf=10   us1=0.06   us2=0  
+    dwt=0.01   766   ttf=10   us1=6.64   us2=0
+    dwt=0.01   727   ttf=10   us1=2.48   us2=0
+               718   lay=3
+a 'N129ENat'   N   4   0.01   60   N129ENat
+  path=no
+    dwt=0.01   765   ttf=10   us1=2.78   us2=0
+               768   lay=3
+a 'N129WNat'   N   4   0.01   60   N129WNat
+  path=no
+    dwt=0.01   768   ttf=10   us1=2.78   us2=0
+               765   lay=3
+a 'N26ENa'   N   4   0.01   60   N26ENa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.29   us2=0
+    dwt=0.01   679   ttf=10   us1=4.12   us2=0
+    dwt=0.01   718   ttf=10   us1=2.49   us2=0
+    dwt=0.01   733   ttf=10   us1=0.23   us2=0
+    dwt=0.01   735   ttf=10   us1=3.08   us2=0
+    dwt=0.01   753   ttf=10   us1=1.24   us2=0
+    dwt=0.01   757   ttf=10   us1=1.56   us2=0
+    dwt=0.01   760   ttf=10   us1=1.85   us2=0
+    dwt=0.01   766   ttf=10   us1=0.06   us2=0
+    dwt=0.01   765   ttf=10   us1=2.7    us2=0
+    dwt=0.01   773   ttf=10   us1=0.29   us2=0
+    dwt=0.01   775   ttf=10   us1=1.19   us2=0
+    dwt=0.01   778   ttf=10   us1=1.04   us2=0
+    dwt=0.01   780   ttf=10   us1=0.89   us2=0
+    dwt=0.01   781   ttf=10   us1=2.88   us2=0
+    dwt=0.01   784   ttf=10   us1=0.37   us2=0
+    dwt=0.01   782   ttf=10   us1=3.1    us2=0
+               783   lay=3
+a 'N26WNa'   N   4   0.01   60   N26WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=3.1    us2=0
+    dwt=0.01   782   ttf=10   us1=0.37   us2=0
+    dwt=0.01   784   ttf=10   us1=2.88   us2=0
+    dwt=0.01   781   ttf=10   us1=0.89   us2=0
+    dwt=0.01   780   ttf=10   us1=1.04   us2=0
+    dwt=0.01   778   ttf=10   us1=1.19   us2=0
+    dwt=0.01   775   ttf=10   us1=0.29   us2=0
+    dwt=0.01   773   ttf=10   us1=2.7    us2=0
+    dwt=0.01   765   ttf=10   us1=0.06   us2=0
+    dwt=0.01   766   ttf=10   us1=1.85   us2=0
+    dwt=0.01   760   ttf=10   us1=1.56   us2=0
+    dwt=0.01   757   ttf=10   us1=1.24   us2=0
+    dwt=0.01   753   ttf=10   us1=3.08   us2=0
+    dwt=0.01   735   ttf=10   us1=0.23   us2=0
+    dwt=0.01   733   ttf=10   us1=2.49   us2=0
+    dwt=0.01   718   ttf=10   us1=4.12   us2=0
+    dwt=0.01   679   ttf=10   us1=3.29   us2=0
+               683   lay=3
+a 'N27ENa'   N   4   0.01   60   N27ENa
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.11   us2=0
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+    dwt=0.01   716   ttf=10   us1=2.12   us2=0
+    dwt=0.01   727   ttf=10   us1=5.19   us2=0
+    dwt=0.01   731   ttf=10   us1=0.31   us2=0
+    dwt=0.01   732   ttf=10   us1=2.14   us2=0
+    dwt=0.01   789   ttf=10   us1=1.09   us2=0
+    dwt=0.01   713   ttf=10   us1=0.89   us2=0
+    dwt=0.01   712   ttf=10   us1=0.63   us2=0
+    dwt=0.01   706   ttf=10   us1=1.14   us2=0
+               709   lay=3
+a 'N27WNa'   N   4   0.01   60   N27WNa
+  path=no
+    dwt=0.01   709   ttf=10   us1=1.14   us2=0
+    dwt=0.01   706   ttf=10   us1=0.63   us2=0
+    dwt=0.01   712   ttf=10   us1=0.89   us2=0
+    dwt=0.01   713   ttf=10   us1=1.09   us2=0
+    dwt=0.01   789   ttf=10   us1=2.14   us2=0
+    dwt=0.01   732   ttf=10   us1=0.31   us2=0
+    dwt=0.01   731   ttf=10   us1=5.19   us2=0
+    dwt=0.01   727   ttf=10   us1=2.12   us2=0
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+    dwt=0.01   715   ttf=10   us1=3.11   us2=0
+               685   lay=3
+a 'N28ENa'   N   4   0.01   60   N28ENa
+  path=no
+    dwt=0.01   736   ttf=10   us1=0.97   us2=0
+    dwt=0.01   737   ttf=10   us1=0.71   us2=0
+    dwt=0.01   746   ttf=10   us1=0.23   us2=0
+    dwt=0.01   745   ttf=10   us1=0.21   us2=0
+    dwt=0.01   743   ttf=10   us1=0.63   us2=0
+    dwt=0.01   741   ttf=10   us1=0.76   us2=0
+    dwt=0.01   742   ttf=10   us1=2.21   us2=0
+    dwt=0.01   748   ttf=10   us1=5.3    us2=0
+               765   lay=3
+a 'N28WNa'   N   4   0.01   60   N28WNa
+  path=no
+    dwt=0.01   765   ttf=10   us1=5.3    us2=0
+    dwt=0.01   748   ttf=10   us1=2.21   us2=0
+    dwt=0.01   742   ttf=10   us1=0.76   us2=0
+    dwt=0.01   741   ttf=10   us1=0.63   us2=0
+    dwt=0.01   743   ttf=10   us1=0.21   us2=0
+    dwt=0.01   745   ttf=10   us1=0.23   us2=0
+    dwt=0.01   746   ttf=10   us1=0.71   us2=0
+    dwt=0.01   737   ttf=10   us1=0.97   us2=0
+               736   lay=3
+a 'N30ENa'   N   4   0.01   60   N30ENa
+  path=no
+    dwt=0.01   735   ttf=10   us1=1.27   us2=0
+    dwt=0.01   734   ttf=10   us1=3.37   us2=0
+    dwt=0.01   751   ttf=10   us1=1.26   us2=0
+    dwt=0.01   755   ttf=10   us1=2.87   us2=0
+    dwt=0.01   756   ttf=10   us1=3.77   us2=0
+               764   lay=3
+a 'N30WNa'   N   4   0.01   60   N30WNa
+  path=no
+    dwt=0.01   764   ttf=10   us1=3.77   us2=0
+    dwt=0.01   756   ttf=10   us1=2.87   us2=0
+    dwt=0.01   755   ttf=10   us1=1.26   us2=0
+    dwt=0.01   751   ttf=10   us1=3.37   us2=0
+    dwt=0.01   734   ttf=10   us1=1.27   us2=0
+               735   lay=3
+a 'N31ENa'   N   4   0.01   60   N31ENa
+  path=no
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+    dwt=0.01   719   ttf=10   us1=0.34   us2=0
+    dwt=0.01   718   ttf=10   us1=1.42   us2=0
+               715   lay=3
+a 'N31WNa'   N   4   0.01   60   N31WNa
+  path=no
+    dwt=0.01   715   ttf=10   us1=1.42   us2=0
+    dwt=0.01   718   ttf=10   us1=0.34   us2=0
+    dwt=0.01   719   ttf=10   us1=3.27   us2=0
+               714   lay=3
+a 'N32ENa'   N   4   0.01   60   N32ENa
+  path=no
+    dwt=0.01   719   ttf=10   us1=2.84   us2=0
+               734   lay=3
+a 'N32WNa'   N   4   0.01   60   N32WNa
+  path=no
+    dwt=0.01   734   ttf=10   us1=2.84   us2=0
+               719   lay=3
+a 'N33ENa'   N   4   0.01   60   N33ENa
+  path=no
+    dwt=0.01   727   ttf=10   us1=2.17   us2=0
+               733   lay=3
+a 'N33WNa'   N   4   0.01   60   N33WNa
+  path=no
+    dwt=0.01   733   ttf=10   us1=2.17   us2=0
+               727   lay=3
+a 'N34ENa'   N   4   0.01   60   N34ENa
+  path=no
+    dwt=0.01   746   ttf=10   us1=0.81   us2=0
+    dwt=0.01   749   ttf=10   us1=0.23   us2=0
+    dwt=0.01   750   ttf=10   us1=3.17   us2=0
+    dwt=0.01   762   ttf=10   us1=2.33   us2=0
+    dwt=0.01   776   ttf=10   us1=2.22   us2=0
+               782   lay=3
+a 'N34WNa'   N   4   0.01   60   N34WNa
+  path=no
+    dwt=0.01   782   ttf=10   us1=2.22   us2=0
+    dwt=0.01   776   ttf=10   us1=2.33   us2=0
+    dwt=0.01   762   ttf=10   us1=3.17   us2=0
+    dwt=0.01   750   ttf=10   us1=0.23   us2=0
+    dwt=0.01   749   ttf=10   us1=0.81   us2=0
+               746   lay=3
+a 'N35ENa'   N   4   0.01   60   N35ENa
+  path=no
+    dwt=0.01   750   ttf=10   us1=0.5    us2=0
+    dwt=0.01   754   ttf=10   us1=1.88   us2=0
+    dwt=0.01   759   ttf=10   us1=3.8    us2=0
+    dwt=0.01   768   ttf=10   us1=1.61   us2=0
+    dwt=0.01   772   ttf=10   us1=0.87   us2=0
+    dwt=0.01   777   ttf=10   us1=1.57   us2=0
+               781   lay=3
+a 'N35WNa'   N   4   0.01   60   N35WNa
+  path=no
+    dwt=0.01   781   ttf=10   us1=1.57   us2=0
+    dwt=0.01   777   ttf=10   us1=0.87   us2=0
+    dwt=0.01   772   ttf=10   us1=1.61   us2=0
+    dwt=0.01   768   ttf=10   us1=3.8    us2=0
+    dwt=0.01   759   ttf=10   us1=1.88   us2=0
+    dwt=0.01   754   ttf=10   us1=0.5    us2=0
+               750   lay=3
+a 'N36ENa'   N   4   0.01   60   N36ENa
+  path=no
+    dwt=0.01   712   ttf=10   us1=2.98   us2=0
+    dwt=0.01   728   ttf=10   us1=0.14   us2=0
+               729   lay=3
+a 'N36WNa'   N   4   0.01   60   N36WNa
+  path=no
+    dwt=0.01   729   ttf=10   us1=0.14   us2=0
+    dwt=0.01   728   ttf=10   us1=2.98   us2=0
+               712   lay=3
+a 'N37ENa'   N   4   0.01   60   N37ENa
+  path=no
+    dwt=0.01   722   ttf=10   us1=1.38   us2=0
+    dwt=0.01   728   ttf=10   us1=1.34   us2=0
+    dwt=0.01   739   ttf=10   us1=0      us2=0
+    dwt=0.01   738   ttf=10   us1=0.52   us2=0
+               745   lay=3
+a 'N37WNa'   N   4   0.01   60   N37WNa
+  path=no
+    dwt=0.01   745   ttf=10   us1=0.52   us2=0
+    dwt=0.01   738   ttf=10   us1=0      us2=0
+    dwt=0.01   739   ttf=10   us1=1.34   us2=0
+    dwt=0.01   728   ttf=10   us1=1.38   us2=0
+               722   lay=3
+a 'N38ENa'   N   4   0.01   60   N38ENa
+  path=no
+    dwt=0.01   723   ttf=10   us1=0.04   us2=0
+    dwt=0.01   724   ttf=10   us1=1.31   us2=0
+    dwt=0.01   729   ttf=10   us1=1.22   us2=0
+               737   lay=3
+a 'N38WNa'   N   4   0.01   60   N38WNa
+  path=no
+    dwt=0.01   737   ttf=10   us1=1.22   us2=0
+    dwt=0.01   729   ttf=10   us1=1.31   us2=0
+    dwt=0.01   724   ttf=10   us1=0.04   us2=0
+               723   lay=3
+a 'N40ENa'   N   4   0.01   60   N40ENa
+  path=no
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+    dwt=0.01   656   ttf=10   us1=0.69   us2=0
+    dwt=0.01   667   ttf=10   us1=3.64   us2=0
+               679   lay=3
+a 'N40WNa'   N   4   0.01   60   N40WNa
+  path=no
+    dwt=0.01   679   ttf=10   us1=3.64   us2=0
+    dwt=0.01   667   ttf=10   us1=0.69   us2=0
+    dwt=0.01   656   ttf=10   us1=3.3    us2=0
+               642   lay=3
+a 'N41ENa'   N   4   0.01   60   N41ENa
+  path=no
+    dwt=0.01   684   ttf=10   us1=1.47   us2=0
+    dwt=0.01   695   ttf=10   us1=2.88   us2=0
+    dwt=0.01   676   ttf=10   us1=1.51   us2=0
+               685   lay=3
+a 'N41WNa'   N   4   0.01   60   N41WNa
+  path=no
+    dwt=0.01   685   ttf=10   us1=1.51   us2=0
+    dwt=0.01   676   ttf=10   us1=2.88   us2=0
+    dwt=0.01   695   ttf=10   us1=1.47   us2=0
+               684   lay=3
+a 'N42ENa'   N   4   0.01   60   N42ENa
+  path=no
+    dwt=0.01   670   ttf=10   us1=2.69   us2=0
+    dwt=0.01   678   ttf=10   us1=0.16   us2=0
+    dwt=0.01   681   ttf=10   us1=2.14   us2=0
+               689   lay=3
+a 'N42WNa'   N   4   0.01   60   N42WNa
+  path=no
+    dwt=0.01   689   ttf=10   us1=2.14   us2=0
+    dwt=0.01   681   ttf=10   us1=0.16   us2=0
+    dwt=0.01   678   ttf=10   us1=2.69   us2=0
+               670   lay=3
+a 'N43ENa'   N   4   0.01   60   N43ENa
+  path=no
+    dwt=0.01   721   ttf=10   us1=0.22   us2=0
+    dwt=0.01   724   ttf=10   us1=2.07   us2=0
+    dwt=0.01   730   ttf=10   us1=1      us2=0
+               736   lay=3
+a 'N43WNa'   N   4   0.01   60   N43WNa
+  path=no
+    dwt=0.01   736   ttf=10   us1=1      us2=0
+    dwt=0.01   730   ttf=10   us1=2.07   us2=0
+    dwt=0.01   724   ttf=10   us1=0.22   us2=0
+               721   lay=3
+a 'N45ENa'   N   4   0.01   60   N45ENa
+  path=no
+    dwt=0.01   703   ttf=10   us1=1.04   us2=0
+               706   lay=3
+a 'N45WNa'   N   4   0.01   60   N45WNa
+  path=no
+    dwt=0.01   706   ttf=10   us1=1.04   us2=0
+               703   lay=3
+a 'N46ENa'   N   4   0.01   60   N46ENa
+  path=no
+    dwt=0.01   732   ttf=10   us1=2.58   us2=0
+               748   lay=3
+a 'N46WNa'   N   4   0.01   60   N46WNa
+  path=no
+    dwt=0.01   748   ttf=10   us1=2.58   us2=0
+               732   lay=3
+a 'N47ENa'   N   4   0.01   60   N47ENa
+  path=no
+    dwt=0.01   753   ttf=10   us1=3.63   us2=0
+               761   lay=3
+a 'N47WNa'   N   4   0.01   60   N47WNa
+  path=no
+    dwt=0.01   761   ttf=10   us1=3.63   us2=0
+               753   lay=3
+a 'N48ENa'   N   4   0.01   60   N48ENa
+  path=no
+    dwt=0.01   760   ttf=10   us1=2.19   us2=0
+               769   lay=3
+a 'N48WNa'   N   4   0.01   60   N48WNa
+  path=no
+    dwt=0.01   769   ttf=10   us1=2.19   us2=0
+               760   lay=3
+a 'N49ENa'   N   4   0.01   60   N49ENa
+  path=no
+    dwt=0.01   772   ttf=10   us1=1.19   us2=0
+               778   lay=3
+a 'N49WNa'   N   4   0.01   60   N49WNa
+  path=no
+    dwt=0.01   778   ttf=10   us1=1.19   us2=0
+               772   lay=3
+a 'N50ENa'   N   4   0.01   60   N50ENa
+  path=no
+    dwt=0.01   777   ttf=10   us1=0.94   us2=0
+               780   lay=3
+a 'N50WNa'   N   4   0.01   60   N50WNa
+  path=no
+    dwt=0.01   780   ttf=10   us1=0.94   us2=0
+               777   lay=3
+a 'N51ENa'   N   4   0.01   60   N51ENa
+  path=no
+    dwt=0.01   660   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   659   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.1    us2=0
+    dwt=0.01   663   ttf=10   us1=0      us2=0
+    dwt=0.01   664   ttf=10   us1=0.16   us2=0
+    dwt=0.01   666   ttf=10   us1=4.56   us2=0
+    dwt=0.01   684   ttf=10   us1=1.17   us2=0
+    dwt=0.01   689   ttf=10   us1=0.39   us2=0
+    dwt=0.01   691   ttf=10   us1=1.31   us2=0
+               706   lay=3
+a 'N51WNa'   N   4   0.01   60   N51WNa
+  path=no
+    dwt=0.01   706   ttf=10   us1=1.31   us2=0
+    dwt=0.01   691   ttf=10   us1=0.39   us2=0
+    dwt=0.01   689   ttf=10   us1=1.17   us2=0
+    dwt=0.01   684   ttf=10   us1=4.56   us2=0
+    dwt=0.01   666   ttf=10   us1=0.16   us2=0
+    dwt=0.01   664   ttf=10   us1=0      us2=0
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+    dwt=0.01   659   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+               660   lay=3
+a 'N52ENa'   N   4   0.01   60   N52ENa
+  path=no
+    dwt=0.01   765   ttf=10   us1=2.44   us2=0
+               770   lay=3
+a 'N52WNa'   N   4   0.01   60   N52WNa
+  path=no
+    dwt=0.01   770   ttf=10   us1=2.44   us2=0
+               765   lay=3
+a 'N71ECma'   N   4   0.01   60   N71ECma
+  path=no
+    dwt=0.01   709   ttf=10   us1=0.23   us2=0
+    dwt=0.01   948   ttf=10   us1=0.45   us2=0
+    dwt=0.01   972   ttf=10   us1=0.14   us2=0
+    dwt=0.01   989   ttf=10   us1=0.05   us2=0
+               999   lay=3
+a 'N71WCma'   N   4   0.01   60   N71WCma
+  path=no
+    dwt=0.01   999   ttf=10   us1=0.05   us2=0
+    dwt=0.01   989   ttf=10   us1=0.14   us2=0
+    dwt=0.01   972   ttf=10   us1=0.45   us2=0
+    dwt=0.01   948   ttf=10   us1=0.23   us2=0
+               709   lay=3
+a 'N72ECma'   N   4   0.01   60   N72ECma
+  path=no
+    dwt=0.01   911   ttf=10   us1=0.29   us2=0
+    dwt=0.01   913   ttf=10   us1=0.36   us2=0
+    dwt=0.01   704   ttf=10   us1=0.48   us2=0
+    dwt=0.01   948   ttf=10   us1=0.19   us2=0
+               987   lay=3
+a 'N72WCma'   N   4   0.01   60   N72WCma
+  path=no
+    dwt=0.01   987   ttf=10   us1=0.19   us2=0
+    dwt=0.01   948   ttf=10   us1=0.48   us2=0
+    dwt=0.01   704   ttf=10   us1=0.36   us2=0
+    dwt=0.01   913   ttf=10   us1=0.29   us2=0
+               911   lay=3
+a 'N73ECma'   N   4   0.01   60   N73ECma
+  path=no
+    dwt=0.01   935   ttf=10   us1=0.28   us2=0
+    dwt=0.01   955   ttf=10   us1=0.07   us2=0
+    dwt=0.01   971   ttf=10   us1=0.03   us2=0
+               983   lay=3
+a 'N73WCma'   N   4   0.01   60   N73WCma
+  path=no
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   971   ttf=10   us1=0.07   us2=0
+    dwt=0.01   955   ttf=10   us1=0.28   us2=0
+               935   lay=3
+a 'N74ECma'   N   4   0.01   60   N74ECma
+  path=no
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.07   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.03   us2=0
+               1013   lay=3
+a 'N74WCma'   N   4   0.01   60   N74WCma
+  path=no
+    dwt=0.01   1013   ttf=10   us1=0.03   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.07   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.05   us2=0
+               1007   lay=3
+a 'N75ECma'   N   4   0.01   60   N75ECma
+  path=no
+    dwt=0.01   1004   ttf=10   us1=0.01   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.28   us2=0
+    dwt=0.01   1018   ttf=10   us1=0.31   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.24   us2=0
+               722   lay=3
+a 'N75WCma'   N   4   0.01   60   N75WCma
+  path=no
+    dwt=0.01   722   ttf=10   us1=0.24   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.31   us2=0
+    dwt=0.01   1018   ttf=10   us1=0.28   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.01   us2=0
+               1004   lay=3
+a 'N76ECma'   N   4   0.01   60   N76ECma
+  path=no
+    dwt=0.01   1019   ttf=10   us1=0.31   us2=0
+               717   lay=3
+a 'N76WCma'   N   4   0.01   60   N76WCma
+  path=no
+    dwt=0.01   717   ttf=10   us1=0.31   us2=0
+               1019   lay=3
+a 'N77ECma'   N   4   0.01   60   N77ECma
+  path=no
+    dwt=0.01   988   ttf=10   us1=0.03   us2=0
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   993   ttf=10   us1=0.04   us2=0
+    dwt=0.01   994   ttf=10   us1=0.09   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1019   ttf=10   us1=0.53   us2=0
+               721   lay=3
+a 'N77WCma'   N   4   0.01   60   N77WCma
+  path=no
+    dwt=0.01   721   ttf=10   us1=0.53   us2=0
+    dwt=0.01   1019   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.09   us2=0
+    dwt=0.01   994   ttf=10   us1=0.04   us2=0
+    dwt=0.01   993   ttf=10   us1=0.01   us2=0
+    dwt=0.01   992   ttf=10   us1=0.03   us2=0
+               988   lay=3
+a 'N78ECma'   N   4   0.01   60   N78ECma
+  path=no
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   998   ttf=10   us1=0.04   us2=0
+    dwt=0.01   999   ttf=10   us1=0.08   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.05   us2=0
+               1016   lay=3
+a 'N78WCma'   N   4   0.01   60   N78WCma
+  path=no
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.08   us2=0
+    dwt=0.01   999   ttf=10   us1=0.04   us2=0
+    dwt=0.01   998   ttf=10   us1=0.05   us2=0
+               1001   lay=3
+a 'N79ECma'   N   4   0.01   60   N79ECma
+  path=no
+    dwt=0.01   994   ttf=10   us1=0.08   us2=0
+    dwt=0.01   990   ttf=10   us1=0.01   us2=0
+    dwt=0.01   991   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+               1003   lay=3
+a 'N79WCma'   N   4   0.01   60   N79WCma
+  path=no
+    dwt=0.01   1003   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   991   ttf=10   us1=0.01   us2=0
+    dwt=0.01   990   ttf=10   us1=0.08   us2=0
+               994   lay=3
+a 'N80ECma'   N   4   0.01   60   N80ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.06   us2=0
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   983   ttf=10   us1=0.04   us2=0
+               990   lay=3
+a 'N80WCma'   N   4   0.01   60   N80WCma
+  path=no
+    dwt=0.01   990   ttf=10   us1=0.04   us2=0
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   963   ttf=10   us1=0.06   us2=0
+               953   lay=3
+a 'N81ECma'   N   4   0.01   60   N81ECma
+  path=no
+    dwt=0.01   968   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+    dwt=0.01   982   ttf=10   us1=0.01   us2=0
+    dwt=0.01   981   ttf=10   us1=0.04   us2=0
+               994   lay=3
+a 'N81WCma'   N   4   0.01   60   N81WCma
+  path=no
+    dwt=0.01   994   ttf=10   us1=0.04   us2=0
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   982   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+               968   lay=3
+a 'N82ECma'   N   4   0.01   60   N82ECma
+  path=no
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+    dwt=0.01   976   ttf=10   us1=0.02   us2=0
+    dwt=0.01   975   ttf=10   us1=0.01   us2=0
+    dwt=0.01   974   ttf=10   us1=0.03   us2=0
+    dwt=0.01   977   ttf=10   us1=0.04   us2=0
+               988   lay=3
+a 'N82WCma'   N   4   0.01   60   N82WCma
+  path=no
+    dwt=0.01   988   ttf=10   us1=0.04   us2=0
+    dwt=0.01   977   ttf=10   us1=0.03   us2=0
+    dwt=0.01   974   ttf=10   us1=0.01   us2=0
+    dwt=0.01   975   ttf=10   us1=0.02   us2=0
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+               981   lay=3
+a 'U01ENa'   U   2   0.01   60   U01ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=19.31  us2=0
+    dwt=0.01   793   ttf=10   us1=6.77   us2=0
+               606   lay=3
+a 'U01WNa'   U   2   0.01   60   U01WNa
+  path=no
+    dwt=0.01   606   ttf=10   us1=6.77   us2=0
+    dwt=0.01   793   ttf=10   us1=19.31  us2=0
+               795   lay=3
+a 'U02ENa'   U   2   0.01   60   U02ENa
+  path=no
+    dwt=0.01   793   ttf=10   us1=2.55   us2=0
+               788   lay=3
+a 'U02WNa'   U   2   0.01   60   U02WNa
+  path=no
+    dwt=0.01   788   ttf=10   us1=2.55   us2=0
+               793   lay=3
+a 'U03ENa'   U   2   0.01   60   U03ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=15.35  us2=0
+               623   lay=3
+a 'U03WNa'   U   2   0.01   60   U03WNa
+  path=no
+    dwt=0.01   623   ttf=10   us1=15.35  us2=0
+               795   lay=3
+a 'U04ENa'   U   2   0.01   60   U04ENa
+  path=no
+    dwt=0.01   795   ttf=10   us1=6.78   us2=0
+               632   lay=3
+a 'U04WNa'   U   2   0.01   60   U04WNa
+  path=no
+    dwt=0.01   632   ttf=10   us1=6.78   us2=0
+               795   lay=3
+a 'U05ENa'   U   2   0.01   60   U05ENa
+  path=no
+    dwt=0.01   619   ttf=10   us1=8.45   us2=0
+    dwt=0.01   802   ttf=10   us1=6.2    us2=0
+               806   lay=3
+a 'U05WNa'   U   2   0.01   60   U05WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=6.2    us2=0
+    dwt=0.01   802   ttf=10   us1=8.45   us2=0
+               619   lay=3
+a 'U06ENa'   U   2   0.01   60   U06ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=3.68   us2=0
+               674   lay=3
+a 'U06WNa'   U   2   0.01   60   U06WNa
+  path=no
+    dwt=0.01   674   ttf=10   us1=3.68   us2=0
+               806   lay=3
+a 'U101ENat'   U   2   0.01   60   U101ENat
+  path=no
+    dwt=0.01   788   ttf=10   us1=1.16   us2=0
+    dwt=0.01   818   ttf=10   us1=1.08   us2=0
+    dwt=0.01   820   ttf=10   us1=0.61   us2=0
+               787   lay=3
+a 'U101WNat'   U   2   0.01   60   U101WNat
+  path=no
+    dwt=0.01   787   ttf=10   us1=0.61   us2=0
+    dwt=0.01   820   ttf=10   us1=1.08   us2=0
+    dwt=0.01   818   ttf=10   us1=1.16   us2=0
+               788   lay=3
+a 'U102ENat'   U   2   0.01   60   U102ENat
+  path=no
+    dwt=0.01   607   ttf=10   us1=0.65   us2=0
+               602   lay=3
+a 'U102WNat'   U   2   0.01   60   U102WNat
+  path=no
+    dwt=0.01   602   ttf=10   us1=0.65   us2=0
+               607   lay=3
+a 'U103ENat'   U   2   0.01   60   U103ENat
+  path=no
+    dwt=0.01   612   ttf=10   us1=0.5    us2=0
+               842   lay=3
+a 'U103WNat'   U   2   0.01   60   U103WNat
+  path=no
+    dwt=0.01   842   ttf=10   us1=0.5    us2=0
+               612   lay=3
+a 'U104ENat'   U   2   0.01   60   U104ENat
+  path=no
+    dwt=0.01   613   ttf=10   us1=0.25   us2=0
+               620   lay=3
+a 'U104WNat'   U   2   0.01   60   U104WNat
+  path=no
+    dwt=0.01   620   ttf=10   us1=0.25   us2=0
+               613   lay=3
+a 'U105ENat'   U   2   0.01   60   U105ENat
+  path=no
+    dwt=0.01   846   ttf=10   us1=0.26   us2=0
+               627   lay=3
+a 'U105WNat'   U   2   0.01   60   U105WNat
+  path=no
+    dwt=0.01   627   ttf=10   us1=0.26   us2=0
+               846   lay=3
+a 'U106ENat'   U   2   0.01   60   U106ENat
+  path=no
+    dwt=0.01   788   ttf=10   us1=1.16   us2=0
+    dwt=0.01   818   ttf=10   us1=1.08   us2=0
+    dwt=0.01   820   ttf=10   us1=0.61   us2=0
+               787   lay=3
+a 'U106WNat'   U   2   0.01   60   U106WNat
+  path=no
+    dwt=0.01   787   ttf=10   us1=0.61   us2=0
+    dwt=0.01   820   ttf=10   us1=1.08   us2=0
+    dwt=0.01   818   ttf=10   us1=1.16   us2=0
+               788   lay=3
+a 'U107ENat'   U   2   0.01   60   U107ENat
+  path=no
+    dwt=0.01   834   ttf=10   us1=0.59   us2=0
+               642   lay=3
+a 'U107WNat'   U   2   0.01   60   U107WNat
+  path=no
+    dwt=0.01   642   ttf=10   us1=0.59   us2=0
+               834   lay=3
+a 'U108ENat'   U   2   0.01   60   U108ENat
+  path=no
+    dwt=0.01   832   ttf=10   us1=0.31   us2=0
+               668   lay=3
+a 'U108WNat'   U   2   0.01   60   U108WNat
+  path=no
+    dwt=0.01   668   ttf=10   us1=0.31   us2=0
+               832   lay=3
+a 'U109ENat'   U   2   0.01   60   U109ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'U109WNat'   U   2   0.01   60   U109WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'U110ENat'   U   2   0.01   60   U110ENat
+  path=no
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+               716   lay=3
+a 'U110WNat'   U   2   0.01   60   U110WNat
+  path=no
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+               715   lay=3
+a 'U111ENat'   U   2   0.01   60   U111ENat
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.11   us2=0
+               715   lay=3
+a 'U111WNat'   U   2   0.01   60   U111WNat
+  path=no
+    dwt=0.01   715   ttf=10   us1=3.11   us2=0
+               685   lay=3
+a 'U112ENat'   U   2   0.01   60   U112ENat
+  path=no
+    dwt=0.01   653   ttf=10   us1=0.85   us2=0
+               662   lay=3
+a 'U112WNat'   U   2   0.01   60   U112WNat
+  path=no
+    dwt=0.01   662   ttf=10   us1=0.85   us2=0
+               653   lay=3
+a 'U113ENat'   U   2   0.01   60   U113ENat
+  path=no
+    dwt=0.01   838   ttf=10   us1=1.89   us2=0
+               651   lay=3
+a 'U113WNat'   U   2   0.01   60   U113WNat
+  path=no
+    dwt=0.01   651   ttf=10   us1=1.89   us2=0
+               838   lay=3
+a 'U114ENat'   U   2   0.01   60   U114ENat
+  path=no
+    dwt=0.01   848   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.1    us2=0
+               663   lay=3
+a 'U114WNat'   U   2   0.01   60   U114WNat
+  path=no
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               848   lay=3
+a 'U115ENat'   U   2   0.01   60   U115ENat
+  path=no
+    dwt=0.01   646   ttf=10   us1=3.44   us2=0
+               660   lay=3
+a 'U115WNat'   U   2   0.01   60   U115WNat
+  path=no
+    dwt=0.01   660   ttf=10   us1=3.44   us2=0
+               646   lay=3
+a 'U116ENat'   U   2   0.01   60   U116ENat
+  path=no
+    dwt=0.01   626   ttf=10   us1=9.15   us2=0
+               629   lay=3
+a 'U116WNat'   U   2   0.01   60   U116WNat
+  path=no
+    dwt=0.01   629   ttf=10   us1=9.15   us2=0
+               626   lay=3
+a 'U117ENat'   U   2   0.01   60   U117ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'U117WNat'   U   2   0.01   60   U117WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'U33ENa'   U   2   0.01   60   U33ENa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.79   us2=0
+    dwt=0.01   668   ttf=10   us1=2.97   us2=0
+    dwt=0.01   667   ttf=10   us1=0.69   us2=0
+    dwt=0.01   656   ttf=10   us1=0.85   us2=0
+    dwt=0.01   665   ttf=10   us1=2.45   us2=0
+    dwt=0.01   675   ttf=10   us1=1.96   us2=0
+    dwt=0.01   676   ttf=10   us1=2.88   us2=0
+    dwt=0.01   695   ttf=10   us1=2.11   us2=0
+    dwt=0.01   703   ttf=10   us1=1.04   us2=0
+    dwt=0.01   706   ttf=10   us1=0.63   us2=0
+    dwt=0.01   712   ttf=10   us1=0.76   us2=0
+               711   lay=3
+a 'U33WNa'   U   2   0.01   60   U33WNa
+  path=no
+    dwt=0.01   711   ttf=10   us1=0.76   us2=0
+    dwt=0.01   712   ttf=10   us1=0.63   us2=0
+    dwt=0.01   706   ttf=10   us1=1.04   us2=0
+    dwt=0.01   703   ttf=10   us1=2.11   us2=0
+    dwt=0.01   695   ttf=10   us1=2.88   us2=0
+    dwt=0.01   676   ttf=10   us1=1.96   us2=0
+    dwt=0.01   675   ttf=10   us1=2.45   us2=0
+    dwt=0.01   665   ttf=10   us1=0.85   us2=0
+    dwt=0.01   656   ttf=10   us1=0.69   us2=0
+    dwt=0.01   667   ttf=10   us1=2.97   us2=0
+    dwt=0.01   668   ttf=10   us1=3.79   us2=0
+               683   lay=3
+a 'U34ENa'   U   2   0.01   60   U34ENa
+  path=no
+    dwt=0.01   632   ttf=10   us1=2.45   us2=0
+    dwt=0.01   634   ttf=10   us1=0.13   us2=0
+    dwt=0.01   635   ttf=10   us1=2.52   us2=0
+    dwt=0.01   644   ttf=10   us1=0.74   us2=0
+    dwt=0.01   639   ttf=10   us1=2.14   us2=0
+    dwt=0.01   642   ttf=10   us1=0.02   us2=0
+    dwt=0.01   641   ttf=10   us1=4.35   us2=0
+    dwt=0.01   651   ttf=10   us1=0.93   us2=0
+    dwt=0.01   653   ttf=10   us1=2.45   us2=0
+    dwt=0.01   655   ttf=10   us1=0.69   us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+    dwt=0.01   659   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.1    us2=0
+    dwt=0.01   663   ttf=10   us1=0      us2=0
+    dwt=0.01   664   ttf=10   us1=0.16   us2=0
+    dwt=0.01   666   ttf=10   us1=4.15   us2=0
+    dwt=0.01   678   ttf=10   us1=0.16   us2=0
+    dwt=0.01   681   ttf=10   us1=0      us2=0
+    dwt=0.01   682   ttf=10   us1=0.73   us2=0
+    dwt=0.01   690   ttf=10   us1=0.37   us2=0
+               699   lay=3
+a 'U34WNa'   U   2   0.01   60   U34WNa
+  path=no
+    dwt=0.01   699   ttf=10   us1=0.37   us2=0
+    dwt=0.01   690   ttf=10   us1=0.73   us2=0
+    dwt=0.01   682   ttf=10   us1=0      us2=0
+    dwt=0.01   681   ttf=10   us1=0.16   us2=0
+    dwt=0.01   678   ttf=10   us1=4.15   us2=0
+    dwt=0.01   666   ttf=10   us1=0.16   us2=0
+    dwt=0.01   664   ttf=10   us1=0      us2=0
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   659   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.69   us2=0
+    dwt=0.01   655   ttf=10   us1=2.45   us2=0
+    dwt=0.01   653   ttf=10   us1=0.93   us2=0
+    dwt=0.01   651   ttf=10   us1=4.35   us2=0
+    dwt=0.01   641   ttf=10   us1=0.02   us2=0
+    dwt=0.01   642   ttf=10   us1=2.14   us2=0
+    dwt=0.01   639   ttf=10   us1=0.74   us2=0
+    dwt=0.01   644   ttf=10   us1=2.52   us2=0
+    dwt=0.01   635   ttf=10   us1=0.13   us2=0
+    dwt=0.01   634   ttf=10   us1=2.45   us2=0
+               632   lay=3
+a 'U35ENa'   U   2   0.01   60   U35ENa
+  path=no
+    dwt=0.01   606   ttf=10   us1=1.51   us2=0
+    dwt=0.01   608   ttf=10   us1=0.23   us2=0
+    dwt=0.01   609   ttf=10   us1=11.09  us2=0
+               620   lay=3
+a 'U35WNa'   U   2   0.01   60   U35WNa
+  path=no
+    dwt=0.01   620   ttf=10   us1=11.09  us2=0
+    dwt=0.01   609   ttf=10   us1=0.23   us2=0
+    dwt=0.01   608   ttf=10   us1=1.51   us2=0
+               606   lay=3
+a 'U38ENa'   U   2   0.01   60   U38ENa
+  path=no
+    dwt=0.01   606   ttf=10   us1=6.63   us2=0
+    dwt=0.01   788   ttf=10   us1=6.79   us2=0
+    dwt=0.01   623   ttf=10   us1=1.5    us2=0
+    dwt=0.01   624   ttf=10   us1=8.62   us2=0
+               634   lay=3
+a 'U38WNa'   U   2   0.01   60   U38WNa
+  path=no
+    dwt=0.01   634   ttf=10   us1=8.62   us2=0
+    dwt=0.01   624   ttf=10   us1=1.5    us2=0
+    dwt=0.01   623   ttf=10   us1=6.79   us2=0
+    dwt=0.01   788   ttf=10   us1=6.63   us2=0
+               606   lay=3
+a 'U39ENa'   U   2   0.01   60   U39ENa
+  path=no
+    dwt=0.01   614   ttf=10   us1=0.98   us2=0
+    dwt=0.01   610   ttf=10   us1=4.52   us2=0
+    dwt=0.01   611   ttf=10   us1=0      us2=0
+    dwt=0.01   612   ttf=10   us1=7.09   us2=0
+    dwt=0.01   786   ttf=10   us1=7.56   us2=0
+    dwt=0.01   622   ttf=10   us1=7.52   us2=0
+    dwt=0.01   629   ttf=10   us1=3.92   us2=0
+    dwt=0.01   638   ttf=10   us1=2.05   us2=0
+    dwt=0.01   646   ttf=10   us1=0.86   us2=0
+    dwt=0.01   650   ttf=10   us1=0.69   us2=0
+    dwt=0.01   652   ttf=10   us1=2.49   us2=0
+    dwt=0.01   669   ttf=10   us1=2.99   us2=0
+    dwt=0.01   687   ttf=10   us1=0.44   us2=0
+    dwt=0.01   693   ttf=10   us1=0.11   us2=0
+               696   lay=3
+a 'U39WNa'   U   2   0.01   60   U39WNa
+  path=no
+    dwt=0.01   696   ttf=10   us1=0.11   us2=0
+    dwt=0.01   693   ttf=10   us1=0.44   us2=0
+    dwt=0.01   687   ttf=10   us1=2.99   us2=0
+    dwt=0.01   669   ttf=10   us1=2.49   us2=0
+    dwt=0.01   652   ttf=10   us1=0.69   us2=0
+    dwt=0.01   650   ttf=10   us1=0.86   us2=0
+    dwt=0.01   646   ttf=10   us1=2.05   us2=0
+    dwt=0.01   638   ttf=10   us1=3.92   us2=0
+    dwt=0.01   629   ttf=10   us1=7.52   us2=0
+    dwt=0.01   622   ttf=10   us1=7.09   us2=0
+    dwt=0.01   786   ttf=10   us1=7.56   us2=0
+    dwt=0.01   612   ttf=10   us1=0      us2=0
+    dwt=0.01   611   ttf=10   us1=4.52   us2=0
+    dwt=0.01   610   ttf=10   us1=0.98   us2=0
+               614   lay=3
+a 'U40ENa'   U   2   0.01   60   U40ENa
+  path=no
+    dwt=0.01   635   ttf=10   us1=1.56   us2=0
+    dwt=0.01   640   ttf=10   us1=1.4    us2=0
+    dwt=0.01   645   ttf=10   us1=0.53   us2=0
+    dwt=0.01   648   ttf=10   us1=2.38   us2=0
+               668   lay=3
+a 'U40WNa'   U   2   0.01   60   U40WNa
+  path=no
+    dwt=0.01   668   ttf=10   us1=2.38   us2=0
+    dwt=0.01   648   ttf=10   us1=0.53   us2=0
+    dwt=0.01   645   ttf=10   us1=1.4    us2=0
+    dwt=0.01   640   ttf=10   us1=1.56   us2=0
+               635   lay=3
+a 'U41ENa'   U   2   0.01   60   U41ENa
+  path=no
+    dwt=0.01   602   ttf=10   us1=6.75   us2=0
+               608   lay=3
+a 'U41WNa'   U   2   0.01   60   U41WNa
+  path=no
+    dwt=0.01   608   ttf=10   us1=6.75   us2=0
+               602   lay=3
+a 'U42ENa'   U   2   0.01   60   U42ENa
+  path=no
+    dwt=0.01   604   ttf=10   us1=10.42  us2=0
+               611   lay=3
+a 'U42WNa'   U   2   0.01   60   U42WNa
+  path=no
+    dwt=0.01   611   ttf=10   us1=10.42  us2=0
+               604   lay=3
+a 'U43ENa'   U   2   0.01   60   U43ENa
+  path=no
+    dwt=0.01   612   ttf=10   us1=4.79   us2=0
+    dwt=0.01   616   ttf=10   us1=1.2    us2=0
+    dwt=0.01   617   ttf=10   us1=0.73   us2=0
+    dwt=0.01   618   ttf=10   us1=0.4    us2=0
+               619   lay=3
+a 'U43WNa'   U   2   0.01   60   U43WNa
+  path=no
+    dwt=0.01   619   ttf=10   us1=0.4    us2=0
+    dwt=0.01   618   ttf=10   us1=0.73   us2=0
+    dwt=0.01   617   ttf=10   us1=1.2    us2=0
+    dwt=0.01   616   ttf=10   us1=4.79   us2=0
+               612   lay=3
+a 'U44ENa'   U   2   0.01   60   U44ENa
+  path=no
+    dwt=0.01   623   ttf=10   us1=3.91   us2=0
+    dwt=0.01   625   ttf=10   us1=4.06   us2=0
+    dwt=0.01   628   ttf=10   us1=0.03   us2=0
+    dwt=0.01   630   ttf=10   us1=8.99   us2=0
+               658   lay=3
+a 'U44WNa'   U   2   0.01   60   U44WNa
+  path=no
+    dwt=0.01   658   ttf=10   us1=8.99   us2=0
+    dwt=0.01   630   ttf=10   us1=0.03   us2=0
+    dwt=0.01   628   ttf=10   us1=4.06   us2=0
+    dwt=0.01   625   ttf=10   us1=3.91   us2=0
+               623   lay=3
+a 'U45ENa'   U   2   0.01   60   U45ENa
+  path=no
+    dwt=0.01   602   ttf=10   us1=0.85   us2=0
+    dwt=0.01   603   ttf=10   us1=0.88   us2=0
+    dwt=0.01   604   ttf=10   us1=12.72  us2=0
+    dwt=0.01   621   ttf=10   us1=0.63   us2=0
+    dwt=0.01   620   ttf=10   us1=9.8    us2=0
+    dwt=0.01   627   ttf=10   us1=9.55   us2=0
+    dwt=0.01   649   ttf=10   us1=1.22   us2=0
+               659   lay=3
+a 'U45WNa'   U   2   0.01   60   U45WNa
+  path=no
+    dwt=0.01   659   ttf=10   us1=1.22   us2=0
+    dwt=0.01   649   ttf=10   us1=9.55   us2=0
+    dwt=0.01   627   ttf=10   us1=9.8    us2=0
+    dwt=0.01   620   ttf=10   us1=0.63   us2=0
+    dwt=0.01   621   ttf=10   us1=12.72  us2=0
+    dwt=0.01   604   ttf=10   us1=0.88   us2=0
+    dwt=0.01   603   ttf=10   us1=0.85   us2=0
+               602   lay=3
+a 'U46ENa'   U   2   0.01   60   U46ENa
+  path=no
+    dwt=0.01   629   ttf=10   us1=2.71   us2=0
+    dwt=0.01   627   ttf=10   us1=7.54   us2=0
+               630   lay=3
+a 'U46WNa'   U   2   0.01   60   U46WNa
+  path=no
+    dwt=0.01   630   ttf=10   us1=7.54   us2=0
+    dwt=0.01   627   ttf=10   us1=2.71   us2=0
+               629   lay=3
+a 'U47ENa'   U   2   0.01   60   U47ENa
+  path=no
+    dwt=0.01   621   ttf=10   us1=2.51   us2=0
+               622   lay=3
+a 'U47WNa'   U   2   0.01   60   U47WNa
+  path=no
+    dwt=0.01   622   ttf=10   us1=2.51   us2=0
+               621   lay=3
+a 'U48ENa'   U   2   0.01   60   U48ENa
+  path=no
+    dwt=0.01   628   ttf=10   us1=5.63   us2=0
+               641   lay=3
+a 'U48WNa'   U   2   0.01   60   U48WNa
+  path=no
+    dwt=0.01   641   ttf=10   us1=5.63   us2=0
+               628   lay=3
+a 'U49ENa'   U   2   0.01   60   U49ENa
+  path=no
+    dwt=0.01   624   ttf=10   us1=5.59   us2=0
+    dwt=0.01   631   ttf=10   us1=3.3    us2=0
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+               656   lay=3
+a 'U49WNa'   U   2   0.01   60   U49WNa
+  path=no
+    dwt=0.01   656   ttf=10   us1=3.3    us2=0
+    dwt=0.01   642   ttf=10   us1=3.3    us2=0
+    dwt=0.01   631   ttf=10   us1=5.59   us2=0
+               624   lay=3
+a 'U50ENa'   U   2   0.01   60   U50ENa
+  path=no
+    dwt=0.01   637   ttf=10   us1=1.37   us2=0
+    dwt=0.01   643   ttf=10   us1=2.4    us2=0
+               648   lay=3
+a 'U50WNa'   U   2   0.01   60   U50WNa
+  path=no
+    dwt=0.01   648   ttf=10   us1=2.4    us2=0
+    dwt=0.01   643   ttf=10   us1=1.37   us2=0
+               637   lay=3
+a 'U51ENa'   U   2   0.01   60   U51ENa
+  path=no
+    dwt=0.01   640   ttf=10   us1=1.47   us2=0
+               643   lay=3
+a 'U51WNa'   U   2   0.01   60   U51WNa
+  path=no
+    dwt=0.01   643   ttf=10   us1=1.47   us2=0
+               640   lay=3
+a 'U52ENa'   U   2   0.01   60   U52ENa
+  path=no
+    dwt=0.01   644   ttf=10   us1=1.81   us2=0
+               645   lay=3
+a 'U52WNa'   U   2   0.01   60   U52WNa
+  path=no
+    dwt=0.01   645   ttf=10   us1=1.81   us2=0
+               644   lay=3
+a 'U53ENa'   U   2   0.01   60   U53ENa
+  path=no
+    dwt=0.01   651   ttf=10   us1=0.82   us2=0
+    dwt=0.01   654   ttf=10   us1=3.05   us2=0
+               675   lay=3
+a 'U53WNa'   U   2   0.01   60   U53WNa
+  path=no
+    dwt=0.01   675   ttf=10   us1=3.05   us2=0
+    dwt=0.01   654   ttf=10   us1=0.82   us2=0
+               651   lay=3
+a 'U54ENa'   U   2   0.01   60   U54ENa
+  path=no
+    dwt=0.01   676   ttf=10   us1=1.51   us2=0
+               685   lay=3
+a 'U54WNa'   U   2   0.01   60   U54WNa
+  path=no
+    dwt=0.01   685   ttf=10   us1=1.51   us2=0
+               676   lay=3
+a 'U55ENa'   U   2   0.01   60   U55ENa
+  path=no
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   660   ttf=10   us1=2.76   us2=0
+    dwt=0.01   670   ttf=10   us1=1.46   us2=0
+    dwt=0.01   669   ttf=10   us1=3.66   us2=0
+    dwt=0.01   673   ttf=10   us1=0.2    us2=0
+    dwt=0.01   672   ttf=10   us1=0.17   us2=0
+    dwt=0.01   671   ttf=10   us1=4.9    us2=0
+               674   lay=3
+a 'U55WNa'   U   2   0.01   60   U55WNa
+  path=no
+    dwt=0.01   674   ttf=10   us1=4.9    us2=0
+    dwt=0.01   671   ttf=10   us1=0.17   us2=0
+    dwt=0.01   672   ttf=10   us1=0.2    us2=0
+    dwt=0.01   673   ttf=10   us1=3.66   us2=0
+    dwt=0.01   669   ttf=10   us1=1.46   us2=0
+    dwt=0.01   670   ttf=10   us1=2.76   us2=0
+    dwt=0.01   660   ttf=10   us1=0.01   us2=0
+               661   lay=3
+a 'U58ENa'   U   2   0.01   60   U58ENa
+  path=no
+    dwt=0.01   666   ttf=10   us1=4.56   us2=0
+    dwt=0.01   684   ttf=10   us1=1.17   us2=0
+    dwt=0.01   689   ttf=10   us1=0.39   us2=0
+    dwt=0.01   691   ttf=10   us1=1.91   us2=0
+               704   lay=3
+a 'U58WNa'   U   2   0.01   60   U58WNa
+  path=no
+    dwt=0.01   704   ttf=10   us1=1.91   us2=0
+    dwt=0.01   691   ttf=10   us1=0.39   us2=0
+    dwt=0.01   689   ttf=10   us1=1.17   us2=0
+    dwt=0.01   684   ttf=10   us1=4.56   us2=0
+               666   lay=3
+a 'U59ENa'   U   2   0.01   60   U59ENa
+  path=no
+    dwt=0.01   684   ttf=10   us1=1.47   us2=0
+               695   lay=3
+a 'U59WNa'   U   2   0.01   60   U59WNa
+  path=no
+    dwt=0.01   695   ttf=10   us1=1.47   us2=0
+               684   lay=3
+a 'U60ENa'   U   2   0.01   60   U60ENa
+  path=no
+    dwt=0.01   689   ttf=10   us1=2.14   us2=0
+    dwt=0.01   681   ttf=10   us1=0.62   us2=0
+    dwt=0.01   692   ttf=10   us1=0.8    us2=0
+               702   lay=3
+a 'U60WNa'   U   2   0.01   60   U60WNa
+  path=no
+    dwt=0.01   702   ttf=10   us1=0.8    us2=0
+    dwt=0.01   692   ttf=10   us1=0.62   us2=0
+    dwt=0.01   681   ttf=10   us1=2.14   us2=0
+               689   lay=3
+a 'U61ENa'   U   2   0.01   60   U61ENa
+  path=no
+    dwt=0.01   673   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=1.76   us2=0
+    dwt=0.01   697   ttf=10   us1=1.21   us2=0
+    dwt=0.01   708   ttf=10   us1=0.09   us2=0
+    dwt=0.01   707   ttf=10   us1=0.3    us2=0
+               710   lay=3
+a 'U61WNa'   U   2   0.01   60   U61WNa
+  path=no
+    dwt=0.01   710   ttf=10   us1=0.3    us2=0
+    dwt=0.01   707   ttf=10   us1=0.09   us2=0
+    dwt=0.01   708   ttf=10   us1=1.21   us2=0
+    dwt=0.01   697   ttf=10   us1=1.76   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+               673   lay=3
+a 'U62ENa'   U   2   0.01   60   U62ENa
+  path=no
+    dwt=0.01   638   ttf=10   us1=3.62   us2=0
+               649   lay=3
+a 'U62WNa'   U   2   0.01   60   U62WNa
+  path=no
+    dwt=0.01   649   ttf=10   us1=3.62   us2=0
+               638   lay=3
+a 'U69ENa'   U   2   0.01   60   U69ENa
+  path=no
+    dwt=0.01   692   ttf=10   us1=0.46   us2=0
+    dwt=0.01   690   ttf=10   us1=0.57   us2=0
+               693   lay=3
+a 'U69WNa'   U   2   0.01   60   U69WNa
+  path=no
+    dwt=0.01   693   ttf=10   us1=0.57   us2=0
+    dwt=0.01   690   ttf=10   us1=0.46   us2=0
+               692   lay=3
+a 'U71ECma'   U   2   0.01   60   U71ECma
+  path=no
+    dwt=0.01   711   ttf=10   us1=0.46   us2=0
+    dwt=0.01   987   ttf=10   us1=0.38   us2=0
+    dwt=0.01   996   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.06   us2=0
+    dwt=0.01   999   ttf=10   us1=0.04   us2=0
+    dwt=0.01   998   ttf=10   us1=0.09   us2=0
+    dwt=0.01   991   ttf=10   us1=0.01   us2=0
+    dwt=0.01   990   ttf=10   us1=0.08   us2=0
+    dwt=0.01   994   ttf=10   us1=0.04   us2=0
+    dwt=0.01   993   ttf=10   us1=0.01   us2=0
+               992   lay=3
+a 'U71WCma'   U   2   0.01   60   U71WCma
+  path=no
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   993   ttf=10   us1=0.04   us2=0
+    dwt=0.01   994   ttf=10   us1=0.08   us2=0
+    dwt=0.01   990   ttf=10   us1=0.01   us2=0
+    dwt=0.01   991   ttf=10   us1=0.09   us2=0
+    dwt=0.01   998   ttf=10   us1=0.04   us2=0
+    dwt=0.01   999   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.12   us2=0
+    dwt=0.01   996   ttf=10   us1=0.38   us2=0
+    dwt=0.01   987   ttf=10   us1=0.46   us2=0
+               711   lay=3
+a 'U72ECma'   U   2   0.01   60   U72ECma
+  path=no
+    dwt=0.01   980   ttf=10   us1=0.13   us2=0
+    dwt=0.01   983   ttf=10   us1=0.05   us2=0
+    dwt=0.01   982   ttf=10   us1=0.01   us2=0
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+    dwt=0.01   976   ttf=10   us1=0.02   us2=0
+               975   lay=3
+a 'U72WCma'   U   2   0.01   60   U72WCma
+  path=no
+    dwt=0.01   975   ttf=10   us1=0.02   us2=0
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   982   ttf=10   us1=0.05   us2=0
+    dwt=0.01   983   ttf=10   us1=0.13   us2=0
+               980   lay=3
+a 'U73ECma'   U   2   0.01   60   U73ECma
+  path=no
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   945   ttf=10   us1=0.05   us2=0
+    dwt=0.01   946   ttf=10   us1=0.04   us2=0
+    dwt=0.01   949   ttf=10   us1=0.03   us2=0
+    dwt=0.01   953   ttf=10   us1=0.09   us2=0
+    dwt=0.01   955   ttf=10   us1=0.1    us2=0
+    dwt=0.01   979   ttf=10   us1=0      us2=0
+               980   lay=3
+a 'U73WCma'   U   2   0.01   60   U73WCma
+  path=no
+    dwt=0.01   980   ttf=10   us1=0      us2=0
+    dwt=0.01   979   ttf=10   us1=0.1    us2=0
+    dwt=0.01   955   ttf=10   us1=0.09   us2=0
+    dwt=0.01   953   ttf=10   us1=0.03   us2=0
+    dwt=0.01   949   ttf=10   us1=0.04   us2=0
+    dwt=0.01   946   ttf=10   us1=0.05   us2=0
+    dwt=0.01   945   ttf=10   us1=0.04   us2=0
+               944   lay=3
+a 'U74ECma'   U   2   0.01   60   U74ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.06   us2=0
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   983   ttf=10   us1=0.04   us2=0
+               990   lay=3
+a 'U74WCma'   U   2   0.01   60   U74WCma
+  path=no
+    dwt=0.01   990   ttf=10   us1=0.04   us2=0
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   963   ttf=10   us1=0.06   us2=0
+               953   lay=3
+a 'U75ECma'   U   2   0.01   60   U75ECma
+  path=no
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.01   us2=0
+               960   lay=3
+a 'U75WCma'   U   2   0.01   60   U75WCma
+  path=no
+    dwt=0.01   960   ttf=10   us1=0.01   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+               963   lay=3
+a 'U76ECma'   U   2   0.01   60   U76ECma
+  path=no
+    dwt=0.01   699   ttf=10   us1=0.38   us2=0
+    dwt=0.01   909   ttf=10   us1=0.53   us2=0
+    dwt=0.01   917   ttf=10   us1=0.04   us2=0
+    dwt=0.01   919   ttf=10   us1=0.03   us2=0
+    dwt=0.01   920   ttf=10   us1=0.06   us2=0
+    dwt=0.01   925   ttf=10   us1=0.33   us2=0
+    dwt=0.01   946   ttf=10   us1=0.07   us2=0
+    dwt=0.01   954   ttf=10   us1=0.04   us2=0
+    dwt=0.01   960   ttf=10   us1=0.05   us2=0
+    dwt=0.01   975   ttf=10   us1=0.01   us2=0
+               974   lay=3
+a 'U76WCma'   U   2   0.01   60   U76WCma
+  path=no
+    dwt=0.01   974   ttf=10   us1=0.01   us2=0
+    dwt=0.01   975   ttf=10   us1=0.05   us2=0
+    dwt=0.01   960   ttf=10   us1=0.04   us2=0
+    dwt=0.01   954   ttf=10   us1=0.07   us2=0
+    dwt=0.01   946   ttf=10   us1=0.33   us2=0
+    dwt=0.01   925   ttf=10   us1=0.06   us2=0
+    dwt=0.01   920   ttf=10   us1=0.03   us2=0
+    dwt=0.01   919   ttf=10   us1=0.04   us2=0
+    dwt=0.01   917   ttf=10   us1=0.53   us2=0
+    dwt=0.01   909   ttf=10   us1=0.38   us2=0
+               699   lay=3
+a 'U77ECma'   U   2   0.01   60   U77ECma
+  path=no
+    dwt=0.01   696   ttf=10   us1=0.38   us2=0
+    dwt=0.01   907   ttf=10   us1=0.29   us2=0
+    dwt=0.01   915   ttf=10   us1=0.46   us2=0
+    dwt=0.01   926   ttf=10   us1=0.22   us2=0
+    dwt=0.01   934   ttf=10   us1=0.04   us2=0
+    dwt=0.01   937   ttf=10   us1=0.04   us2=0
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   952   ttf=10   us1=0.07   us2=0
+    dwt=0.01   958   ttf=10   us1=0.05   us2=0
+    dwt=0.01   977   ttf=10   us1=0.03   us2=0
+    dwt=0.01   974   ttf=10   us1=0.04   us2=0
+    dwt=0.01   986   ttf=10   us1=0.01   us2=0
+               992   lay=3
+a 'U77WCma'   U   2   0.01   60   U77WCma
+  path=no
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   986   ttf=10   us1=0.04   us2=0
+    dwt=0.01   974   ttf=10   us1=0.03   us2=0
+    dwt=0.01   977   ttf=10   us1=0.05   us2=0
+    dwt=0.01   958   ttf=10   us1=0.07   us2=0
+    dwt=0.01   952   ttf=10   us1=0.04   us2=0
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   937   ttf=10   us1=0.04   us2=0
+    dwt=0.01   934   ttf=10   us1=0.22   us2=0
+    dwt=0.01   926   ttf=10   us1=0.46   us2=0
+    dwt=0.01   915   ttf=10   us1=0.29   us2=0
+    dwt=0.01   907   ttf=10   us1=0.38   us2=0
+               696   lay=3
+a 'U78ECma'   U   2   0.01   60   U78ECma
+  path=no
+    dwt=0.01   996   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.04   us2=0
+               1014   lay=3
+a 'U78WCma'   U   2   0.01   60   U78WCma
+  path=no
+    dwt=0.01   1014   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1007   ttf=10   us1=0.1    us2=0
+               996   lay=3
+a 'U79ECma'   U   2   0.01   60   U79ECma
+  path=no
+    dwt=0.01   704   ttf=10   us1=0.25   us2=0
+               921   lay=3
+a 'U79WCma'   U   2   0.01   60   U79WCma
+  path=no
+    dwt=0.01   921   ttf=10   us1=0.25   us2=0
+               704   lay=3
+a 'U80ECma'   U   2   0.01   60   U80ECma
+  path=no
+    dwt=0.01   702   ttf=10   us1=0.03   us2=0
+    dwt=0.01   913   ttf=10   us1=0.52   us2=0
+    dwt=0.01   921   ttf=10   us1=0.35   us2=0
+    dwt=0.01   929   ttf=10   us1=0.04   us2=0
+    dwt=0.01   930   ttf=10   us1=0.37   us2=0
+    dwt=0.01   949   ttf=10   us1=0.09   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+               976   lay=3
+a 'U80WCma'   U   2   0.01   60   U80WCma
+  path=no
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.09   us2=0
+    dwt=0.01   949   ttf=10   us1=0.37   us2=0
+    dwt=0.01   930   ttf=10   us1=0.04   us2=0
+    dwt=0.01   929   ttf=10   us1=0.35   us2=0
+    dwt=0.01   921   ttf=10   us1=0.52   us2=0
+    dwt=0.01   913   ttf=10   us1=0.03   us2=0
+               702   lay=3
+a 'U81ECma'   U   2   0.01   60   U81ECma
+  path=no
+    dwt=0.01   911   ttf=10   us1=0.67   us2=0
+               917   lay=3
+a 'U81WCma'   U   2   0.01   60   U81WCma
+  path=no
+    dwt=0.01   917   ttf=10   us1=0.67   us2=0
+               911   lay=3
+a 'U82ECma'   U   2   0.01   60   U82ECma
+  path=no
+    dwt=0.01   909   ttf=10   us1=0.22   us2=0
+    dwt=0.01   914   ttf=10   us1=0.2    us2=0
+               915   lay=3
+a 'U82WCma'   U   2   0.01   60   U82WCma
+  path=no
+    dwt=0.01   915   ttf=10   us1=0.2    us2=0
+    dwt=0.01   914   ttf=10   us1=0.22   us2=0
+               909   lay=3
+a 'U83ECma'   U   2   0.01   60   U83ECma
+  path=no
+    dwt=0.01   701   ttf=10   us1=0.78   us2=0
+    dwt=0.01   928   ttf=10   us1=0.24   us2=0
+    dwt=0.01   940   ttf=10   us1=0.16   us2=0
+    dwt=0.01   956   ttf=10   us1=0.09   us2=0
+    dwt=0.01   984   ttf=10   us1=0.04   us2=0
+    dwt=0.01   988   ttf=10   us1=0.04   us2=0
+               977   lay=3
+a 'U83WCma'   U   2   0.01   60   U83WCma
+  path=no
+    dwt=0.01   977   ttf=10   us1=0.04   us2=0
+    dwt=0.01   988   ttf=10   us1=0.04   us2=0
+    dwt=0.01   984   ttf=10   us1=0.09   us2=0
+    dwt=0.01   956   ttf=10   us1=0.16   us2=0
+    dwt=0.01   940   ttf=10   us1=0.24   us2=0
+    dwt=0.01   928   ttf=10   us1=0.78   us2=0
+               701   lay=3
+a 'U84ECma'   U   2   0.01   60   U84ECma
+  path=no
+    dwt=0.01   906   ttf=10   us1=0.83   us2=0
+    dwt=0.01   923   ttf=10   us1=0.1    us2=0
+               926   lay=3
+a 'U84WCma'   U   2   0.01   60   U84WCma
+  path=no
+    dwt=0.01   926   ttf=10   us1=0.1    us2=0
+    dwt=0.01   923   ttf=10   us1=0.83   us2=0
+               906   lay=3
+a 'U85ECma'   U   2   0.01   60   U85ECma
+  path=no
+    dwt=0.01   956   ttf=10   us1=0.06   us2=0
+    dwt=0.01   957   ttf=10   us1=0.03   us2=0
+               958   lay=3
+a 'U85WCma'   U   2   0.01   60   U85WCma
+  path=no
+    dwt=0.01   958   ttf=10   us1=0.03   us2=0
+    dwt=0.01   957   ttf=10   us1=0.06   us2=0
+               956   lay=3
+a 'U86ECma'   U   2   0.01   60   U86ECma
+  path=no
+    dwt=0.01   710   ttf=10   us1=0.81   us2=0
+    dwt=0.01   942   ttf=10   us1=0.22   us2=0
+    dwt=0.01   951   ttf=10   us1=0.1    us2=0
+    dwt=0.01   940   ttf=10   us1=0.14   us2=0
+    dwt=0.01   938   ttf=10   us1=0.06   us2=0
+               937   lay=3
+a 'U86WCma'   U   2   0.01   60   U86WCma
+  path=no
+    dwt=0.01   937   ttf=10   us1=0.06   us2=0
+    dwt=0.01   938   ttf=10   us1=0.14   us2=0
+    dwt=0.01   940   ttf=10   us1=0.1    us2=0
+    dwt=0.01   951   ttf=10   us1=0.22   us2=0
+    dwt=0.01   942   ttf=10   us1=0.81   us2=0
+               710   lay=3
+a 'U87ECma'   U   2   0.01   60   U87ECma
+  path=no
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+               967   lay=3
+a 'U87WCma'   U   2   0.01   60   U87WCma
+  path=no
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+               968   lay=3
+a 'X01ENa'   X   3   0.01   60   X01ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=13.31  us2=0
+    dwt=0.01   810   ttf=10   us1=5.23   us2=0
+               762   lay=3
+a 'X01WNa'   X   3   0.01   60   X01WNa
+  path=no
+    dwt=0.01   762   ttf=10   us1=5.23   us2=0
+    dwt=0.01   810   ttf=10   us1=13.31  us2=0
+               806   lay=3
+a 'X109ENat'   X   3   0.01   60   X109ENat
+  path=no
+    dwt=0.01   829   ttf=10   us1=0.58   us2=0
+               755   lay=3
+a 'X109WNat'   X   3   0.01   60   X109WNat
+  path=no
+    dwt=0.01   755   ttf=10   us1=0.58   us2=0
+               829   lay=3
+a 'X110ENat'   X   3   0.01   60   X110ENat
+  path=no
+    dwt=0.01   752   ttf=10   us1=0.46   us2=0
+               756   lay=3
+a 'X110WNat'   X   3   0.01   60   X110WNat
+  path=no
+    dwt=0.01   756   ttf=10   us1=0.46   us2=0
+               752   lay=3
+a 'X112ENat'   X   3   0.01   60   X112ENat
+  path=no
+    dwt=0.01   776   ttf=10   us1=0.28   us2=0
+               819   lay=3
+a 'X112WNat'   X   3   0.01   60   X112WNat
+  path=no
+    dwt=0.01   819   ttf=10   us1=0.28   us2=0
+               776   lay=3
+a 'X113ENat'   X   3   0.01   60   X113ENat
+  path=no
+    dwt=0.01   783   ttf=10   us1=1.16   us2=0
+               821   lay=3
+a 'X113WNat'   X   3   0.01   60   X113WNat
+  path=no
+    dwt=0.01   821   ttf=10   us1=1.16   us2=0
+               783   lay=3
+a 'X114ENat'   X   3   0.01   60   X114ENat
+  path=no
+    dwt=0.01   782   ttf=10   us1=3.1    us2=0
+               783   lay=3
+a 'X114WNat'   X   3   0.01   60   X114WNat
+  path=no
+    dwt=0.01   783   ttf=10   us1=3.1    us2=0
+               782   lay=3
+a 'X115ENat'   X   3   0.01   60   X115ENat
+  path=no
+    dwt=0.01   782   ttf=10   us1=0.53   us2=0
+    dwt=0.01   827   ttf=10   us1=0.93   us2=0
+    dwt=0.01   826   ttf=10   us1=0.72   us2=0
+    dwt=0.01   824   ttf=10   us1=0.52   us2=0
+               785   lay=3
+a 'X115WNat'   X   3   0.01   60   X115WNat
+  path=no
+    dwt=0.01   785   ttf=10   us1=0.52   us2=0
+    dwt=0.01   824   ttf=10   us1=0.72   us2=0
+    dwt=0.01   826   ttf=10   us1=0.93   us2=0
+    dwt=0.01   827   ttf=10   us1=0.53   us2=0
+               782   lay=3
+a 'X116ENat'   X   3   0.01   60   X116ENat
+  path=no
+    dwt=0.01   822   ttf=10   us1=0.85   us2=0
+    dwt=0.01   784   ttf=10   us1=2.56   us2=0
+    dwt=0.01   785   ttf=10   us1=0.42   us2=0
+    dwt=0.01   790   ttf=10   us1=0.27   us2=0
+    dwt=0.01   823   ttf=10   us1=0.4    us2=0
+               825   lay=3
+a 'X116WNat'   X   3   0.01   60   X116WNat
+  path=no
+    dwt=0.01   825   ttf=10   us1=0.4    us2=0
+    dwt=0.01   823   ttf=10   us1=0.27   us2=0
+    dwt=0.01   790   ttf=10   us1=0.42   us2=0
+    dwt=0.01   785   ttf=10   us1=2.56   us2=0
+    dwt=0.01   784   ttf=10   us1=0.85   us2=0
+               822   lay=3
+a 'X117ENat'   X   3   0.01   60   X117ENat
+  path=no
+    dwt=0.01   780   ttf=10   us1=0.39   us2=0
+    dwt=0.01   809   ttf=10   us1=0.44   us2=0
+               830   lay=3
+a 'X117WNat'   X   3   0.01   60   X117WNat
+  path=no
+    dwt=0.01   830   ttf=10   us1=0.44   us2=0
+    dwt=0.01   809   ttf=10   us1=0.39   us2=0
+               780   lay=3
+a 'X118ENat'   X   3   0.01   60   X118ENat
+  path=no
+    dwt=0.01   778   ttf=10   us1=0.57   us2=0
+    dwt=0.01   807   ttf=10   us1=0.48   us2=0
+               808   lay=3
+a 'X118WNat'   X   3   0.01   60   X118WNat
+  path=no
+    dwt=0.01   808   ttf=10   us1=0.48   us2=0
+    dwt=0.01   807   ttf=10   us1=0.57   us2=0
+               778   lay=3
+a 'X119ENat'   X   3   0.01   60   X119ENat
+  path=no
+    dwt=0.01   831   ttf=10   us1=0.14   us2=0
+               775   lay=3
+a 'X119WNat'   X   3   0.01   60   X119WNat
+  path=no
+    dwt=0.01   775   ttf=10   us1=0.14   us2=0
+               831   lay=3
+a 'X120ENat'   X   3   0.01   60   X120ENat
+  path=no
+    dwt=0.01   771   ttf=10   us1=1.38   us2=0
+               779   lay=3
+a 'X120WNat'   X   3   0.01   60   X120WNat
+  path=no
+    dwt=0.01   779   ttf=10   us1=1.38   us2=0
+               771   lay=3
+a 'X121ENat'   X   3   0.01   60   X121ENat
+  path=no
+    dwt=0.01   769   ttf=10   us1=0.29   us2=0
+               828   lay=3
+a 'X121WNat'   X   3   0.01   60   X121WNat
+  path=no
+    dwt=0.01   828   ttf=10   us1=0.29   us2=0
+               769   lay=3
+a 'X122ENat'   X   3   0.01   60   X122ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'X122WNat'   X   3   0.01   60   X122WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'X123ENat'   X   3   0.01   60   X123ENat
+  path=no
+    dwt=0.01   740   ttf=10   us1=0.69   us2=0
+               742   lay=3
+a 'X123WNat'   X   3   0.01   60   X123WNat
+  path=no
+    dwt=0.01   742   ttf=10   us1=0.69   us2=0
+               740   lay=3
+a 'X124ENat'   X   3   0.01   60   X124ENat
+  path=no
+    dwt=0.01   732   ttf=10   us1=0.27   us2=0
+               726   lay=3
+a 'X124WNat'   X   3   0.01   60   X124WNat
+  path=no
+    dwt=0.01   726   ttf=10   us1=0.27   us2=0
+               732   lay=3
+a 'X125ENat'   X   3   0.01   60   X125ENat
+  path=no
+    dwt=0.01   728   ttf=10   us1=0.14   us2=0
+               729   lay=3
+a 'X125WNat'   X   3   0.01   60   X125WNat
+  path=no
+    dwt=0.01   729   ttf=10   us1=0.14   us2=0
+               728   lay=3
+a 'X126ENat'   X   3   0.01   60   X126ENat
+  path=no
+    dwt=0.01   676   ttf=10   us1=1.51   us2=0
+               685   lay=3
+a 'X126WNat'   X   3   0.01   60   X126WNat
+  path=no
+    dwt=0.01   685   ttf=10   us1=1.51   us2=0
+               676   lay=3
+a 'X127ENat'   X   3   0.01   60   X127ENat
+  path=no
+    dwt=0.01   675   ttf=10   us1=1.96   us2=0
+               676   lay=3
+a 'X127WNat'   X   3   0.01   60   X127WNat
+  path=no
+    dwt=0.01   676   ttf=10   us1=1.96   us2=0
+               675   lay=3
+a 'X128ENat'   X   3   0.01   60   X128ENat
+  path=no
+    dwt=0.01   759   ttf=10   us1=0.34   us2=0
+               836   lay=3
+a 'X128WNat'   X   3   0.01   60   X128WNat
+  path=no
+    dwt=0.01   836   ttf=10   us1=0.34   us2=0
+               759   lay=3
+a 'X16ENa'   X   3   0.01   60   X16ENa
+  path=no
+    dwt=0.01   764   ttf=10   us1=3.77   us2=0
+    dwt=0.01   756   ttf=10   us1=2.87   us2=0
+    dwt=0.01   755   ttf=10   us1=1.26   us2=0
+    dwt=0.01   751   ttf=10   us1=3.31   us2=0
+    dwt=0.01   761   ttf=10   us1=2.46   us2=0
+    dwt=0.01   767   ttf=10   us1=1.77   us2=0
+    dwt=0.01   769   ttf=10   us1=1.85   us2=0
+    dwt=0.01   771   ttf=10   us1=0.45   us2=0
+    dwt=0.01   770   ttf=10   us1=1.77   us2=0
+    dwt=0.01   773   ttf=10   us1=0.29   us2=0
+    dwt=0.01   775   ttf=10   us1=1.19   us2=0
+    dwt=0.01   778   ttf=10   us1=1.04   us2=0
+    dwt=0.01   780   ttf=10   us1=0.89   us2=0
+    dwt=0.01   781   ttf=10   us1=2.88   us2=0
+    dwt=0.01   784   ttf=10   us1=0.37   us2=0
+               782   lay=3
+a 'X16WNa'   X   3   0.01   60   X16WNa
+  path=no
+    dwt=0.01   782   ttf=10   us1=0.37   us2=0
+    dwt=0.01   784   ttf=10   us1=2.88   us2=0
+    dwt=0.01   781   ttf=10   us1=0.89   us2=0
+    dwt=0.01   780   ttf=10   us1=1.04   us2=0
+    dwt=0.01   778   ttf=10   us1=1.19   us2=0
+    dwt=0.01   775   ttf=10   us1=0.29   us2=0
+    dwt=0.01   773   ttf=10   us1=1.77   us2=0
+    dwt=0.01   770   ttf=10   us1=0.45   us2=0
+    dwt=0.01   771   ttf=10   us1=1.85   us2=0
+    dwt=0.01   769   ttf=10   us1=1.77   us2=0
+    dwt=0.01   767   ttf=10   us1=2.46   us2=0
+    dwt=0.01   761   ttf=10   us1=3.31   us2=0
+    dwt=0.01   751   ttf=10   us1=1.26   us2=0
+    dwt=0.01   755   ttf=10   us1=2.87   us2=0
+    dwt=0.01   756   ttf=10   us1=3.77   us2=0
+               764   lay=3
+a 'X17ENa'   X   3   0.01   60   X17ENa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.27   us2=0
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+    dwt=0.01   719   ttf=10   us1=0.34   us2=0
+    dwt=0.01   718   ttf=10   us1=1.42   us2=0
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+    dwt=0.01   716   ttf=10   us1=2.09   us2=0
+    dwt=0.01   720   ttf=10   us1=4.29   us2=0
+    dwt=0.01   713   ttf=10   us1=0.89   us2=0
+    dwt=0.01   712   ttf=10   us1=0.76   us2=0
+               711   lay=3
+a 'X17WNa'   X   3   0.01   60   X17WNa
+  path=no
+    dwt=0.01   711   ttf=10   us1=0.76   us2=0
+    dwt=0.01   712   ttf=10   us1=0.89   us2=0
+    dwt=0.01   713   ttf=10   us1=4.29   us2=0
+    dwt=0.01   720   ttf=10   us1=2.09   us2=0
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+    dwt=0.01   715   ttf=10   us1=1.42   us2=0
+    dwt=0.01   718   ttf=10   us1=0.34   us2=0
+    dwt=0.01   719   ttf=10   us1=3.27   us2=0
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+               683   lay=3
+a 'X18ENa'   X   3   0.01   60   X18ENa
+  path=no
+    dwt=0.01   714   ttf=10   us1=6.57   us2=0
+               755   lay=3
+a 'X18WNa'   X   3   0.01   60   X18WNa
+  path=no
+    dwt=0.01   755   ttf=10   us1=6.57   us2=0
+               714   lay=3
+a 'X19ENa'   X   3   0.01   60   X19ENa
+  path=no
+    dwt=0.01   717   ttf=10   us1=1.62   us2=0
+    dwt=0.01   725   ttf=10   us1=1.45   us2=0
+    dwt=0.01   730   ttf=10   us1=1      us2=0
+    dwt=0.01   736   ttf=10   us1=0.97   us2=0
+    dwt=0.01   737   ttf=10   us1=0.53   us2=0
+    dwt=0.01   738   ttf=10   us1=0      us2=0
+    dwt=0.01   739   ttf=10   us1=0.71   us2=0
+    dwt=0.01   741   ttf=10   us1=0.76   us2=0
+    dwt=0.01   742   ttf=10   us1=2.21   us2=0
+               748   lay=3
+a 'X19WNa'   X   3   0.01   60   X19WNa
+  path=no
+    dwt=0.01   748   ttf=10   us1=2.21   us2=0
+    dwt=0.01   742   ttf=10   us1=0.76   us2=0
+    dwt=0.01   741   ttf=10   us1=0.71   us2=0
+    dwt=0.01   739   ttf=10   us1=0      us2=0
+    dwt=0.01   738   ttf=10   us1=0.53   us2=0
+    dwt=0.01   737   ttf=10   us1=0.97   us2=0
+    dwt=0.01   736   ttf=10   us1=1      us2=0
+    dwt=0.01   730   ttf=10   us1=1.45   us2=0
+    dwt=0.01   725   ttf=10   us1=1.62   us2=0
+               717   lay=3
+a 'X20ENa'   X   3   0.01   60   X20ENa
+  path=no
+    dwt=0.01   722   ttf=10   us1=1.38   us2=0
+    dwt=0.01   728   ttf=10   us1=1.34   us2=0
+    dwt=0.01   739   ttf=10   us1=0.47   us2=0
+    dwt=0.01   743   ttf=10   us1=0.33   us2=0
+    dwt=0.01   747   ttf=10   us1=0.7    us2=0
+    dwt=0.01   749   ttf=10   us1=0.23   us2=0
+    dwt=0.01   750   ttf=10   us1=3.17   us2=0
+    dwt=0.01   762   ttf=10   us1=2.33   us2=0
+    dwt=0.01   776   ttf=10   us1=2.22   us2=0
+               782   lay=3
+a 'X20WNa'   X   3   0.01   60   X20WNa
+  path=no
+    dwt=0.01   782   ttf=10   us1=2.22   us2=0
+    dwt=0.01   776   ttf=10   us1=2.33   us2=0
+    dwt=0.01   762   ttf=10   us1=3.17   us2=0
+    dwt=0.01   750   ttf=10   us1=0.23   us2=0
+    dwt=0.01   749   ttf=10   us1=0.7    us2=0
+    dwt=0.01   747   ttf=10   us1=0.33   us2=0
+    dwt=0.01   743   ttf=10   us1=0.47   us2=0
+    dwt=0.01   739   ttf=10   us1=1.34   us2=0
+    dwt=0.01   728   ttf=10   us1=1.38   us2=0
+               722   lay=3
+a 'X21ENa'   X   3   0.01   60   X21ENa
+  path=no
+    dwt=0.01   747   ttf=10   us1=1.37   us2=0
+    dwt=0.01   754   ttf=10   us1=1.88   us2=0
+    dwt=0.01   759   ttf=10   us1=3.8    us2=0
+    dwt=0.01   768   ttf=10   us1=1.11   us2=0
+               775   lay=3
+a 'X21WNa'   X   3   0.01   60   X21WNa
+  path=no
+    dwt=0.01   775   ttf=10   us1=1.11   us2=0
+    dwt=0.01   768   ttf=10   us1=3.8    us2=0
+    dwt=0.01   759   ttf=10   us1=1.88   us2=0
+    dwt=0.01   754   ttf=10   us1=1.37   us2=0
+               747   lay=3
+a 'X22ENa'   X   3   0.01   60   X22ENa
+  path=no
+    dwt=0.01   732   ttf=10   us1=0.31   us2=0
+    dwt=0.01   731   ttf=10   us1=5.19   us2=0
+    dwt=0.01   727   ttf=10   us1=2.17   us2=0
+    dwt=0.01   733   ttf=10   us1=0.23   us2=0
+    dwt=0.01   735   ttf=10   us1=1.27   us2=0
+    dwt=0.01   734   ttf=10   us1=3.37   us2=0
+               751   lay=3
+a 'X22WNa'   X   3   0.01   60   X22WNa
+  path=no
+    dwt=0.01   751   ttf=10   us1=3.37   us2=0
+    dwt=0.01   734   ttf=10   us1=1.27   us2=0
+    dwt=0.01   735   ttf=10   us1=0.23   us2=0
+    dwt=0.01   733   ttf=10   us1=2.17   us2=0
+    dwt=0.01   727   ttf=10   us1=5.19   us2=0
+    dwt=0.01   731   ttf=10   us1=0.31   us2=0
+               732   lay=3
+a 'X24ENa'   X   3   0.01   60   X24ENa
+  path=no
+    dwt=0.01   719   ttf=10   us1=2.84   us2=0
+               734   lay=3
+a 'X24WNa'   X   3   0.01   60   X24WNa
+  path=no
+    dwt=0.01   734   ttf=10   us1=2.84   us2=0
+               719   lay=3
+a 'X25ENa'   X   3   0.01   60   X25ENa
+  path=no
+    dwt=0.01   735   ttf=10   us1=3.08   us2=0
+    dwt=0.01   753   ttf=10   us1=3.63   us2=0
+               761   lay=3
+a 'X25WNa'   X   3   0.01   60   X25WNa
+  path=no
+    dwt=0.01   761   ttf=10   us1=3.63   us2=0
+    dwt=0.01   753   ttf=10   us1=3.08   us2=0
+               735   lay=3
+a 'X30ENa'   X   3   0.01   60   X30ENa
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.55   us2=0
+    dwt=0.01   720   ttf=10   us1=4.44   us2=0
+               731   lay=3
+a 'X30WNa'   X   3   0.01   60   X30WNa
+  path=no
+    dwt=0.01   731   ttf=10   us1=4.44   us2=0
+    dwt=0.01   720   ttf=10   us1=3.55   us2=0
+               685   lay=3
+a 'X32ENa'   X   3   0.01   60   X32ENa
+  path=no
+    dwt=0.01   753   ttf=10   us1=1.24   us2=0
+    dwt=0.01   757   ttf=10   us1=1.84   us2=0
+               767   lay=3
+a 'X32WNa'   X   3   0.01   60   X32WNa
+  path=no
+    dwt=0.01   767   ttf=10   us1=1.84   us2=0
+    dwt=0.01   757   ttf=10   us1=1.24   us2=0
+               753   lay=3
+a 'X33ENa'   X   3   0.01   60   X33ENa
+  path=no
+    dwt=0.01   716   ttf=10   us1=2.12   us2=0
+               727   lay=3
+a 'X33WNa'   X   3   0.01   60   X33WNa
+  path=no
+    dwt=0.01   727   ttf=10   us1=2.12   us2=0
+               716   lay=3
+a 'X34ENa'   X   3   0.01   60   X34ENa
+  path=no
+    dwt=0.01   760   ttf=10   us1=2.19   us2=0
+               769   lay=3
+a 'X34WNa'   X   3   0.01   60   X34WNa
+  path=no
+    dwt=0.01   769   ttf=10   us1=2.19   us2=0
+               760   lay=3
+a 'X35ENat'   X   3   0.01   60   X35ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'X35WNat'   X   3   0.01   60   X35WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'X36ENa'   X   3   0.01   60   X36ENa
+  path=no
+    dwt=0.01   684   ttf=10   us1=1.59   us2=0
+    dwt=0.01   703   ttf=10   us1=1.15   us2=0
+    dwt=0.01   713   ttf=10   us1=1.09   us2=0
+    dwt=0.01   789   ttf=10   us1=2.14   us2=0
+    dwt=0.01   732   ttf=10   us1=2.58   us2=0
+    dwt=0.01   748   ttf=10   us1=5.3    us2=0
+    dwt=0.01   765   ttf=10   us1=2.44   us2=0
+               770   lay=3
+a 'X36WNa'   X   3   0.01   60   X36WNa
+  path=no
+    dwt=0.01   770   ttf=10   us1=2.44   us2=0
+    dwt=0.01   765   ttf=10   us1=5.3    us2=0
+    dwt=0.01   748   ttf=10   us1=2.58   us2=0
+    dwt=0.01   732   ttf=10   us1=2.14   us2=0
+    dwt=0.01   789   ttf=10   us1=1.09   us2=0
+    dwt=0.01   713   ttf=10   us1=1.15   us2=0
+    dwt=0.01   703   ttf=10   us1=1.59   us2=0
+               684   lay=3
+a 'X51ECma'   X   3   0.01   60   X51ECma
+  path=no
+    dwt=0.01   994   ttf=10   us1=0.09   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.2    us2=0
+    dwt=0.01   1017   ttf=10   us1=0.39   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.24   us2=0
+               722   lay=3
+a 'X51WCma'   X   3   0.01   60   X51WCma
+  path=no
+    dwt=0.01   722   ttf=10   us1=0.24   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.39   us2=0
+    dwt=0.01   1017   ttf=10   us1=0.2    us2=0
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.09   us2=0
+               994   lay=3
+a 'X52ECma'   X   3   0.01   60   X52ECma
+  path=no
+    dwt=0.01   1017   ttf=10   us1=0.1    us2=0
+               1019   lay=3
+a 'X52WCma'   X   3   0.01   60   X52WCma
+  path=no
+    dwt=0.01   1019   ttf=10   us1=0.1    us2=0
+               1017   lay=3
+a 'X53ECma'   X   3   0.01   60   X53ECma
+  path=no
+    dwt=0.01   991   ttf=10   us1=0.09   us2=0
+    dwt=0.01   998   ttf=10   us1=0.04   us2=0
+    dwt=0.01   999   ttf=10   us1=0.08   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1019   ttf=10   us1=0.31   us2=0
+               717   lay=3
+a 'X53WCma'   X   3   0.01   60   X53WCma
+  path=no
+    dwt=0.01   717   ttf=10   us1=0.31   us2=0
+    dwt=0.01   1019   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.08   us2=0
+    dwt=0.01   999   ttf=10   us1=0.04   us2=0
+    dwt=0.01   998   ttf=10   us1=0.09   us2=0
+               991   lay=3
+a 'X54ECma'   X   3   0.01   60   X54ECma
+  path=no
+    dwt=0.01   996   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.07   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.01   us2=0
+               1004   lay=3
+a 'X54WCma'   X   3   0.01   60   X54WCma
+  path=no
+    dwt=0.01   1004   ttf=10   us1=0.01   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.07   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1007   ttf=10   us1=0.1    us2=0
+               996   lay=3
+a 'X55ECma'   X   3   0.01   60   X55ECma
+  path=no
+    dwt=0.01   1008   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.03   us2=0
+               1013   lay=3
+a 'X55WCma'   X   3   0.01   60   X55WCma
+  path=no
+    dwt=0.01   1013   ttf=10   us1=0.03   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.04   us2=0
+               1008   lay=3
+a 'X56ECma'   X   3   0.01   60   X56ECma
+  path=no
+    dwt=0.01   979   ttf=10   us1=0.06   us2=0
+    dwt=0.01   989   ttf=10   us1=0.03   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1006   ttf=10   us1=0.05   us2=0
+               1007   lay=3
+a 'X56WCma'   X   3   0.01   60   X56WCma
+  path=no
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1006   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1000   ttf=10   us1=0.03   us2=0
+    dwt=0.01   989   ttf=10   us1=0.06   us2=0
+               979   lay=3
+a 'X57ECma'   X   3   0.01   60   X57ECma
+  path=no
+    dwt=0.01   711   ttf=10   us1=0.46   us2=0
+    dwt=0.01   987   ttf=10   us1=0.38   us2=0
+    dwt=0.01   996   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.06   us2=0
+    dwt=0.01   999   ttf=10   us1=0.07   us2=0
+    dwt=0.01   980   ttf=10   us1=0.13   us2=0
+    dwt=0.01   983   ttf=10   us1=0.05   us2=0
+    dwt=0.01   982   ttf=10   us1=0.01   us2=0
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+    dwt=0.01   976   ttf=10   us1=0.02   us2=0
+    dwt=0.01   975   ttf=10   us1=0.01   us2=0
+    dwt=0.01   974   ttf=10   us1=0.03   us2=0
+               977   lay=3
+a 'X57WCma'   X   3   0.01   60   X57WCma
+  path=no
+    dwt=0.01   977   ttf=10   us1=0.03   us2=0
+    dwt=0.01   974   ttf=10   us1=0.01   us2=0
+    dwt=0.01   975   ttf=10   us1=0.02   us2=0
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+    dwt=0.01   981   ttf=10   us1=0.01   us2=0
+    dwt=0.01   982   ttf=10   us1=0.05   us2=0
+    dwt=0.01   983   ttf=10   us1=0.13   us2=0
+    dwt=0.01   980   ttf=10   us1=0.07   us2=0
+    dwt=0.01   999   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.12   us2=0
+    dwt=0.01   996   ttf=10   us1=0.38   us2=0
+    dwt=0.01   987   ttf=10   us1=0.46   us2=0
+               711   lay=3
+a 'X58ECma'   X   3   0.01   60   X58ECma
+  path=no
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+               976   lay=3
+a 'X58WCma'   X   3   0.01   60   X58WCma
+  path=no
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+               967   lay=3
+a 'X59ECma'   X   3   0.01   60   X59ECma
+  path=no
+    dwt=0.01   911   ttf=10   us1=0.67   us2=0
+               917   lay=3
+a 'X59WCma'   X   3   0.01   60   X59WCma
+  path=no
+    dwt=0.01   917   ttf=10   us1=0.67   us2=0
+               911   lay=3
+a 'X60ECma'   X   3   0.01   60   X60ECma
+  path=no
+    dwt=0.01   913   ttf=10   us1=0.29   us2=0
+    dwt=0.01   911   ttf=10   us1=0.56   us2=0
+    dwt=0.01   922   ttf=10   us1=0.19   us2=0
+    dwt=0.01   929   ttf=10   us1=0.02   us2=0
+    dwt=0.01   931   ttf=10   us1=0.08   us2=0
+    dwt=0.01   935   ttf=10   us1=0.3    us2=0
+               979   lay=3
+a 'X60WCma'   X   3   0.01   60   X60WCma
+  path=no
+    dwt=0.01   979   ttf=10   us1=0.3    us2=0
+    dwt=0.01   935   ttf=10   us1=0.08   us2=0
+    dwt=0.01   931   ttf=10   us1=0.02   us2=0
+    dwt=0.01   929   ttf=10   us1=0.19   us2=0
+    dwt=0.01   922   ttf=10   us1=0.56   us2=0
+    dwt=0.01   911   ttf=10   us1=0.29   us2=0
+               913   lay=3
+a 'X61ECma'   X   3   0.01   60   X61ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.06   us2=0
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   983   ttf=10   us1=0.04   us2=0
+    dwt=0.01   990   ttf=10   us1=0.01   us2=0
+    dwt=0.01   991   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+               1003   lay=3
+a 'X61WCma'   X   3   0.01   60   X61WCma
+  path=no
+    dwt=0.01   1003   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   991   ttf=10   us1=0.01   us2=0
+    dwt=0.01   990   ttf=10   us1=0.04   us2=0
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   963   ttf=10   us1=0.06   us2=0
+               953   lay=3
+a 'X62ECma'   X   3   0.01   60   X62ECma
+  path=no
+    dwt=0.01   947   ttf=10   us1=0.05   us2=0
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   945   ttf=10   us1=0.05   us2=0
+    dwt=0.01   946   ttf=10   us1=0.04   us2=0
+    dwt=0.01   949   ttf=10   us1=0.03   us2=0
+    dwt=0.01   953   ttf=10   us1=0.09   us2=0
+    dwt=0.01   955   ttf=10   us1=0.1    us2=0
+    dwt=0.01   979   ttf=10   us1=0      us2=0
+               980   lay=3
+a 'X62WCma'   X   3   0.01   60   X62WCma
+  path=no
+    dwt=0.01   980   ttf=10   us1=0      us2=0
+    dwt=0.01   979   ttf=10   us1=0.1    us2=0
+    dwt=0.01   955   ttf=10   us1=0.09   us2=0
+    dwt=0.01   953   ttf=10   us1=0.03   us2=0
+    dwt=0.01   949   ttf=10   us1=0.04   us2=0
+    dwt=0.01   946   ttf=10   us1=0.05   us2=0
+    dwt=0.01   945   ttf=10   us1=0.04   us2=0
+    dwt=0.01   944   ttf=10   us1=0.05   us2=0
+               947   lay=3
+a 'X63ECma'   X   3   0.01   60   X63ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.08   us2=0
+    dwt=0.01   964   ttf=10   us1=0.02   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+               982   lay=3
+a 'X63WCma'   X   3   0.01   60   X63WCma
+  path=no
+    dwt=0.01   982   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.02   us2=0
+    dwt=0.01   964   ttf=10   us1=0.08   us2=0
+               953   lay=3
+a 'X64ECma'   X   3   0.01   60   X64ECma
+  path=no
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.01   us2=0
+    dwt=0.01   960   ttf=10   us1=0.03   us2=0
+    dwt=0.01   959   ttf=10   us1=0.02   us2=0
+    dwt=0.01   958   ttf=10   us1=0.03   us2=0
+               957   lay=3
+a 'X64WCma'   X   3   0.01   60   X64WCma
+  path=no
+    dwt=0.01   957   ttf=10   us1=0.03   us2=0
+    dwt=0.01   958   ttf=10   us1=0.02   us2=0
+    dwt=0.01   959   ttf=10   us1=0.03   us2=0
+    dwt=0.01   960   ttf=10   us1=0.01   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+               963   lay=3
+a 'X65ECma'   X   3   0.01   60   X65ECma
+  path=no
+    dwt=0.01   943   ttf=10   us1=0.04   us2=0
+    dwt=0.01   947   ttf=10   us1=0.07   us2=0
+    dwt=0.01   952   ttf=10   us1=0.08   us2=0
+    dwt=0.01   959   ttf=10   us1=0.04   us2=0
+    dwt=0.01   974   ttf=10   us1=0.04   us2=0
+    dwt=0.01   986   ttf=10   us1=0.01   us2=0
+               992   lay=3
+a 'X65WCma'   X   3   0.01   60   X65WCma
+  path=no
+    dwt=0.01   992   ttf=10   us1=0.01   us2=0
+    dwt=0.01   986   ttf=10   us1=0.04   us2=0
+    dwt=0.01   974   ttf=10   us1=0.04   us2=0
+    dwt=0.01   959   ttf=10   us1=0.08   us2=0
+    dwt=0.01   952   ttf=10   us1=0.07   us2=0
+    dwt=0.01   947   ttf=10   us1=0.04   us2=0
+               943   lay=3
+a 'n01ENa'   n   7   0.01   60   n01ENa
+  path=no
+    dwt=0.01   615   ttf=10   us1=21.15  us2=0
+               806   lay=3
+a 'n01WNa'   n   7   0.01   60   n01WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=21.15  us2=0
+               615   lay=3
+a 'n02ENa'   n   7   0.01   60   n02ENa
+  path=no
+    dwt=0.01   619   ttf=10   us1=8.45   us2=0
+    dwt=0.01   802   ttf=10   us1=6.2    us2=0
+               806   lay=3
+a 'n02WNa'   n   7   0.01   60   n02WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=6.2    us2=0
+    dwt=0.01   802   ttf=10   us1=8.45   us2=0
+               619   lay=3
+a 'n03ENa'   n   7   0.01   60   n03ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=3.68   us2=0
+               674   lay=3
+a 'n03WNa'   n   7   0.01   60   n03WNa
+  path=no
+    dwt=0.01   674   ttf=10   us1=3.68   us2=0
+               806   lay=3
+a 'n04ENa'   n   7   0.01   60   n04ENa
+  path=no
+    dwt=0.01   810   ttf=10   us1=6.86   us2=0
+               783   lay=3
+a 'n04WNa'   n   7   0.01   60   n04WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=6.86   us2=0
+               810   lay=3
+a 'n05ENa'   n   7   0.01   60   n05ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=13.31  us2=0
+    dwt=0.01   810   ttf=10   us1=5.23   us2=0
+               762   lay=3
+a 'n05WNa'   n   7   0.01   60   n05WNa
+  path=no
+    dwt=0.01   762   ttf=10   us1=5.23   us2=0
+    dwt=0.01   810   ttf=10   us1=13.31  us2=0
+               806   lay=3
+a 'n100ENat'   n   7   0.01   60   n100ENat
+  path=no
+    dwt=0.01   679   ttf=10   us1=4.12   us2=0
+               718   lay=3
+a 'n100WNat'   n   7   0.01   60   n100WNat
+  path=no
+    dwt=0.01   718   ttf=10   us1=4.12   us2=0
+               679   lay=3
+a 'n101ENat'   n   7   0.01   60   n101ENat
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.27   us2=0
+               714   lay=3
+a 'n101WNat'   n   7   0.01   60   n101WNat
+  path=no
+    dwt=0.01   714   ttf=10   us1=3.27   us2=0
+               683   lay=3
+a 'n102ENat'   n   7   0.01   60   n102ENat
+  path=no
+    dwt=0.01   762   ttf=10   us1=2.33   us2=0
+    dwt=0.01   776   ttf=10   us1=2.22   us2=0
+               782   lay=3
+a 'n102WNat'   n   7   0.01   60   n102WNat
+  path=no
+    dwt=0.01   782   ttf=10   us1=2.22   us2=0
+    dwt=0.01   776   ttf=10   us1=2.33   us2=0
+               762   lay=3
+a 'n103ENat'   n   7   0.01   60   n103ENat
+  path=no
+    dwt=0.01   776   ttf=10   us1=0.28   us2=0
+               819   lay=3
+a 'n103WNat'   n   7   0.01   60   n103WNat
+  path=no
+    dwt=0.01   819   ttf=10   us1=0.28   us2=0
+               776   lay=3
+a 'n104ENat'   n   7   0.01   60   n104ENat
+  path=no
+    dwt=0.01   783   ttf=10   us1=1.16   us2=0
+               821   lay=3
+a 'n104WNat'   n   7   0.01   60   n104WNat
+  path=no
+    dwt=0.01   821   ttf=10   us1=1.16   us2=0
+               783   lay=3
+a 'n105ENat'   n   7   0.01   60   n105ENat
+  path=no
+    dwt=0.01   835   ttf=10   us1=1.5    us2=0
+    dwt=0.01   833   ttf=10   us1=0.45   us2=0
+               683   lay=3
+a 'n105WNat'   n   7   0.01   60   n105WNat
+  path=no
+    dwt=0.01   683   ttf=10   us1=0.45   us2=0
+    dwt=0.01   833   ttf=10   us1=1.5    us2=0
+               835   lay=3
+a 'n106ENat'   n   7   0.01   60   n106ENat
+  path=no
+    dwt=0.01   728   ttf=10   us1=0.14   us2=0
+               729   lay=3
+a 'n106WNat'   n   7   0.01   60   n106WNat
+  path=no
+    dwt=0.01   729   ttf=10   us1=0.14   us2=0
+               728   lay=3
+a 'n107ENat'   n   7   0.01   60   n107ENat
+  path=no
+    dwt=0.01   724   ttf=10   us1=1.31   us2=0
+               729   lay=3
+a 'n107WNat'   n   7   0.01   60   n107WNat
+  path=no
+    dwt=0.01   729   ttf=10   us1=1.31   us2=0
+               724   lay=3
+a 'n108ENat'   n   7   0.01   60   n108ENat
+  path=no
+    dwt=0.01   715   ttf=10   us1=0.02   us2=0
+               716   lay=3
+a 'n108WNat'   n   7   0.01   60   n108WNat
+  path=no
+    dwt=0.01   716   ttf=10   us1=0.02   us2=0
+               715   lay=3
+a 'n109ENat'   n   7   0.01   60   n109ENat
+  path=no
+    dwt=0.01   685   ttf=10   us1=3.11   us2=0
+               715   lay=3
+a 'n109WNat'   n   7   0.01   60   n109WNat
+  path=no
+    dwt=0.01   715   ttf=10   us1=3.11   us2=0
+               685   lay=3
+a 'n110ENat'   n   7   0.01   60   n110ENat
+  path=no
+    dwt=0.01   684   ttf=10   us1=0.02   us2=0
+               850   lay=3
+a 'n110WNat'   n   7   0.01   60   n110WNat
+  path=no
+    dwt=0.01   850   ttf=10   us1=0.02   us2=0
+               684   lay=3
+a 'n112ENat'   n   7   0.01   60   n112ENat
+  path=no
+    dwt=0.01   759   ttf=10   us1=0.34   us2=0
+               836   lay=3
+a 'n112WNat'   n   7   0.01   60   n112WNat
+  path=no
+    dwt=0.01   836   ttf=10   us1=0.34   us2=0
+               759   lay=3
+a 'n113ENat'   n   7   0.01   60   n113ENat
+  path=no
+    dwt=0.01   675   ttf=10   us1=1.96   us2=0
+               676   lay=3
+a 'n113WNat'   n   7   0.01   60   n113WNat
+  path=no
+    dwt=0.01   676   ttf=10   us1=1.96   us2=0
+               675   lay=3
+a 'n11ENa'   n   7   0.01   60   n11ENa
+  path=no
+    dwt=0.01   683   ttf=10   us1=3.29   us2=0
+    dwt=0.01   679   ttf=10   us1=3.7    us2=0
+    dwt=0.01   685   ttf=10   us1=1.51   us2=0
+    dwt=0.01   676   ttf=10   us1=2.88   us2=0
+    dwt=0.01   695   ttf=10   us1=2.11   us2=0
+    dwt=0.01   703   ttf=10   us1=1.04   us2=0
+    dwt=0.01   706   ttf=10   us1=1.14   us2=0
+               709   lay=3
+a 'n11WNa'   n   7   0.01   60   n11WNa
+  path=no
+    dwt=0.01   709   ttf=10   us1=1.14   us2=0
+    dwt=0.01   706   ttf=10   us1=1.04   us2=0
+    dwt=0.01   703   ttf=10   us1=2.11   us2=0
+    dwt=0.01   695   ttf=10   us1=2.88   us2=0
+    dwt=0.01   676   ttf=10   us1=1.51   us2=0
+    dwt=0.01   685   ttf=10   us1=3.7    us2=0
+    dwt=0.01   679   ttf=10   us1=3.29   us2=0
+               683   lay=3
+a 'n12ENa'   n   7   0.01   60   n12ENa
+  path=no
+    dwt=0.01   674   ttf=10   us1=4.9    us2=0
+    dwt=0.01   671   ttf=10   us1=0.17   us2=0
+    dwt=0.01   672   ttf=10   us1=0.2    us2=0
+    dwt=0.01   673   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   680   ttf=10   us1=0.5    us2=0
+    dwt=0.01   686   ttf=10   us1=0.72   us2=0
+               698   lay=3
+a 'n12WNa'   n   7   0.01   60   n12WNa
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.72   us2=0
+    dwt=0.01   686   ttf=10   us1=0.5    us2=0
+    dwt=0.01   680   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   673   ttf=10   us1=0.2    us2=0
+    dwt=0.01   672   ttf=10   us1=0.17   us2=0
+    dwt=0.01   671   ttf=10   us1=4.9    us2=0
+               674   lay=3
+a 'n14ENa'   n   7   0.01   60   n14ENa
+  path=no
+    dwt=0.01   650   ttf=10   us1=0.69   us2=0
+    dwt=0.01   652   ttf=10   us1=2.49   us2=0
+    dwt=0.01   669   ttf=10   us1=2.99   us2=0
+    dwt=0.01   687   ttf=10   us1=0.26   us2=0
+               686   lay=3
+a 'n14WNa'   n   7   0.01   60   n14WNa
+  path=no
+    dwt=0.01   686   ttf=10   us1=0.26   us2=0
+    dwt=0.01   687   ttf=10   us1=2.99   us2=0
+    dwt=0.01   669   ttf=10   us1=2.49   us2=0
+    dwt=0.01   652   ttf=10   us1=0.69   us2=0
+               650   lay=3
+a 'n15ENa'   n   7   0.01   60   n15ENa
+  path=no
+    dwt=0.01   680   ttf=10   us1=0.92   us2=0
+               694   lay=3
+a 'n15WNa'   n   7   0.01   60   n15WNa
+  path=no
+    dwt=0.01   694   ttf=10   us1=0.92   us2=0
+               680   lay=3
+a 'n16ENa'   n   7   0.01   60   n16ENa
+  path=no
+    dwt=0.01   750   ttf=10   us1=0.5    us2=0
+    dwt=0.01   754   ttf=10   us1=1.88   us2=0
+               759   lay=3
+a 'n16WNa'   n   7   0.01   60   n16WNa
+  path=no
+    dwt=0.01   759   ttf=10   us1=1.88   us2=0
+    dwt=0.01   754   ttf=10   us1=0.5    us2=0
+               750   lay=3
+a 'n17ENa'   n   7   0.01   60   n17ENa
+  path=no
+    dwt=0.01   684   ttf=10   us1=1.47   us2=0
+               695   lay=3
+a 'n17WNa'   n   7   0.01   60   n17WNa
+  path=no
+    dwt=0.01   695   ttf=10   us1=1.47   us2=0
+               684   lay=3
+a 'n19ENa'   n   7   0.01   60   n19ENa
+  path=no
+    dwt=0.01   737   ttf=10   us1=0.97   us2=0
+               736   lay=3
+a 'n19WNa'   n   7   0.01   60   n19WNa
+  path=no
+    dwt=0.01   736   ttf=10   us1=0.97   us2=0
+               737   lay=3
+a 'n23ENa'   n   7   0.01   60   n23ENa
+  path=no
+    dwt=0.01   723   ttf=10   us1=0.04   us2=0
+    dwt=0.01   724   ttf=10   us1=2.07   us2=0
+    dwt=0.01   730   ttf=10   us1=1      us2=0
+    dwt=0.01   736   ttf=10   us1=4.64   us2=0
+    dwt=0.01   762   ttf=10   us1=7.23   us2=0
+               783   lay=3
+a 'n23WNa'   n   7   0.01   60   n23WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=7.23   us2=0
+    dwt=0.01   762   ttf=10   us1=4.64   us2=0
+    dwt=0.01   736   ttf=10   us1=1      us2=0
+    dwt=0.01   730   ttf=10   us1=2.07   us2=0
+    dwt=0.01   724   ttf=10   us1=0.04   us2=0
+               723   lay=3
+a 'n24ENa'   n   7   0.01   60   n24ENa
+  path=no
+    dwt=0.01   677   ttf=10   us1=1.76   us2=0
+    dwt=0.01   697   ttf=10   us1=1.21   us2=0
+    dwt=0.01   708   ttf=10   us1=0.09   us2=0
+    dwt=0.01   707   ttf=10   us1=0.2    us2=0
+               705   lay=3
+a 'n24WNa'   n   7   0.01   60   n24WNa
+  path=no
+    dwt=0.01   705   ttf=10   us1=0.2    us2=0
+    dwt=0.01   707   ttf=10   us1=0.09   us2=0
+    dwt=0.01   708   ttf=10   us1=1.21   us2=0
+    dwt=0.01   697   ttf=10   us1=1.76   us2=0
+               677   lay=3
+a 'n51ECma'   n   7   0.01   60   n51ECma
+  path=no
+    dwt=0.01   982   ttf=10   us1=0.03   us2=0
+    dwt=0.01   969   ttf=10   us1=0.05   us2=0
+    dwt=0.01   970   ttf=10   us1=0.02   us2=0
+    dwt=0.01   971   ttf=10   us1=0.11   us2=0
+    dwt=0.01   979   ttf=10   us1=0.06   us2=0
+    dwt=0.01   989   ttf=10   us1=0.03   us2=0
+    dwt=0.01   1000   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1006   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1014   ttf=10   us1=0.27   us2=0
+    dwt=0.01   1018   ttf=10   us1=0.31   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.44   us2=0
+               723   lay=3
+a 'n51WCma'   n   7   0.01   60   n51WCma
+  path=no
+    dwt=0.01   723   ttf=10   us1=0.44   us2=0
+    dwt=0.01   1021   ttf=10   us1=0.31   us2=0
+    dwt=0.01   1018   ttf=10   us1=0.27   us2=0
+    dwt=0.01   1014   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1010   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1006   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1000   ttf=10   us1=0.03   us2=0
+    dwt=0.01   989   ttf=10   us1=0.06   us2=0
+    dwt=0.01   979   ttf=10   us1=0.11   us2=0
+    dwt=0.01   971   ttf=10   us1=0.02   us2=0
+    dwt=0.01   970   ttf=10   us1=0.05   us2=0
+    dwt=0.01   969   ttf=10   us1=0.03   us2=0
+               982   lay=3
+a 'n52ECma'   n   7   0.01   60   n52ECma
+  path=no
+    dwt=0.01   709   ttf=10   us1=0.23   us2=0
+    dwt=0.01   948   ttf=10   us1=0.45   us2=0
+    dwt=0.01   972   ttf=10   us1=0.14   us2=0
+    dwt=0.01   989   ttf=10   us1=0.05   us2=0
+    dwt=0.01   999   ttf=10   us1=0.04   us2=0
+    dwt=0.01   998   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.12   us2=0
+               997   lay=3
+a 'n52WCma'   n   7   0.01   60   n52WCma
+  path=no
+    dwt=0.01   997   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1002   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   998   ttf=10   us1=0.04   us2=0
+    dwt=0.01   999   ttf=10   us1=0.05   us2=0
+    dwt=0.01   989   ttf=10   us1=0.14   us2=0
+    dwt=0.01   972   ttf=10   us1=0.45   us2=0
+    dwt=0.01   948   ttf=10   us1=0.23   us2=0
+               709   lay=3
+a 'n53ECma'   n   7   0.01   60   n53ECma
+  path=no
+    dwt=0.01   921   ttf=10   us1=0.35   us2=0
+    dwt=0.01   929   ttf=10   us1=0.04   us2=0
+    dwt=0.01   930   ttf=10   us1=0.37   us2=0
+    dwt=0.01   949   ttf=10   us1=0.09   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   978   ttf=10   us1=0.02   us2=0
+    dwt=0.01   985   ttf=10   us1=0.03   us2=0
+    dwt=0.01   993   ttf=10   us1=0.01   us2=0
+    dwt=0.01   995   ttf=10   us1=0.02   us2=0
+               997   lay=3
+a 'n53WCma'   n   7   0.01   60   n53WCma
+  path=no
+    dwt=0.01   997   ttf=10   us1=0.02   us2=0
+    dwt=0.01   995   ttf=10   us1=0.01   us2=0
+    dwt=0.01   993   ttf=10   us1=0.03   us2=0
+    dwt=0.01   985   ttf=10   us1=0.02   us2=0
+    dwt=0.01   978   ttf=10   us1=0.02   us2=0
+    dwt=0.01   968   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.09   us2=0
+    dwt=0.01   949   ttf=10   us1=0.37   us2=0
+    dwt=0.01   930   ttf=10   us1=0.04   us2=0
+    dwt=0.01   929   ttf=10   us1=0.35   us2=0
+               921   lay=3
+a 'n54ECma'   n   7   0.01   60   n54ECma
+  path=no
+    dwt=0.01   1006   ttf=10   us1=0.05   us2=0
+               1007   lay=3
+a 'n54WCma'   n   7   0.01   60   n54WCma
+  path=no
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+               1006   lay=3
+a 'n55ECma'   n   7   0.01   60   n55ECma
+  path=no
+    dwt=0.01   922   ttf=10   us1=0.21   us2=0
+               927   lay=3
+a 'n55WCma'   n   7   0.01   60   n55WCma
+  path=no
+    dwt=0.01   927   ttf=10   us1=0.21   us2=0
+               922   lay=3
+a 'n56ECma'   n   7   0.01   60   n56ECma
+  path=no
+    dwt=0.01   968   ttf=10   us1=0.01   us2=0
+               967   lay=3
+a 'n56WCma'   n   7   0.01   60   n56WCma
+  path=no
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+               968   lay=3
+a 'n57ECma'   n   7   0.01   60   n57ECma
+  path=no
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+               978   lay=3
+a 'n57WCma'   n   7   0.01   60   n57WCma
+  path=no
+    dwt=0.01   978   ttf=10   us1=0.01   us2=0
+               976   lay=3
+a 'n58ECma'   n   7   0.01   60   n58ECma
+  path=no
+    dwt=0.01   950   ttf=10   us1=0.1    us2=0
+    dwt=0.01   942   ttf=10   us1=0.03   us2=0
+    dwt=0.01   939   ttf=10   us1=0.09   us2=0
+    dwt=0.01   933   ttf=10   us1=0.18   us2=0
+    dwt=0.01   928   ttf=10   us1=0.2    us2=0
+    dwt=0.01   924   ttf=10   us1=0.04   us2=0
+    dwt=0.01   923   ttf=10   us1=0.1    us2=0
+    dwt=0.01   926   ttf=10   us1=0.13   us2=0
+    dwt=0.01   925   ttf=10   us1=0.19   us2=0
+    dwt=0.01   927   ttf=10   us1=0.14   us2=0
+    dwt=0.01   930   ttf=10   us1=0.04   us2=0
+    dwt=0.01   931   ttf=10   us1=0.35   us2=0
+    dwt=0.01   972   ttf=10   us1=0.06   us2=0
+    dwt=0.01   996   ttf=10   us1=0.1    us2=0
+    dwt=0.01   1007   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1014   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.08   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.12   us2=0
+               1003   lay=3
+a 'n58WCma'   n   7   0.01   60   n58WCma
+  path=no
+    dwt=0.01   1003   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.08   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1014   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1011   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1007   ttf=10   us1=0.1    us2=0
+    dwt=0.01   996   ttf=10   us1=0.06   us2=0
+    dwt=0.01   972   ttf=10   us1=0.35   us2=0
+    dwt=0.01   931   ttf=10   us1=0.04   us2=0
+    dwt=0.01   930   ttf=10   us1=0.14   us2=0
+    dwt=0.01   927   ttf=10   us1=0.19   us2=0
+    dwt=0.01   925   ttf=10   us1=0.13   us2=0
+    dwt=0.01   926   ttf=10   us1=0.1    us2=0
+    dwt=0.01   923   ttf=10   us1=0.04   us2=0
+    dwt=0.01   924   ttf=10   us1=0.2    us2=0
+    dwt=0.01   928   ttf=10   us1=0.18   us2=0
+    dwt=0.01   933   ttf=10   us1=0.09   us2=0
+    dwt=0.01   939   ttf=10   us1=0.03   us2=0
+    dwt=0.01   942   ttf=10   us1=0.1    us2=0
+               950   lay=3
+a 'n59ECma'   n   7   0.01   60   n59ECma
+  path=no
+    dwt=0.01   694   ttf=10   us1=0.46   us2=0
+    dwt=0.01   906   ttf=10   us1=0.83   us2=0
+    dwt=0.01   923   ttf=10   us1=0.25   us2=0
+    dwt=0.01   934   ttf=10   us1=0.1    us2=0
+    dwt=0.01   945   ttf=10   us1=0.08   us2=0
+    dwt=0.01   954   ttf=10   us1=0.04   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   967   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+    dwt=0.01   976   ttf=10   us1=0.02   us2=0
+               985   lay=3
+a 'n59WCma'   n   7   0.01   60   n59WCma
+  path=no
+    dwt=0.01   985   ttf=10   us1=0.02   us2=0
+    dwt=0.01   976   ttf=10   us1=0.01   us2=0
+    dwt=0.01   973   ttf=10   us1=0.01   us2=0
+    dwt=0.01   967   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.04   us2=0
+    dwt=0.01   954   ttf=10   us1=0.08   us2=0
+    dwt=0.01   945   ttf=10   us1=0.1    us2=0
+    dwt=0.01   934   ttf=10   us1=0.25   us2=0
+    dwt=0.01   923   ttf=10   us1=0.83   us2=0
+    dwt=0.01   906   ttf=10   us1=0.46   us2=0
+               694   lay=3
+a 'n60ECma'   n   7   0.01   60   n60ECma
+  path=no
+    dwt=0.01   947   ttf=10   us1=0.05   us2=0
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   945   ttf=10   us1=0.05   us2=0
+    dwt=0.01   946   ttf=10   us1=0.04   us2=0
+    dwt=0.01   949   ttf=10   us1=0.03   us2=0
+    dwt=0.01   953   ttf=10   us1=0.09   us2=0
+    dwt=0.01   955   ttf=10   us1=0.1    us2=0
+               979   lay=3
+a 'n60WCma'   n   7   0.01   60   n60WCma
+  path=no
+    dwt=0.01   979   ttf=10   us1=0.1    us2=0
+    dwt=0.01   955   ttf=10   us1=0.09   us2=0
+    dwt=0.01   953   ttf=10   us1=0.03   us2=0
+    dwt=0.01   949   ttf=10   us1=0.04   us2=0
+    dwt=0.01   946   ttf=10   us1=0.05   us2=0
+    dwt=0.01   945   ttf=10   us1=0.04   us2=0
+    dwt=0.01   944   ttf=10   us1=0.05   us2=0
+               947   lay=3
+a 'n61ECma'   n   7   0.01   60   n61ECma
+  path=no
+    dwt=0.01   705   ttf=10   us1=0.69   us2=0
+    dwt=0.01   932   ttf=10   us1=0.1    us2=0
+    dwt=0.01   933   ttf=10   us1=0.24   us2=0
+    dwt=0.01   940   ttf=10   us1=0.1    us2=0
+    dwt=0.01   943   ttf=10   us1=0.04   us2=0
+    dwt=0.01   947   ttf=10   us1=0.07   us2=0
+    dwt=0.01   952   ttf=10   us1=0.08   us2=0
+    dwt=0.01   959   ttf=10   us1=0.04   us2=0
+               974   lay=3
+a 'n61WCma'   n   7   0.01   60   n61WCma
+  path=no
+    dwt=0.01   974   ttf=10   us1=0.04   us2=0
+    dwt=0.01   959   ttf=10   us1=0.08   us2=0
+    dwt=0.01   952   ttf=10   us1=0.07   us2=0
+    dwt=0.01   947   ttf=10   us1=0.04   us2=0
+    dwt=0.01   943   ttf=10   us1=0.1    us2=0
+    dwt=0.01   940   ttf=10   us1=0.24   us2=0
+    dwt=0.01   933   ttf=10   us1=0.1    us2=0
+    dwt=0.01   932   ttf=10   us1=0.69   us2=0
+               705   lay=3
+a 'p01ENa'   p   6   0.01   60   p01ENa
+  path=no
+    dwt=0.01   615   ttf=10   us1=21.15  us2=0
+               806   lay=3
+a 'p01WNa'   p   6   0.01   60   p01WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=21.15  us2=0
+               615   lay=3
+a 'p02ENa'   p   6   0.01   60   p02ENa
+  path=no
+    dwt=0.01   619   ttf=10   us1=8.45   us2=0
+    dwt=0.01   802   ttf=10   us1=6.2    us2=0
+               806   lay=3
+a 'p02WNa'   p   6   0.01   60   p02WNa
+  path=no
+    dwt=0.01   806   ttf=10   us1=6.2    us2=0
+    dwt=0.01   802   ttf=10   us1=8.45   us2=0
+               619   lay=3
+a 'p03ENa'   p   6   0.01   60   p03ENa
+  path=no
+    dwt=0.01   802   ttf=10   us1=3.02   us2=0
+               633   lay=3
+a 'p03WNa'   p   6   0.01   60   p03WNa
+  path=no
+    dwt=0.01   633   ttf=10   us1=3.02   us2=0
+               802   lay=3
+a 'p04ENa'   p   6   0.01   60   p04ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=3.68   us2=0
+               674   lay=3
+a 'p04WNa'   p   6   0.01   60   p04WNa
+  path=no
+    dwt=0.01   674   ttf=10   us1=3.68   us2=0
+               806   lay=3
+a 'p05ENa'   p   6   0.01   60   p05ENa
+  path=no
+    dwt=0.01   810   ttf=10   us1=6.86   us2=0
+               783   lay=3
+a 'p05WNa'   p   6   0.01   60   p05WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=6.86   us2=0
+               810   lay=3
+a 'p06ENa'   p   6   0.01   60   p06ENa
+  path=no
+    dwt=0.01   806   ttf=10   us1=13.31  us2=0
+    dwt=0.01   810   ttf=10   us1=5.23   us2=0
+               762   lay=3
+a 'p06WNa'   p   6   0.01   60   p06WNa
+  path=no
+    dwt=0.01   762   ttf=10   us1=5.23   us2=0
+    dwt=0.01   810   ttf=10   us1=13.31  us2=0
+               806   lay=3
+a 'p102ENat'   p   6   0.01   60   p102ENat
+  path=no
+    dwt=0.01   776   ttf=10   us1=0.28   us2=0
+               819   lay=3
+a 'p102WNat'   p   6   0.01   60   p102WNat
+  path=no
+    dwt=0.01   819   ttf=10   us1=0.28   us2=0
+               776   lay=3
+a 'p103ENat'   p   6   0.01   60   p103ENat
+  path=no
+    dwt=0.01   783   ttf=10   us1=1.16   us2=0
+               821   lay=3
+a 'p103WNat'   p   6   0.01   60   p103WNat
+  path=no
+    dwt=0.01   821   ttf=10   us1=1.16   us2=0
+               783   lay=3
+a 'p104ENat'   p   6   0.01   60   p104ENat
+  path=no
+    dwt=0.01   782   ttf=10   us1=0.53   us2=0
+    dwt=0.01   827   ttf=10   us1=0.93   us2=0
+    dwt=0.01   826   ttf=10   us1=0.72   us2=0
+    dwt=0.01   824   ttf=10   us1=0.52   us2=0
+               785   lay=3
+a 'p104WNat'   p   6   0.01   60   p104WNat
+  path=no
+    dwt=0.01   785   ttf=10   us1=0.52   us2=0
+    dwt=0.01   824   ttf=10   us1=0.72   us2=0
+    dwt=0.01   826   ttf=10   us1=0.93   us2=0
+    dwt=0.01   827   ttf=10   us1=0.53   us2=0
+               782   lay=3
+a 'p105ENat'   p   6   0.01   60   p105ENat
+  path=no
+    dwt=0.01   822   ttf=10   us1=0.85   us2=0
+    dwt=0.01   784   ttf=10   us1=2.56   us2=0
+    dwt=0.01   785   ttf=10   us1=0.42   us2=0
+    dwt=0.01   790   ttf=10   us1=0.27   us2=0
+    dwt=0.01   823   ttf=10   us1=0.4    us2=0
+               825   lay=3
+a 'p105WNat'   p   6   0.01   60   p105WNat
+  path=no
+    dwt=0.01   825   ttf=10   us1=0.4    us2=0
+    dwt=0.01   823   ttf=10   us1=0.27   us2=0
+    dwt=0.01   790   ttf=10   us1=0.42   us2=0
+    dwt=0.01   785   ttf=10   us1=2.56   us2=0
+    dwt=0.01   784   ttf=10   us1=0.85   us2=0
+               822   lay=3
+a 'p106ENat'   p   6   0.01   60   p106ENat
+  path=no
+    dwt=0.01   830   ttf=10   us1=0.44   us2=0
+    dwt=0.01   809   ttf=10   us1=0.39   us2=0
+    dwt=0.01   780   ttf=10   us1=0.89   us2=0
+               781   lay=3
+a 'p106WNat'   p   6   0.01   60   p106WNat
+  path=no
+    dwt=0.01   781   ttf=10   us1=0.89   us2=0
+    dwt=0.01   780   ttf=10   us1=0.39   us2=0
+    dwt=0.01   809   ttf=10   us1=0.44   us2=0
+               830   lay=3
+a 'p107ENat'   p   6   0.01   60   p107ENat
+  path=no
+    dwt=0.01   728   ttf=10   us1=0.14   us2=0
+               729   lay=3
+a 'p107WNat'   p   6   0.01   60   p107WNat
+  path=no
+    dwt=0.01   729   ttf=10   us1=0.14   us2=0
+               728   lay=3
+a 'p108ENat'   p   6   0.01   60   p108ENat
+  path=no
+    dwt=0.01   848   ttf=10   us1=0.03   us2=0
+    dwt=0.01   658   ttf=10   us1=0.1    us2=0
+    dwt=0.01   663   ttf=10   us1=0      us2=0
+               664   lay=3
+a 'p108WNat'   p   6   0.01   60   p108WNat
+  path=no
+    dwt=0.01   664   ttf=10   us1=0      us2=0
+    dwt=0.01   663   ttf=10   us1=0.1    us2=0
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+               848   lay=3
+a 'p12ENa'   p   6   0.01   60   p12ENa
+  path=no
+    dwt=0.01   633   ttf=10   us1=1.37   us2=0
+    dwt=0.01   636   ttf=10   us1=3.58   us2=0
+    dwt=0.01   647   ttf=10   us1=4.22   us2=0
+    dwt=0.01   671   ttf=10   us1=0.17   us2=0
+    dwt=0.01   672   ttf=10   us1=0.2    us2=0
+    dwt=0.01   673   ttf=10   us1=2.13   us2=0
+    dwt=0.01   677   ttf=10   us1=1.76   us2=0
+    dwt=0.01   697   ttf=10   us1=1.21   us2=0
+    dwt=0.01   708   ttf=10   us1=0.09   us2=0
+    dwt=0.01   707   ttf=10   us1=0.3    us2=0
+               710   lay=3
+a 'p12WNa'   p   6   0.01   60   p12WNa
+  path=no
+    dwt=0.01   710   ttf=10   us1=0.3    us2=0
+    dwt=0.01   707   ttf=10   us1=0.09   us2=0
+    dwt=0.01   708   ttf=10   us1=1.21   us2=0
+    dwt=0.01   697   ttf=10   us1=1.76   us2=0
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   673   ttf=10   us1=0.2    us2=0
+    dwt=0.01   672   ttf=10   us1=0.17   us2=0
+    dwt=0.01   671   ttf=10   us1=4.22   us2=0
+    dwt=0.01   647   ttf=10   us1=3.58   us2=0
+    dwt=0.01   636   ttf=10   us1=1.37   us2=0
+               633   lay=3
+a 'p13ENa'   p   6   0.01   60   p13ENa
+  path=no
+    dwt=0.01   674   ttf=10   us1=4.9    us2=0
+               671   lay=3
+a 'p13WNa'   p   6   0.01   60   p13WNa
+  path=no
+    dwt=0.01   671   ttf=10   us1=4.9    us2=0
+               674   lay=3
+a 'p16ENa'   p   6   0.01   60   p16ENa
+  path=no
+    dwt=0.01   721   ttf=10   us1=0.22   us2=0
+    dwt=0.01   724   ttf=10   us1=1.31   us2=0
+    dwt=0.01   729   ttf=10   us1=1.22   us2=0
+    dwt=0.01   737   ttf=10   us1=0.97   us2=0
+               736   lay=3
+a 'p16WNa'   p   6   0.01   60   p16WNa
+  path=no
+    dwt=0.01   736   ttf=10   us1=0.97   us2=0
+    dwt=0.01   737   ttf=10   us1=1.22   us2=0
+    dwt=0.01   729   ttf=10   us1=1.31   us2=0
+    dwt=0.01   724   ttf=10   us1=0.22   us2=0
+               721   lay=3
+a 'p17ENa'   p   6   0.01   60   p17ENa
+  path=no
+    dwt=0.01   762   ttf=10   us1=2.33   us2=0
+    dwt=0.01   776   ttf=10   us1=2.22   us2=0
+               782   lay=3
+a 'p17WNa'   p   6   0.01   60   p17WNa
+  path=no
+    dwt=0.01   782   ttf=10   us1=2.22   us2=0
+    dwt=0.01   776   ttf=10   us1=2.33   us2=0
+               762   lay=3
+a 'p18ENa'   p   6   0.01   60   p18ENa
+  path=no
+    dwt=0.01   669   ttf=10   us1=2.99   us2=0
+    dwt=0.01   687   ttf=10   us1=0.26   us2=0
+    dwt=0.01   686   ttf=10   us1=0.72   us2=0
+               698   lay=3
+a 'p18WNa'   p   6   0.01   60   p18WNa
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.72   us2=0
+    dwt=0.01   686   ttf=10   us1=0.26   us2=0
+    dwt=0.01   687   ttf=10   us1=2.99   us2=0
+               669   lay=3
+a 'p20ENa'   p   6   0.01   60   p20ENa
+  path=no
+    dwt=0.01   652   ttf=10   us1=2.49   us2=0
+    dwt=0.01   669   ttf=10   us1=1.46   us2=0
+    dwt=0.01   670   ttf=10   us1=2.76   us2=0
+    dwt=0.01   660   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   659   ttf=10   us1=0.03   us2=0
+               658   lay=3
+a 'p20WNa'   p   6   0.01   60   p20WNa
+  path=no
+    dwt=0.01   658   ttf=10   us1=0.03   us2=0
+    dwt=0.01   659   ttf=10   us1=0.01   us2=0
+    dwt=0.01   661   ttf=10   us1=0.01   us2=0
+    dwt=0.01   660   ttf=10   us1=2.76   us2=0
+    dwt=0.01   670   ttf=10   us1=1.46   us2=0
+    dwt=0.01   669   ttf=10   us1=2.49   us2=0
+               652   lay=3
+a 'p22ENa'   p   6   0.01   60   p22ENa
+  path=no
+    dwt=0.01   677   ttf=10   us1=2.13   us2=0
+    dwt=0.01   680   ttf=10   us1=0.5    us2=0
+               686   lay=3
+a 'p22WNa'   p   6   0.01   60   p22WNa
+  path=no
+    dwt=0.01   686   ttf=10   us1=0.5    us2=0
+    dwt=0.01   680   ttf=10   us1=2.13   us2=0
+               677   lay=3
+a 'p23ENa'   p   6   0.01   60   p23ENa
+  path=no
+    dwt=0.01   697   ttf=10   us1=1.22   us2=0
+               700   lay=3
+a 'p23WNa'   p   6   0.01   60   p23WNa
+  path=no
+    dwt=0.01   700   ttf=10   us1=1.22   us2=0
+               697   lay=3
+a 'p24ENa'   p   6   0.01   60   p24ENa
+  path=no
+    dwt=0.01   780   ttf=10   us1=0.94   us2=0
+    dwt=0.01   777   ttf=10   us1=1.57   us2=0
+    dwt=0.01   781   ttf=10   us1=2.88   us2=0
+    dwt=0.01   784   ttf=10   us1=0.37   us2=0
+    dwt=0.01   782   ttf=10   us1=3.1    us2=0
+               783   lay=3
+a 'p24WNa'   p   6   0.01   60   p24WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=3.1    us2=0
+    dwt=0.01   782   ttf=10   us1=0.37   us2=0
+    dwt=0.01   784   ttf=10   us1=2.88   us2=0
+    dwt=0.01   781   ttf=10   us1=1.57   us2=0
+    dwt=0.01   777   ttf=10   us1=0.94   us2=0
+               780   lay=3
+a 'p25ENa'   p   6   0.01   60   p25ENa
+  path=no
+    dwt=0.01   772   ttf=10   us1=0.87   us2=0
+               777   lay=3
+a 'p25WNa'   p   6   0.01   60   p25WNa
+  path=no
+    dwt=0.01   777   ttf=10   us1=0.87   us2=0
+               772   lay=3
+a 'p27ENa'   p   6   0.01   60   p27ENa
+  path=no
+    dwt=0.01   717   ttf=10   us1=1.62   us2=0
+    dwt=0.01   725   ttf=10   us1=1.45   us2=0
+    dwt=0.01   730   ttf=10   us1=1      us2=0
+    dwt=0.01   736   ttf=10   us1=4.64   us2=0
+    dwt=0.01   762   ttf=10   us1=7.23   us2=0
+               783   lay=3
+a 'p27WNa'   p   6   0.01   60   p27WNa
+  path=no
+    dwt=0.01   783   ttf=10   us1=7.23   us2=0
+    dwt=0.01   762   ttf=10   us1=4.64   us2=0
+    dwt=0.01   736   ttf=10   us1=1      us2=0
+    dwt=0.01   730   ttf=10   us1=1.45   us2=0
+    dwt=0.01   725   ttf=10   us1=1.62   us2=0
+               717   lay=3
+a 'p31ECma'   p   6   0.01   60   p31ECma
+  path=no
+    dwt=0.01   943   ttf=10   us1=0.04   us2=0
+    dwt=0.01   947   ttf=10   us1=0.11   us2=0
+    dwt=0.01   957   ttf=10   us1=0.03   us2=0
+    dwt=0.01   958   ttf=10   us1=0.02   us2=0
+    dwt=0.01   959   ttf=10   us1=0.03   us2=0
+    dwt=0.01   960   ttf=10   us1=0.01   us2=0
+    dwt=0.01   961   ttf=10   us1=0.02   us2=0
+    dwt=0.01   962   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   983   ttf=10   us1=0.04   us2=0
+    dwt=0.01   990   ttf=10   us1=0.01   us2=0
+    dwt=0.01   991   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1016   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1019   ttf=10   us1=0.53   us2=0
+               721   lay=3
+a 'p31WCma'   p   6   0.01   60   p31WCma
+  path=no
+    dwt=0.01   721   ttf=10   us1=0.53   us2=0
+    dwt=0.01   1019   ttf=10   us1=0.3    us2=0
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1013   ttf=10   us1=0.12   us2=0
+    dwt=0.01   1003   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1001   ttf=10   us1=0.05   us2=0
+    dwt=0.01   991   ttf=10   us1=0.01   us2=0
+    dwt=0.01   990   ttf=10   us1=0.04   us2=0
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   970   ttf=10   us1=0.03   us2=0
+    dwt=0.01   963   ttf=10   us1=0.03   us2=0
+    dwt=0.01   964   ttf=10   us1=0.03   us2=0
+    dwt=0.01   962   ttf=10   us1=0.02   us2=0
+    dwt=0.01   961   ttf=10   us1=0.01   us2=0
+    dwt=0.01   960   ttf=10   us1=0.03   us2=0
+    dwt=0.01   959   ttf=10   us1=0.02   us2=0
+    dwt=0.01   958   ttf=10   us1=0.03   us2=0
+    dwt=0.01   957   ttf=10   us1=0.11   us2=0
+    dwt=0.01   947   ttf=10   us1=0.04   us2=0
+               943   lay=3
+a 'p32ECma'   p   6   0.01   60   p32ECma
+  path=no
+    dwt=0.01   1019   ttf=10   us1=0.31   us2=0
+               717   lay=3
+a 'p32WCma'   p   6   0.01   60   p32WCma
+  path=no
+    dwt=0.01   717   ttf=10   us1=0.31   us2=0
+               1019   lay=3
+a 'p33ECma'   p   6   0.01   60   p33ECma
+  path=no
+    dwt=0.01   1004   ttf=10   us1=0.01   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.28   us2=0
+               1018   lay=3
+a 'p33WCma'   p   6   0.01   60   p33WCma
+  path=no
+    dwt=0.01   1018   ttf=10   us1=0.28   us2=0
+    dwt=0.01   1015   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1009   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1005   ttf=10   us1=0.01   us2=0
+               1004   lay=3
+a 'p34ECma'   p   6   0.01   60   p34ECma
+  path=no
+    dwt=0.01   1009   ttf=10   us1=0.02   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.03   us2=0
+               1013   lay=3
+a 'p34WCma'   p   6   0.01   60   p34WCma
+  path=no
+    dwt=0.01   1013   ttf=10   us1=0.03   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.04   us2=0
+    dwt=0.01   1008   ttf=10   us1=0.02   us2=0
+               1009   lay=3
+a 'p35ECma'   p   6   0.01   60   p35ECma
+  path=no
+    dwt=0.01   991   ttf=10   us1=0.09   us2=0
+    dwt=0.01   998   ttf=10   us1=0.04   us2=0
+    dwt=0.01   999   ttf=10   us1=0.08   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.05   us2=0
+               1016   lay=3
+a 'p35WCma'   p   6   0.01   60   p35WCma
+  path=no
+    dwt=0.01   1016   ttf=10   us1=0.05   us2=0
+    dwt=0.01   1012   ttf=10   us1=0.06   us2=0
+    dwt=0.01   1004   ttf=10   us1=0.08   us2=0
+    dwt=0.01   999   ttf=10   us1=0.04   us2=0
+    dwt=0.01   998   ttf=10   us1=0.09   us2=0
+               991   lay=3
+a 'p36ECma'   p   6   0.01   60   p36ECma
+  path=no
+    dwt=0.01   947   ttf=10   us1=0.05   us2=0
+    dwt=0.01   944   ttf=10   us1=0.04   us2=0
+    dwt=0.01   945   ttf=10   us1=0.05   us2=0
+    dwt=0.01   946   ttf=10   us1=0.04   us2=0
+    dwt=0.01   949   ttf=10   us1=0.03   us2=0
+    dwt=0.01   953   ttf=10   us1=0.09   us2=0
+    dwt=0.01   955   ttf=10   us1=0.1    us2=0
+    dwt=0.01   979   ttf=10   us1=0      us2=0
+    dwt=0.01   980   ttf=10   us1=0.07   us2=0
+               999   lay=3
+a 'p36WCma'   p   6   0.01   60   p36WCma
+  path=no
+    dwt=0.01   999   ttf=10   us1=0.07   us2=0
+    dwt=0.01   980   ttf=10   us1=0      us2=0
+    dwt=0.01   979   ttf=10   us1=0.1    us2=0
+    dwt=0.01   955   ttf=10   us1=0.09   us2=0
+    dwt=0.01   953   ttf=10   us1=0.03   us2=0
+    dwt=0.01   949   ttf=10   us1=0.04   us2=0
+    dwt=0.01   946   ttf=10   us1=0.05   us2=0
+    dwt=0.01   945   ttf=10   us1=0.04   us2=0
+    dwt=0.01   944   ttf=10   us1=0.05   us2=0
+               947   lay=3
+a 'p37ECma'   p   6   0.01   60   p37ECma
+  path=no
+    dwt=0.01   955   ttf=10   us1=0.07   us2=0
+    dwt=0.01   971   ttf=10   us1=0.03   us2=0
+               983   lay=3
+a 'p37WCma'   p   6   0.01   60   p37WCma
+  path=no
+    dwt=0.01   983   ttf=10   us1=0.03   us2=0
+    dwt=0.01   971   ttf=10   us1=0.07   us2=0
+               955   lay=3
+a 'p38ECma'   p   6   0.01   60   p38ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.06   us2=0
+               963   lay=3
+a 'p38WCma'   p   6   0.01   60   p38WCma
+  path=no
+    dwt=0.01   963   ttf=10   us1=0.06   us2=0
+               953   lay=3
+a 'p39ECma'   p   6   0.01   60   p39ECma
+  path=no
+    dwt=0.01   953   ttf=10   us1=0.08   us2=0
+               964   lay=3
+a 'p39WCma'   p   6   0.01   60   p39WCma
+  path=no
+    dwt=0.01   964   ttf=10   us1=0.08   us2=0
+               953   lay=3
+a 'p40ECma'   p   6   0.01   60   p40ECma
+  path=no
+    dwt=0.01   949   ttf=10   us1=0.09   us2=0
+               962   lay=3
+a 'p40WCma'   p   6   0.01   60   p40WCma
+  path=no
+    dwt=0.01   962   ttf=10   us1=0.09   us2=0
+               949   lay=3
+a 'p41ECma'   p   6   0.01   60   p41ECma
+  path=no
+    dwt=0.01   700   ttf=10   us1=0.95   us2=0
+    dwt=0.01   932   ttf=10   us1=0.13   us2=0
+               939   lay=3
+a 'p41WCma'   p   6   0.01   60   p41WCma
+  path=no
+    dwt=0.01   939   ttf=10   us1=0.13   us2=0
+    dwt=0.01   932   ttf=10   us1=0.95   us2=0
+               700   lay=3
+a 'p42ECma'   p   6   0.01   60   p42ECma
+  path=no
+    dwt=0.01   957   ttf=10   us1=0.02   us2=0
+    dwt=0.01   966   ttf=10   us1=0.05   us2=0
+    dwt=0.01   984   ttf=10   us1=0.04   us2=0
+               988   lay=3
+a 'p42WCma'   p   6   0.01   60   p42WCma
+  path=no
+    dwt=0.01   988   ttf=10   us1=0.04   us2=0
+    dwt=0.01   984   ttf=10   us1=0.05   us2=0
+    dwt=0.01   966   ttf=10   us1=0.02   us2=0
+               957   lay=3
+a 'p43ECma'   p   6   0.01   60   p43ECma
+  path=no
+    dwt=0.01   710   ttf=10   us1=0.81   us2=0
+    dwt=0.01   942   ttf=10   us1=0.03   us2=0
+    dwt=0.01   939   ttf=10   us1=0.2    us2=0
+    dwt=0.01   951   ttf=10   us1=0.18   us2=0
+    dwt=0.01   956   ttf=10   us1=0.06   us2=0
+    dwt=0.01   966   ttf=10   us1=0.04   us2=0
+    dwt=0.01   977   ttf=10   us1=0.04   us2=0
+               988   lay=3
+a 'p43WCma'   p   6   0.01   60   p43WCma
+  path=no
+    dwt=0.01   988   ttf=10   us1=0.04   us2=0
+    dwt=0.01   977   ttf=10   us1=0.04   us2=0
+    dwt=0.01   966   ttf=10   us1=0.06   us2=0
+    dwt=0.01   956   ttf=10   us1=0.18   us2=0
+    dwt=0.01   951   ttf=10   us1=0.2    us2=0
+    dwt=0.01   939   ttf=10   us1=0.03   us2=0
+    dwt=0.01   942   ttf=10   us1=0.81   us2=0
+               710   lay=3
+a 'p44ECma'   p   6   0.01   60   p44ECma
+  path=no
+    dwt=0.01   947   ttf=10   us1=0.05   us2=0
+    dwt=0.01   938   ttf=10   us1=0.14   us2=0
+    dwt=0.01   940   ttf=10   us1=0.1    us2=0
+               951   lay=3
+a 'p44WCma'   p   6   0.01   60   p44WCma
+  path=no
+    dwt=0.01   951   ttf=10   us1=0.1    us2=0
+    dwt=0.01   940   ttf=10   us1=0.14   us2=0
+    dwt=0.01   938   ttf=10   us1=0.05   us2=0
+               947   lay=3
+a 'p45ECma'   p   6   0.01   60   p45ECma
+  path=no
+    dwt=0.01   924   ttf=10   us1=0.28   us2=0
+               938   lay=3
+a 'p45WCma'   p   6   0.01   60   p45WCma
+  path=no
+    dwt=0.01   938   ttf=10   us1=0.28   us2=0
+               924   lay=3
+a 'p46ECma'   p   6   0.01   60   p46ECma
+  path=no
+    dwt=0.01   698   ttf=10   us1=0.2    us2=0
+    dwt=0.01   905   ttf=10   us1=0.04   us2=0
+    dwt=0.01   907   ttf=10   us1=0.29   us2=0
+    dwt=0.01   915   ttf=10   us1=0.46   us2=0
+    dwt=0.01   926   ttf=10   us1=0.22   us2=0
+    dwt=0.01   934   ttf=10   us1=0.04   us2=0
+    dwt=0.01   937   ttf=10   us1=0.06   us2=0
+               938   lay=3
+a 'p46WCma'   p   6   0.01   60   p46WCma
+  path=no
+    dwt=0.01   938   ttf=10   us1=0.06   us2=0
+    dwt=0.01   937   ttf=10   us1=0.04   us2=0
+    dwt=0.01   934   ttf=10   us1=0.22   us2=0
+    dwt=0.01   926   ttf=10   us1=0.46   us2=0
+    dwt=0.01   915   ttf=10   us1=0.29   us2=0
+    dwt=0.01   907   ttf=10   us1=0.04   us2=0
+    dwt=0.01   905   ttf=10   us1=0.2    us2=0
+               698   lay=3
+a 'p47ECma'   p   6   0.01   60   p47ECma
+  path=no
+    dwt=0.01   905   ttf=10   us1=0.37   us2=0
+               906   lay=3
+a 'p47WCma'   p   6   0.01   60   p47WCma
+  path=no
+    dwt=0.01   906   ttf=10   us1=0.37   us2=0
+               905   lay=3
