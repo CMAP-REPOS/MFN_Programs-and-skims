@@ -1,0 +1,66 @@
+~# zn09_skim_data.mac
+~#  Craig Heither, 05-04-2016
+~# 
+~#  *********************************************************************
+~#    Modified version of input_data.mac to get AM Peak and Midday
+~#    skim times and AM Peak distance for use in Meso Freight Model 
+~#    truck touring logic. 
+~#
+~#     Output files created should be stored in:
+~#       <meso model setup>\Database\SAS\inputs\<Conformity run>
+~#  *********************************************************************
+~#  =====================================================================
+~o|39
+~t1=temp1
+~t2=hwytime_pk
+~t3=hwydist_pk
+~t4=hwytime_op
+~#
+~# ---------------------------
+~/ ## CREATE %t2% ## 
+~# ---------------------------
+~!if exist %t1% (del %t1%)
+~!if exist %t2% (del %t2%)
+batchout=%t1%
+3.14
+~+;4;2;8,2;y;4;n
+~+;3;mf44; ;n;n;n;q
+~#
+~#  ##Insert new headers into file##
+~!type %t1% | findstr /B "c t" >> %t2%
+~+;~>>%t2%;~"d matrix=mf01;~"a matrix=mf01  amtime     0 am peak 7-9 am hwy time skim bal4;~>
+~!type %t1% | findstr /V "c t a" >> %t2%
+~#
+~# ---------------------------
+~/ ## CREATE %t3% ## 
+~# ---------------------------
+~!if exist %t1% (del %t1%)
+~!if exist %t3% (del %t3%)
+3.14
+~+;4;2;8,2;y;4;n
+~+;3;mf45; ;n;n;n;q
+~#
+~#  ##Insert new headers into file##
+~!type %t1% | findstr /B "c t" >> %t3%
+~+;~>>%t3%;~"d matrix=mf2;~"a matrix=mf2  amdist     0 am peak 7-9 am hwy distance skim bal4;~>
+~!type %t1% | findstr /V "c t a" >> %t3%
+~!del %t1%
+~#
+~#
+~# ---------------------------
+~/ ## CREATE %t4% ## 
+~# ---------------------------
+~!if exist %t1% (del %t1%)
+~!if exist %t4% (del %t4%)
+batchout=%t1%
+3.14
+~+;4;2;8,2;y;4;n
+~+;3;mf46; ;n;n;n;q
+~#
+~#  ##Insert new headers into file##
+~!type %t1% | findstr /B "c t" >> %t4%
+~+;~>>%t4%;~"d matrix=mf03;~"a matrix=mf03  mdtime     0 midday 10 am -2 pm hwy time skim bal4;~>
+~!type %t1% | findstr /V "c t a" >> %t4%
+~o=6
+batchout=
+~/ end of macro
