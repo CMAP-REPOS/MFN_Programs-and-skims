@@ -3,19 +3,20 @@
 
 library(tidyverse)
 library(sf)
-
+library(openxlsx)        #for writing to an xl
 
 #SET PARAMETERS & VARIABLES####
-oldDir = "V:/Secure/Master_Freight/working_pro/MFN_currentFY25.gdb"
+oldDir = "V:/Secure/Master_Freight/Current/MFN_currentFY25.gdb"
 newDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"
 MHN_Dir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
+outFile = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/QC/changedTIPIDs.xlsx"
 
 years = c(2022, 2030, 2040, 2050, 2060)
 layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways", 
            "Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System", "CMAP_Rail_nodes", 
            "National_Rail_nodes", "National_Hwy_nodes", "Inland_Waterway_nodes", "Crude_Oil_System_nodes", 
            "NEC_NG_19_nodes","Prod_17_18_nodes", "Meso_Logistic_Nodes", "Meso_Ext_Int_Centroids", 
-           "conus_ak", "CMAP_Rail_Routes", "National_Rail_Routes")
+           "conus_ak", "CMAP_Rail_Routes", "National_Rail_Routes", "National_Rail_Itinerary", "CMAP_Rail_Itinerary")
 
 #MHN formatting data
 in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
@@ -28,22 +29,24 @@ projCode <- in_MHN_hwyproj_coding %>%
   select(TIPID, ACTION_CODE, ABB) %>%
   left_join(TIPIDs, by = join_by(TIPID)) %>%
   separate(ABB, into = c('INODE', 'JNODE', 'Reverse'), sep = "-") %>%
-  mutate(INODE = as.numeric(INODE), JNODE = as.numeric(JNODE), Reverse = as.numeric(Reverse), ACTION_CODE = as.numeric(ACTION_CODE))
+  mutate(INODE = as.numeric(INODE), JNODE = as.numeric(JNODE), Reverse = as.numeric(Reverse), ACTION_CODE = as.numeric(ACTION_CODE), linkID = paste(INODE, JNODE, sep = "-"))
 
 t1 <- projCode %>%
   select(-JNODE) %>%
-  rename(NODE = INODE)
+  rename(NODE = INODE) %>%
+  select(TIPID, NODE) 
 t2 <- projCode %>%
   select(-INODE) %>%
-  rename(NODE = JNODE)
+  rename(NODE = JNODE)%>%
+  select(TIPID, NODE) 
 
 allNodes <- rbind(t1, t2) %>%
   distinct() %>%
   group_by(NODE) %>%
-  mutate(count = n(), TIPPROJS = paste(TIPID, sep = ", ")) 
+  mutate(count = n()) %>%
+  ungroup()
 
-projNodes <- data.frame(NODE = c(unique(projCode$INODE), unique(projCode$JNODE))) %>%
-  unique()
+
 #COMPARE STATIC DATA####
 for(layer in layers){
   print(layer)
@@ -55,9 +58,7 @@ for(layer in layers){
   if(resp != TRUE){stop()}
 }
 
-#COMPARE ITINERARIES####
-
-##CMAP HIGHWAY YEAR LOOP####
+#CMAP HIGHWAY YEAR LOOP####
 #Create empty final df for data to be bound to
 loopNodes <- data.frame(Year = as.numeric(), NODE_ID_T = as.numeric(), MESOZONE = as.integer(), 
                         POINT_X= as.numeric(), POINT_Y= as.numeric(), dfFlag = as.character())
@@ -149,4 +150,57 @@ for(year in years){
   
 }
 
-#after we have all loopnodes and looplinks, QC range of IDs and then check with TIPIDS
+#QC With TIPIDs####
+#Added Nodes and Links####
+t1 <- loopNodes %>%
+  filter(dfFlag == "new") %>%
+  rename(NODE = NODE_ID_T) %>%
+  select(NODE:POINT_Y) %>%
+  distinct() %>%
+  left_join(allNodes, by = "NODE") %>%
+  select(TIPID) %>%
+  distinct()
+
+t2 <- loopLinks %>%
+  filter(dfFlag == "new") %>%
+  mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
+  select(linkID) %>%
+  distinct() %>%
+  left_join(projCode, by = c("linkID")) %>%
+  select(TIPID) %>%
+  unique()
+
+add_chTIPID <- rbind(t1, t2) %>%
+  left_join(in_MHN_hwyproj, by = "TIPID") %>%
+  select(TIPID:RSP_ID) %>%
+  mutate(TIPID = as.numeric(TIPID)) %>%
+  distinct()
+
+#Removed Nodes and Links####
+t1 <- loopNodes %>%
+  filter(dfFlag == "old") %>%
+  rename(NODE = NODE_ID_T) %>%
+  select(NODE:POINT_Y) %>%
+  distinct() %>%
+  left_join(allNodes, by = "NODE") %>%
+  select(TIPID) %>%
+  distinct()
+
+t2 <- loopLinks %>%
+  filter(dfFlag == "old") %>%
+  mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
+  select(linkID) %>%
+  distinct() %>%
+  left_join(projCode, by = c("linkID")) %>%
+  select(TIPID) %>%
+  unique()
+
+rem_chTIPID <- rbind(t1, t2) %>%
+  left_join(in_MHN_hwyproj, by = "TIPID") %>%
+  select(TIPID:RSP_ID) %>%
+  mutate(TIPID = as.numeric(TIPID)) %>%
+  distinct()
+
+#Export####
+exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
+write.xlsx(exportList, outFile)
