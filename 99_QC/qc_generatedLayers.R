@@ -1,344 +1,206 @@
 #Compares output from XXX to previous version
-#KCazzato 1/9/2025
+#KCazzato 3/19/2025
 
 library(tidyverse)
 library(sf)
-
+library(openxlsx)        #for writing to an xl
 
 #SET PARAMETERS & VARIABLES####
-oldDir = "V:\Secure\Master_Freight\working_pro\MFN_currentFY25.gdb"
+oldDir = "V:/Secure/Master_Freight/Current/MFN_currentFY25.gdb"
 newDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"
-outDir = "../../../Output/QC"
-year = '2022'
+MHN_Dir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
+outFile = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/QC/changedTIPIDs.xlsx"
 
-#create names
-links = paste("CMAP_HWY_LINK_y", year, sep = "")
-nodes = paste("CMAP_HWY_NODE_y", year, sep = "")
+years = c(2022, 2030, 2040, 2050, 2060)
+layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways", 
+           "Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System", "CMAP_Rail_nodes", 
+           "National_Rail_nodes", "National_Hwy_nodes", "Inland_Waterway_nodes", "Crude_Oil_System_nodes", 
+           "NEC_NG_19_nodes","Prod_17_18_nodes", "Meso_Logistic_Nodes", "Meso_Ext_Int_Centroids", 
+           "conus_ak", "CMAP_Rail_Routes", "National_Rail_Routes", "National_Rail_Itinerary", "CMAP_Rail_Itinerary")
 
-setwd(outDir)
-#LOAD DATA: New Version####
-in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
-in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
-in_new_links_nation <- read_sf(dsn = newDir, layer ="National_Highway", crs = 26771) 
-in_new_nodes_nation <- read_sf(dsn = newDir, layer ="National_Hwy_nodes", crs = 26771) 
-in_new_logistic <- read_sf(dsn = newDir, layer ="Meso_Logistic_nodes", crs = 26771)
-in_new_links_rail <- read_sf(dsn = newDir, layer ="CMAP_Rail", crs = 26771) 
-in_new_nodes_rail <- read_sf(dsn = newDir, layer ="CMAP_Rail_nodes", crs = 26771)
+#MHN formatting data
+in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
+in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
 
-#LOAD DATA: Old Version####
-in_old_links_cmap <- read_sf(dsn = oldDir, layer ="CMAP_Highway", crs = 26771) 
-in_old_nodes_cmap <- read_sf(dsn = oldDir, layer ="CMAP_Hwy_nodes", crs = 26771)
-in_old_links_rail <- read_sf(dsn = oldDir, layer ="CMAP_Rail", crs = 26771) 
-in_old_nodes_rail <- read_sf(dsn = oldDir, layer ="CMAP_Rail_nodes", crs = 26771)
-in_old_links_nation <- read_sf(dsn = oldDir, layer ="National_Highway", crs = 26771) 
-in_old_nodes_nation <- read_sf(dsn = oldDir, layer ="National_Hwy_nodes", crs = 26771)
-in_old_logistic <- read_sf(dsn = oldDir, layer ="Meso_Logistic_nodes", crs = 26771)
+#Format MHN Project Information####
+TIPIDs <- in_MHN_hwyproj %>% select(TIPID:RSP_ID) %>% st_drop_geometry() %>% filter(COMPLETION_YEAR != 9999)
 
-#QC Logistic Nodes####
-#--Prep old nodes
-old_logistic <- in_old_logistic %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "old",
-         MESOZONE = as.numeric(MESOZONE),
-         NODE_ID = as.numeric(NODE_ID)) %>%
+projCode <- in_MHN_hwyproj_coding %>%
+  select(TIPID, ACTION_CODE, ABB) %>%
+  left_join(TIPIDs, by = join_by(TIPID)) %>%
+  separate(ABB, into = c('INODE', 'JNODE', 'Reverse'), sep = "-") %>%
+  mutate(INODE = as.numeric(INODE), JNODE = as.numeric(JNODE), Reverse = as.numeric(Reverse), ACTION_CODE = as.numeric(ACTION_CODE), linkID = paste(INODE, JNODE, sep = "-"))
+
+t1 <- projCode %>%
+  select(-JNODE) %>%
+  rename(NODE = INODE) %>%
+  select(TIPID, NODE) 
+t2 <- projCode %>%
+  select(-INODE) %>%
+  rename(NODE = JNODE)%>%
+  select(TIPID, NODE) 
+
+allNodes <- rbind(t1, t2) %>%
+  distinct() %>%
+  group_by(NODE) %>%
+  mutate(count = n()) %>%
   ungroup()
 
-unique(old_logistic$count) #check for duplicates; expect = 1
 
-old_logistic <- as.data.frame(old_logistic)
+#COMPARE STATIC DATA####
+for(layer in layers){
+  print(layer)
+  #Import Data
+  in_new <- read_sf(dsn = newDir, layer =layer, crs = 26771) 
+  in_old <- read_sf(dsn = oldDir, layer =layer, crs = 26771)
+  
+  resp = all.equal(in_new, in_old)
+  if(resp != TRUE){stop()}
+}
 
-#--Prep new nodes
-new_logistic <- in_new_logistic %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID_T) %>%
-  mutate(count = n(),
-         flag = "new")%>%
-  ungroup()%>%
-  rename(NODE_ID = NODE_ID_T) %>%
-  select(colnames(old_logistic))
+#CMAP HIGHWAY YEAR LOOP####
+#Create empty final df for data to be bound to
+loopNodes <- data.frame(Year = as.numeric(), NODE_ID_T = as.numeric(), MESOZONE = as.integer(), 
+                        POINT_X= as.numeric(), POINT_Y= as.numeric(), dfFlag = as.character())
+loopLinks <- data.frame(Year = as.numeric(), INODE = as.numeric(), JNODE = as.numeric(), Type = as.numeric(),
+                        VDF = as.numeric(), Miles = as.numeric(), Modes = as.character(), LANES = as.numeric(),
+                        LANES2 = as.numeric(), Shape_Length = as.numeric(), dfFlag = as.character())
+for(year in years){
+  print(year)
+  #Define Link 
+  links = paste("CMAP_HWY_LINK_y", year, sep = "")
+  nodes = paste("CMAP_HWY_NODE_y", year, sep = "")
+  
+  #Import New Data
+  in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
+  in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
+  
+  #Import Old Data
+  if(year == 2022){
+    links = "CMAP_HWY_LINK_base"
+    nodes = "CMAP_HWY_NODE_base"
+  }
+  in_old_links_cmap <- read_sf(dsn = oldDir, layer =links, crs = 26771) 
+  in_old_nodes_cmap <- read_sf(dsn = oldDir, layer =nodes, crs = 26771)
+  
+  #NODES
+  resp = all.equal(in_old_nodes_cmap, in_new_nodes_cmap)
+  if(length(resp) != 1){
+    print('NODES NOT EQUAL')
+    in_old_nodes_cmap <- in_old_nodes_cmap %>% mutate(flagOld = 1) %>% select(NODE_ID_T, MESOZONE, POINT_X, POINT_Y, flagOld, SHAPE)
+    in_new_nodes_cmap <- in_new_nodes_cmap %>% mutate(flagNew = 1)%>% select(NODE_ID_T, MESOZONE, POINT_X, POINT_Y, flagNew, SHAPE)
+    
+    tNodes <- st_join(in_old_nodes_cmap, in_new_nodes_cmap) %>%
+      st_drop_geometry() %>%
+      mutate(flagOld = ifelse(is.na(flagOld), 0, flagOld),
+             flagNew = ifelse(is.na(flagNew), 0, flagNew),
+             flags = flagOld + flagNew) %>%
+      filter(flags < 2) %>%
+      mutate(Year = year,
+             MESOZONE = ifelse(is.na(MESOZONE.x), MESOZONE.y, MESOZONE.x),
+             NODE_ID_T = ifelse(is.na(NODE_ID_T.x), NODE_ID_T.y, NODE_ID_T.x),
+             POINT_X = ifelse(is.na(POINT_X.x), POINT_X.y, POINT_X.x),
+             POINT_Y = ifelse(is.na(POINT_Y.x), POINT_Y.y, POINT_Y.x),
+             dfFlag = ifelse(is.na(POINT_Y.x), 'new', 'old')
+      ) %>%
+      select(colnames(loopNodes)) %>%
+      distinct()
+  
+    loopNodes <- loopNodes %>% rbind(tNodes)  
+    #
+  }else{
+    print('NODES ARE EQUAL')
+  }
+  
+  #LINKS
+  resp = all.equal(in_new_links_cmap, in_old_links_cmap)
+  if(length(resp) != 1){
+    print("LINKS NOT EQUAL")
+    
+    in_old_links_cmap <- in_old_links_cmap %>% mutate(flagOld = 1) %>% select(INODE:Shape_Length, flagOld, SHAPE)
+    in_new_links_cmap <- in_new_links_cmap %>% mutate(flagNew = 1)%>% select(INODE:Shape_Length, flagNew, SHAPE)
+    
+    tLinks <- st_join(in_old_links_cmap, in_new_links_cmap) %>%
+      st_drop_geometry() %>%
+      mutate(flagOld = ifelse(is.na(flagOld), 0, flagOld),
+             flagNew = ifelse(is.na(flagNew), 0, flagNew),
+             flags = flagOld + flagNew) %>%
+      filter(flags < 2) %>%
+      mutate(Year = year,
+             INODE = ifelse(is.na(INODE.x), INODE.y, INODE.x),
+             JNODE = ifelse(is.na(JNODE.x), JNODE.y, JNODE.x),
+             Type = ifelse(is.na(Type.x), Type.y, Type.x),
+             VDF = ifelse(is.na(VDF.x), VDF.y, VDF.x),
+             Miles = ifelse(is.na(Miles.x), Miles.y, Miles.x),
+             Modes = ifelse(is.na(Modes.x), Modes.y, Modes.x),
+             LANES = ifelse(is.na(LANES.x), LANES.y, LANES.x),
+             LANES2 = ifelse(is.na(LANES2.x), LANES2.y, LANES2.x),
+             Shape_Length = ifelse(is.na(Shape_Length.x), Shape_Length.y, Shape_Length.x),
+             dfFlag = ifelse(is.na(INODE.x), 'new', 'old')
+      ) %>%
+      select(colnames(loopLinks)) %>%
+      distinct()
+    
+    loopLinks <- loopLinks %>% rbind(tLinks)
 
-new_logistic <- as.data.frame(new_logistic)
+    #
+    }else{
+    print("LINKS ARE EQUAL")
+  }
+  
+}
 
-sink("qc_layers.txt", append = FALSE)  #set append = FALSE first time to clear file
-print(paste("Unique instances of logistic node ID in new layer (expect '1') = ", unique(new_logistic$count), sep = ""))
-sink()
+#QC With TIPIDs####
+#Added Nodes and Links####
+t1 <- loopNodes %>%
+  filter(dfFlag == "new") %>%
+  rename(NODE = NODE_ID_T) %>%
+  select(NODE:POINT_Y) %>%
+  distinct() %>%
+  left_join(allNodes, by = "NODE") %>%
+  select(TIPID) %>%
+  distinct()
 
-#--Compare
-#for logistic nodes, SAS looks for NODE_ID, POINT_X, POINT_Y
-#we change point locations, so the most important part is that each NODE_ID expected is represented
-qc_allLogistic <- new_logistic %>%
-  rename(flagNew = flag) %>%
-  full_join(old_logistic, by = c("NODE_ID")) %>%
-  select(NODE_ID, flag, flagNew) %>%
-  filter(is.na(flag) | is.na(flagNew))
+t2 <- loopLinks %>%
+  filter(dfFlag == "new") %>%
+  mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
+  select(linkID) %>%
+  distinct() %>%
+  left_join(projCode, by = c("linkID")) %>%
+  select(TIPID) %>%
+  unique()
 
-sink("qc_layers.txt", append = TRUE)  
-print("Logistic nodes with issues (expect no output):")
-qc_allLogistic
-sink()
+add_chTIPID <- rbind(t1, t2) %>%
+  left_join(in_MHN_hwyproj, by = "TIPID") %>%
+  select(TIPID:RSP_ID) %>%
+  mutate(TIPID = as.numeric(TIPID)) %>%
+  distinct()
 
-#QC CMAP Highway Nodes####
-#--Prep old nodes
-old_nodes <- in_old_nodes_cmap %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "old",
-         MESOZONE = as.numeric(MESOZONE),
-         NODE_ID = as.numeric(NODE_ID)) %>%
-  ungroup()
+#Removed Nodes and Links####
+t1 <- loopNodes %>%
+  filter(dfFlag == "old") %>%
+  rename(NODE = NODE_ID_T) %>%
+  select(NODE:POINT_Y) %>%
+  distinct() %>%
+  left_join(allNodes, by = "NODE") %>%
+  select(TIPID) %>%
+  distinct()
 
-unique(old_nodes$count) #check for duplicates; expect = 1
+t2 <- loopLinks %>%
+  filter(dfFlag == "old") %>%
+  mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
+  select(linkID) %>%
+  distinct() %>%
+  left_join(projCode, by = c("linkID")) %>%
+  select(TIPID) %>%
+  unique()
 
-old_nodes <- as.data.frame(old_nodes)
+rem_chTIPID <- rbind(t1, t2) %>%
+  left_join(in_MHN_hwyproj, by = "TIPID") %>%
+  select(TIPID:RSP_ID) %>%
+  mutate(TIPID = as.numeric(TIPID)) %>%
+  distinct()
 
-#--Prep new nodes
-new_nodes <- in_new_nodes_cmap %>%
-  st_drop_geometry() %>%
-  rename(NODE_ID = NODE_ID_T) %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "new")%>%
-  ungroup()%>%
-  select(colnames(old_nodes))
-
-duplicateCoords <- new_nodes %>%
-  group_by(POINT_X, POINT_Y) %>%
-  mutate(count = n()) %>%
-  filter(count > 1)
-
-sink("qc_layers.txt", append = TRUE)
-print(paste("Unique instances of new CMAP nodes (expect '1') = ", unique(new_nodes$count), sep = ""))
-sink()
-new_nodes <- as.data.frame(new_nodes)
-
-#--Compare
-qc_allNodes <- full_join(new_nodes, old_nodes, by = c("MESOZONE", "NODE_ID", "POINT_X", "POINT_Y")) %>%
-  select(-count.x, -count.y) %>%
-  group_by(NODE_ID) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  arrange(NODE_ID)
-
-same_nodes <- qc_allNodes %>% filter(count2 == 1 & (!is.na(flag.y) & !is.na(flag.x)))
-different_nodes <- qc_allNodes %>% filter(!(NODE_ID %in% same_nodes$NODE_ID)) %>%
-  filter(NODE_ID < 5000)
-
-different_nodes_dup <- different_nodes %>%
-  filter(count2 == 2)
-
-different_nodes_single <- different_nodes %>%
-  filter(count2 == 1)
-
-sink("qc_layers.txt", append = TRUE)
-print(paste("The first NODEID with different coordinates from the previous version = ", min(different_nodes$NODE_ID), sep = ""))
-print(paste("Duplicate node range = ", range(different_nodes_dup$NODE_ID), sep = ""))
-print("**expect this value to be 133 and a range of 133-150; these are the logistic nodes; we expect some of these to be in a different location)")
-print(paste("The first NODEID with different coordinates, that's not a logistic node, from the previous version = ", min(different_nodes_single$NODE_ID), sep = ""))
-print(paste("Single node range = ", range(different_nodes_single$NODE_ID), sep = ""))
-print("**expect this value to be 1945 and a range of ending with 3649; these are the update POE nodes; we expect all of these to have a different NODE_ID")
-sink()
-
-
-#QC CMAP Highway Links####
-#qc links
-old_links <- in_old_links_cmap %>%
-  st_drop_geometry() %>%
-  select("INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", "DIRECTIONS") %>%
-  mutate(flag = "old")
-summary(old_links)
-new_links <- in_new_links_cmap %>%
-  st_drop_geometry() %>%
-  mutate(flag = "new") %>%
-  select(colnames(old_links))
-summary(new_links)
-
-#--Compare
-#SAS looks for mode, type, vdf, and directions
-#expect JNODES to be different so join just on INODE and reconcile later
-qc_allLinks <- full_join(new_links, old_links, by = c("INODE", "Modes", "Type", "VDF", "DIRECTIONS"), relationship = "many-to-many") %>%
-  group_by(INODE, Modes, Type) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  arrange(INODE) %>%
-  select(INODE, JNODE.x, JNODE.y, Modes, Type, VDF, DIRECTIONS, flag.x, flag.y, count2) %>%
-  rename(oldJNODE = JNODE.y, newJNODE = JNODE.x)
-
-qc_JLinks <- full_join(new_links, old_links, by = c("INODE","JNODE", "Modes", "Type", "VDF", "DIRECTIONS"), relationship = "many-to-many") %>%
-  group_by(INODE, Modes, Type) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  arrange(INODE) %>%
-  select(INODE, JNODE, Modes, Type, VDF, DIRECTIONS, flag.x, flag.y, count2)
-
-qc_JLinks_dif <- qc_JLinks %>% filter(is.na(flag.x) | is.na(flag.y)) %>%
-  group_by(INODE, JNODE) %>%
-  mutate(pairCount = n())
-
-differentOld <- qc_JLinks_dif %>%
-  filter(flag.y == "old")
-
-differentNew <- qc_JLinks_dif %>%
-  filter(flag.x == "new")
-
-
-write.csv(differentOld, "differentOld.csv")
-write.csv(differentNew, "differentNew.csv")
-
-qc_allConnect <- full_join(new_links, old_links, by = c("INODE", "Modes", "Type", "VDF", "DIRECTIONS"), relationship = "many-to-many") %>%
-  filter(INODE <= 150) %>%
-  rename(newMi = Miles.x, oldMi = Miles.y, newJ = JNODE.x, oldJ = JNODE.y) %>%
-  select(INODE, newJ, oldJ, Modes, newMi, oldMi) %>%
-  mutate(difference = round(newMi - oldMi, 4))
-
-write.csv(qc_allConnect, "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/proUpdate/finalGDB/0_generate_future_networks/out_qc/differentMiles.csv")
-
-#Centroid connector links (1-132)
-qc_connectors <- qc_allLinks %>%
-  filter(INODE <= 132 | (oldJNODE <= 132 | newJNODE <= 132)) %>%
-  filter(!(INODE == 52 & oldJNODE == 11132)) %>%  #old version has 2 links connected to this centroid; for QC only want to check 1
-  filter(!(INODE == 83 & oldJNODE == 8119)) %>%   #old version has 2 links connected to this centroid; for QC only want to check 1
-  group_by(INODE, Modes, Type) %>%
-  mutate(count = n()) %>%
-  filter(count > 1)
-
-#Logistic node connector links (133-150)
-qc_logisticLinks <- qc_allLinks %>%
-  filter(INODE <= 150 | (oldJNODE <= 150 | newJNODE <= 150))%>%
-  filter(INODE >= 133 & (oldJNODE >= 133 | newJNODE >= 133)) %>%
-  filter(!(INODE == 141 & oldJNODE == 11414)) %>% #old version has 2 1-way links connected to this centroid; for QC only want to check 1
-  group_by(INODE, Modes, Type)%>%
-  mutate(count = n()) %>%
-  filter(count > 1)
-
-#POE (3634-3648)
-qc_cmapPOELinks <- qc_allLinks %>%
-  filter((INODE > 150 & INODE < 4000))
-
-
-sink("qc_layers.txt", append = TRUE)
-print("############QC CMAP Centroid Connectors############")
-print(paste("Duplicate or missmatched centroid connectors:"))
-qc_connectors
-print(paste("Duplicate or missmatched logistic connectors:"))
-qc_logisticLinks
-print(paste("Duplicate or missmatched POE connectors:"))
-qc_logisticLinks
-sink()
-
-
-#QC National network####
-#only thing that should be different are POE so isolate and confirm that
-#Nodes
-old_nodes <- in_old_nodes_nation %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "old",
-         MESOZONE = as.numeric(MESOZONE),
-         NODE_ID = as.numeric(NODE_ID)) %>%
-  ungroup()
-
-unique(old_nodes$count) #check for duplicates; expect = 1
-
-old_nodes <- as.data.frame(old_nodes)
-
-#--Prep new nodes
-new_nodes <- in_new_nodes_nation %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "new")%>%
-  ungroup()%>%
-  select(colnames(old_nodes))
-
-qc_allNodes_nation <- full_join(new_nodes, old_nodes, by = c("MESOZONE", "NODE_ID", "POINT_X", "POINT_Y")) %>%
-  select(-count.x, -count.y) %>%
-  group_by(NODE_ID) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  arrange(NODE_ID)
-
-#Links
-#qc links
-old_links <- in_old_links_nation %>%
-  st_drop_geometry() %>%
-  select("INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", "DIRECTIONS") %>%
-  mutate(flag = "old")
-summary(old_links)
-new_links <- in_new_links_nation %>%
-  st_drop_geometry() %>%
-  mutate(flag = "new") %>%
-  select(colnames(old_links))
-summary(new_links)
-
-#--Compare
-#SAS looks for mode, type, vdf, and directions
-#expect JNODES to be different so join just on INODE and reconcile later
-qc_allLinks_nation <- full_join(new_links, old_links, by = c("INODE", "JNODE","Miles", "Modes", "LANES", "Type", "VDF", "DIRECTIONS"), relationship = "many-to-many") %>%
-  group_by(INODE, JNODE) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  filter(is.na(flag.x) | is.na(flag.y)) %>%
-  arrange(INODE) %>%
-  select(INODE, JNODE, Miles, Modes, Type, VDF, DIRECTIONS, flag.x, flag.y, count2) %>%
-  filter(INODE >=1945 | JNODE >= 1945)
-
-#QC CMAP Highway Nodes####
-#--Prep old nodes
-old_nodes <- in_old_nodes_rail %>%
-  st_drop_geometry() %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "old",
-         MESOZONE = as.numeric(MESOZONE),
-         NODE_ID = as.numeric(NODE_ID)) %>%
-  ungroup()
-
-unique(old_nodes$count) #check for duplicates; expect = 1
-
-old_nodes <- as.data.frame(old_nodes)
-
-#--Prep new nodes
-new_nodes <- in_new_nodes_rail %>%
-  st_drop_geometry() %>%
-  rename(NODE_ID = NODE_ID_T) %>%
-  group_by(NODE_ID) %>%
-  mutate(count = n(),
-         flag = "new")%>%
-  ungroup()%>%
-  select(colnames(old_nodes))
-
-duplicateCoords <- new_nodes %>%
-  group_by(POINT_X, POINT_Y) %>%
-  mutate(count = n()) %>%
-  filter(count > 1)
-
-#--Compare
-qc_allNodes <- full_join(new_nodes, old_nodes, by = c("MESOZONE", "NODE_ID", "POINT_X", "POINT_Y")) %>%
-  select(-count.x, -count.y) %>%
-  group_by(NODE_ID) %>%
-  mutate(count2 = n()) %>%
-  ungroup() %>%
-  arrange(NODE_ID)
-
-same_nodes <- qc_allNodes %>% filter(count2 == 1 & (!is.na(flag.y) & !is.na(flag.x)))
-different_nodes <- qc_allNodes %>% filter(!(NODE_ID %in% same_nodes$NODE_ID)) %>%
-  filter(NODE_ID < 5000)
-
-different_nodes_dup <- different_nodes %>%
-  filter(count2 == 2)
-
-different_nodes_single <- different_nodes %>%
-  filter(count2 == 1)
-
-sink("qc_layers.txt", append = TRUE)
-print(paste("The first NODEID with different coordinates from the previous version = ", min(different_nodes$NODE_ID), sep = ""))
-print(paste("Duplicate node range = ", range(different_nodes_dup$NODE_ID), sep = ""))
-print("**expect this value to be 133 and a range of 133-150; these are the logistic nodes; we expect some of these to be in a different location)")
-print(paste("The first NODEID with different coordinates, that's not a logistic node, from the previous version = ", first(different_nodes_single$NODE_ID), sep = ""))
-print(paste("Single node range = ", range(different_nodes_single$NODE_ID), sep = ""))
-print("**expect this value to be 1945 and a range of ending with 3649; these are the update POE nodes; we expect all of these to have a different NODE_ID")
-sink()
+#Export####
+exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
+write.xlsx(exportList, outFile)
