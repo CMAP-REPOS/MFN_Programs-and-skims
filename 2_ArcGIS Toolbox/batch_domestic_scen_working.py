@@ -273,7 +273,7 @@ for yr in years:
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(outputPath_T + "DomesticNetwork.csv", index=False)
+    df.to_csv(outputPath + "/DomesticNetwork.csv", index=False)
     arcpy.AddMessage("---> domesticnetwork file saved")
 
 
@@ -294,7 +294,7 @@ for yr in years:
     df = pd.concat([x for x in pipedflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(outputPath_T + "DomesticPipelineNetwork.csv", index=False)
+    df.to_csv(outputPath + "/DomesticPipelineNetwork.csv", index=False)
     arcpy.AddMessage("---> pipelinenetwork file saved")
 
     # ---------------------------------------------------------------
