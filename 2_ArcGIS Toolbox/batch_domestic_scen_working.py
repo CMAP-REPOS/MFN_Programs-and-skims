@@ -36,12 +36,12 @@ from arcpy import env
 import pandas as pd
 arcpy.OverwriteOutput = 1
 
-
 # ---------------------------------------------------------------
 # Read Script Arguments
 # ---------------------------------------------------------------
-outputPath_T = arcpy.GetParameterAsText(0)
-years = str(arcpy.GetParameterAsText(1))
+gdbDir = arcpy.GetParameterAsText(0)
+outputPath_T = arcpy.GetParameterAsText(1)
+years = str(arcpy.GetParameterAsText(2))
 if years == 'all':
     years = ['2022', '2030', '2040', '2050', '2060']
 else:
@@ -49,28 +49,24 @@ else:
     years = years.split(",")
 arcpy.AddMessage(years)
 
-for scenario in years:
+programDir = os.path.dirname(__file__)
+for yr in years:
 # ---------------------------------------------------------------
 # Local variables
 # ---------------------------------------------------------------
-    outputPath = outputPath_T + "\\scen_" + scenario
+    outputPath = outputPath_T + "\\batchin_" + yr
+    arcpy.AddMessage(outputPath)
     os.mkdir(outputPath)
-    newdir1 = outputPath + "\\domesticnetworks\\"
-    newdir2 = outputPath + "\\" + "batchin"
 
     arcpy.env.workspace = outputPath
     Temp = arcpy.CreateScratchName(prefix='Temp',data_type='Folder')
     os.mkdir(Temp)
     arcpy.AddMessage("--> Created temp folder at {}".format(Temp))
 
-    currentDir = "S:\\AdminGroups\\ResearchAnalysis\\kcc\\FY25\\MFN\\Current_copies"                                                                  # working directory 
-    programDir = currentDir + "\\Scripts\\2_ArcGIS Toolbox\\ToolboxScripts"
-    gdbDir = currentDir + "\\Output\\MFN_currentFY25.gdb"
+    hwyLinks = "CMAP_HWY_LINK_y" + yr
+    hwyNodes = "CMAP_HWY_NODE_y" + yr
+
     arcpy.env.workspace = gdbDir
-
-    hwyLinks = "CMAP_HWY_LINK_y" + scenario
-    hwyNodes = "CMAP_HWY_NODE_y" + scenario
-
 
     shapefiles_links = ["CMAP_Rail","National_Rail", hwyLinks,"National_Highway","Inland_Waterways",
                         "Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System"]
@@ -92,36 +88,18 @@ for scenario in years:
     # ---------------------------------------------------------------
     # Update Field types
     # ---------------------------------------------------------------
+    for x in [hwyNodes, "National_Hwy_nodes", "Meso_Logistic_Nodes", "Meso_Ext_Int_Centroids", "CMAP_Rail_nodes"]:
+        arcpy.management.AddField(x, 'NODE_ID', 'LONG')
+        arcpy.management.CalculateField(x, 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
 
-    arcpy.management.AddField(hwyNodes, 'NODE_ID', 'LONG')
-    arcpy.management.CalculateField(hwyNodes, 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
-
-    arcpy.management.AddField("National_Hwy_nodes", 'NODE_ID', 'LONG')
-    arcpy.management.CalculateField("National_Hwy_nodes", 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
-
-    arcpy.management.AddField("Meso_Logistic_Nodes", 'NODE_ID', 'LONG')
-    arcpy.management.CalculateField("Meso_Logistic_Nodes", 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
-
-    arcpy.management.AddField("Meso_Ext_Int_Centroids", 'NODE_ID', 'LONG')
-    arcpy.management.CalculateField("Meso_Ext_Int_Centroids", 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
-
-    arcpy.management.AddField("CMAP_Rail_nodes", 'NODE_ID', 'LONG')
-    arcpy.management.CalculateField("CMAP_Rail_nodes", 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
-
-    arcpy.management.AddField("National_Highway", 'INODE', 'LONG')
-    arcpy.management.CalculateField("National_Highway", 'INODE', "!INODE_T!", "PYTHON3")
-    arcpy.management.AddField("National_Highway", 'JNODE', 'LONG')
-    arcpy.management.CalculateField("National_Highway", 'JNODE', "!JNODE_T!", "PYTHON3")
-
-    arcpy.management.AddField("National_Highway", 'DIRECTIONS', 'SHORT')
-    arcpy.management.CalculateField("National_Highway", 'DIRECTIONS', "!DIRECTIONS_T!", "PYTHON3")
-
-
-    arcpy.management.AddField("CMAP_Rail", 'INODE', 'LONG')
-    arcpy.management.CalculateField("CMAP_Rail", 'INODE', "!INODE_T!", "PYTHON3")
-    arcpy.management.AddField("CMAP_Rail", 'JNODE', 'LONG')
-    arcpy.management.CalculateField("CMAP_Rail", 'JNODE', "!JNODE_T!", "PYTHON3")
-
+    for x in ["National_Highway", "CMAP_Rail"]:
+        arcpy.management.AddField(x, 'INODE', 'LONG')
+        arcpy.management.CalculateField(x, 'INODE', "!INODE_T!", "PYTHON3")
+        arcpy.management.AddField(x, 'JNODE', 'LONG')
+        arcpy.management.CalculateField(x, 'JNODE', "!JNODE_T!", "PYTHON3")
+        if x == "National_Highway":
+            arcpy.management.AddField("National_Highway", 'DIRECTIONS', 'SHORT')
+            arcpy.management.CalculateField("National_Highway", 'DIRECTIONS', "!DIRECTIONS_T!", "PYTHON3")
 
     # ---------------------------------------------------------------
     # Extract Data for Scenario Network
@@ -139,13 +117,13 @@ for scenario in years:
     arcpy.analysis.TableSelect(rail_itineraries[1], temp_itin_dbfs[1], "\"OBJECTID\" >= 1")
 
     ## create storage folder if it does not exist
-    if not os.path.exists(newdir2):
-        arcpy.AddMessage("---> Directory created: " + newdir2)
-        os.mkdir(newdir2)
+    if not os.path.exists(outputPath_T):
+        arcpy.AddMessage("---> Directory created: " + outputPath_T)
+        os.mkdir(outputPath_T)
 
-    if not os.path.exists(newdir1):
-        arcpy.AddMessage("---> Directory created: " + newdir1)
-        os.mkdir(newdir1)
+    if not os.path.exists(outputPath_T):
+        arcpy.AddMessage("---> Directory created: " + outputPath_T)
+        os.mkdir(outputPath_T)
         
     # ---------------------------------------------------------------
     # Create Emme Batchin Files
@@ -295,7 +273,7 @@ for scenario in years:
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(newdir1 + "DomesticNetwork.csv", index=False)
+    df.to_csv(outputPath + "/DomesticNetwork.csv", index=False)
     arcpy.AddMessage("---> domesticnetwork file saved")
 
 
@@ -316,7 +294,7 @@ for scenario in years:
     df = pd.concat([x for x in pipedflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(newdir1 + "DomesticPipelineNetwork.csv", index=False)
+    df.to_csv(outputPath + "/DomesticPipelineNetwork.csv", index=False)
     arcpy.AddMessage("---> pipelinenetwork file saved")
 
     # ---------------------------------------------------------------

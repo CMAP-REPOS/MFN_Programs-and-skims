@@ -4,7 +4,7 @@
 library(tidyverse)
 library(sf)
 library(openxlsx)        #for writing to an xl
-
+library(readxl)
 #SET PARAMETERS & VARIABLES####
 oldDir = "V:/Secure/Master_Freight/Current/MFN_currentFY25.gdb"
 newDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"
@@ -21,6 +21,7 @@ layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways",
 #MHN formatting data
 in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
 in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
+in_TIPIDs <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/mhn_highway_project_coding_c24q4.xlsx")
 
 #Format MHN Project Information####
 TIPIDs <- in_MHN_hwyproj %>% select(TIPID:RSP_ID) %>% st_drop_geometry() %>% filter(COMPLETION_YEAR != 9999)
@@ -46,6 +47,11 @@ allNodes <- rbind(t1, t2) %>%
   mutate(count = n()) %>%
   ungroup()
 
+confIDs <- in_TIPIDs %>%
+  select(tipid) %>%
+  unique() %>%
+  mutate(flag = "conformity") %>%
+  rename(TIPID=tipid)
 
 #COMPARE STATIC DATA####
 for(layer in layers){
@@ -174,7 +180,9 @@ add_chTIPID <- rbind(t1, t2) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
   mutate(TIPID = as.numeric(TIPID)) %>%
-  distinct()
+  distinct()%>%
+  left_join(confIDs, by = "TIPID") %>%
+  filter(is.na(flag))
 
 #Removed Nodes and Links####
 t1 <- loopNodes %>%
@@ -199,8 +207,15 @@ rem_chTIPID <- rbind(t1, t2) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
   mutate(TIPID = as.numeric(TIPID)) %>%
-  distinct()
+  distinct()%>%
+  left_join(confIDs, by = "TIPID") %>%
+  filter(is.na(flag))
 
 #Export####
-exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
-write.xlsx(exportList, outFile)
+if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
+  print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
+  exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
+  write.xlsx(exportList, outFile)
+}else{
+  print("all good to go")
+}

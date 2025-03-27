@@ -121,8 +121,8 @@ ________________________________________________________________________________
 
          /* ------------------------------------------------------------------------------ */
                         *** OUTPUT FILES ***;
-           filename out1 "&outpath.\batchin\lines.in";run;
-           filename out2 "&outpath.\batchin\base_ntwk.txt";run;
+           filename out1 "&outpath.\lines.in";run;
+           filename out2 "&outpath.\base_ntwk.txt";run;
          /* ------------------------------------------------------------------------------ */
    
          * - - - - - - - - - - - - - - - - - *;
