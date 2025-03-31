@@ -4,7 +4,7 @@
 #--SET KEY PARAMETERS--####
 inputDir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
 outputDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"   ### Current MFN
-outPath = "../../Output"
+outPath = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output"
 
 #--SETUP--
 library(scales)
@@ -39,8 +39,8 @@ in_mesozoneGeo<- read_sf(dsn = outputDir, layer ="Meso_External_CMAP_merge", crs
 in_Rail<- read_sf(dsn = outputDir, layer ="CMAP_Rail", crs = 26771)
 
 #For links not flagged as base MESO in MHN but should be (to fix w/Tim at a later time)
-in_forceMESO <- read.xlsx("../../Input/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
-in_removeMESO <- read.xlsx("../../Input/removeLinks.xlsx")
+in_forceMESO <- read.xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
+in_removeMESO <- read.xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/removeLinks.xlsx")
 #--FORMAT DATA--####
 #Important Nodes####
 #work to ensure all centroids and logistic nodes are properly included
@@ -189,7 +189,7 @@ for(yr in years){
     select(colnames(updated_MHN_MESO)) %>%
     rbind(updated_MHN_MESO) %>%                               #remove any of these from base meso, then bind base meso
     filter(!(ABB %in% removeBaseMeso$ABB)) %>%                #then remove final remove action list
-    filter(!(ABB %in% manualRemove$ABB))
+    filter(!(linkID %in% manualRemove$linkID))
   
   #now we have all the links
 
@@ -205,6 +205,7 @@ for(yr in years){
     mutate(linkID = paste(ANODE, BNODE, sep = "-")) %>%
     full_join(futureLinks_baseT, by = c("linkID")) %>%
     filter(!is.na(flag)) %>%
+    filter(ABB %in% futureLinks_baseT$ABB) %>%
     select(colnames(futureLinks_baseT), SHAPE)
   
   tempNodes2 <- futureLinks_baseT %>%
