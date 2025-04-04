@@ -1,6 +1,13 @@
 
-#0. SET UP####
+#1. SET UP####
 library(tidyverse)
+library(readxl)
+
+in_modePath <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "modePath")
+in_ports <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "Ports")
+in_zones <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "zones")
+in_mesozones <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "mesozones")
+in_POE <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "POE")
 
 #--Define paths####
 currentDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Skims_Current/Scenario2_wLogistics140"
@@ -25,51 +32,42 @@ allFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_employment", "cmap_data_z
              "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", 
              "cmap_data_zone_centroids", "data_mesozone_centroids", "data_mesozone_gcd", "data_modepath_airports")
 
-#--Define Crosswalks####
-zoneCrosswalk <- data.frame(Zone = c(1:3649)) %>%
-  mutate(County = case_when(
-    Zone %in% 1:717 ~ "Cook-Chicago",
-    Zone %in% 718:1732 ~ "Cook-remaining",
-    Zone %in% 1733:2111 ~ "DuPage",
-    Zone %in% 2112:2304 ~ "Kane",
-    Zone %in% 2305:2325 ~ "Kendall",
-    Zone %in% 2326:2583 ~ "Lake",
-    Zone %in% 2584:2702 ~ "McHenry",
-    Zone %in% 2703:2926 ~ "Will",
-    Zone %in% 2927:3247 ~ "Other IL",
-    Zone %in% 3248:3467 ~ "Other IN",
-    Zone %in% 3468:3632 ~ "Other WI",
-    Zone %in% 3633:3649 ~ "POE"
-  ))
+#--Define Empty DF for Comparison####
+#depending on format, amend to full df then export as tab in xlsx, or just export
+#truckEE as supplemental tab
+all_TruckEE <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
+                          C_poe2 = as.integer(), C_poe = as.integer(), N_poe2 = as.integer(), N_poe = as.integer(), flag_Poe = as.logical(), flag_Poe2 = as.logical())
+#truckIE as supplemental tab
+all_TruckIE <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
+                          C_poe = as.integer(), N_poe = as.integer())
 
+#znEmp as supplemental tab
+all_znEmp <- data.frame(Scenario = as.numeric(), Year = as.numeric(), County = as.character(), currentEmp = as.integer(),
+                        newEmp = as.integer(), Difference = as.integer(), Percent = as.numeric())
 
-mesoCrosswalk <- data.frame(Mesozone = c(1:399)) %>%
-  mutate(Region = case_when(
-    Mesozone %in% 1:132 ~ "CMAP",
-    Mesozone %in% 133:299 ~ "National",
-    Mesozone %in% 300:399 ~ "International"))
-cmapMesoCross <- data.frame(Mesozone = (1:132))%>%
-  mutate(County = case_when(
-    Mesozone %in% 1:29 ~ "Cook",
-    Mesozone %in% 30:45 ~ "McHenry",
-    Mesozone %in% 46:61 ~ "Lake",
-    Mesozone %in% 62:76 ~ "Kane",
-    Mesozone %in% 77:86 ~ "DuPage",
-    Mesozone %in% 87:109 ~ "Will",
-    Mesozone %in% 110:118 ~ "Kendall",
-    Mesozone %in% 118:132 ~ "Other CMAP",))
+#modePort - visual QC; can try to build a geography crosswalk based on nearby ports
+all_modePort <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
+                          Port_mesozoneNB = as.integer(), Port_NameNB = as.character(), Port_mesozoneB = as.numeric(), Port_NameB = as.character(),
+                          flagC = as.numeric(), flagN = as.numeric())
 
-modeCrosswalk <- data.frame(Modepath = 1:57) %>%
-  mutate(Path = case_when(
-    Modepath %in% 1:2 ~ "Inland Water",
-    Modepath %in% 3:12 ~ "Rail Carload",
-    Modepath %in% 13:30 ~ "Rail Intermodal",
-    Modepath %in% 31:46 ~ "Truck",
-    Modepath %in% 47:50 ~ "Air",
-    Modepath %in% 51:54 ~ "International Water",
-    Modepath %in% 55:57 ~ "Pipeline"
-  ))
-#1. Compare within new run####
+#ZnSkim - filter to keep only OD pairs with differences
+all_znSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), OCounty= as.character(), DCounty= as.character(),
+                         C_avPeak= as.numeric(), C_avOffPeak= as.numeric(), C_avMiles= as.numeric(), C_totMiles= as.numeric(), 
+                         N_avPeak= as.numeric(),     N_avOffPeak= as.numeric(), N_avMiles= as.numeric(), N_totMiles= as.numeric(),  
+                         diff_Peak= as.numeric(), diff_OffPeak= as.numeric(), diff_avMi= as.numeric(), diff_totMi= as.numeric())
+
+#MesSkim - filter to keep only OD pairs with differences >= 1%
+all_mesoSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), OCounty= as.character(), DCounty= as.character(), currentTime= as.numeric(), 
+                           newTime= as.numeric(), Difference= as.numeric(), Percent= as.numeric())
+
+#modeMi  - find a filter; 
+all_modeMi <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Mode= as.character(), LogNode = as.numeric(), Perc_TotMi= as.numeric(),     
+                         Perc_DmsLh= as.numeric(), Perc_DmsDray= as.numeric(), Perc_IntlShip= as.numeric(), Perc_PsTR= as.numeric(),      
+                         Perc_PsRL= as.numeric(), Perc_NATrnFr= as.numeric(), Perc_NoZeroCode= as.numeric())
+#modeSkim
+all_modeSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Mode=as.character(), LogNode=as.numeric(), C_Time= as.numeric(), C_Cost= as.numeric(),    
+                           N_Time= as.numeric(), N_Cost= as.numeric(), perc_Time= as.numeric(), perc_Cost= as.numeric())
+#2. Compare within new run####
 #--Confirm universal data is consistent across folders####
 i = 1
 for(file in smFiles){
@@ -112,20 +110,22 @@ for(file in yrFiles){
   }
 }
 
-#2. Compare against previous version####
+#3. Compare against previous version####
 #Make sure things haven't changed that shouldn't change
 #need to understand the universe of what's changing and how first
 #Build Loop####
 #for testing:
-#sc = 100
+#sc = 200
 #yr = 2022
+#years = c(2022)
+#scen = c(100)
 ###
-for(file in chFiles){
+for(file in allFiles){
   for(yr in years){
     for(sc in scen){
       #LOAD DATA
-      inCurrent = read.csv(paste(currentDir, currentFolName, yr, "/Database/SAS/outputs/", sc, "/", "data_modepath_skims", "_", yr, ".csv", sep = ""))
-      inNew = read.csv(paste(newDir, newFolName, yr, "/Database/SAS/outputs/", sc, "/", "data_modepath_skims", "_", yr, ".csv", sep = ""))
+      inCurrent = read.csv(paste(currentDir, currentFolName, yr, "/Database/SAS/outputs/", sc, "/", file, "_", yr, ".csv", sep = ""))
+      inNew = read.csv(paste(newDir, newFolName, yr, "/Database/SAS/outputs/", sc, "/", file, "_", yr, ".csv", sep = ""))
       
       #STATIC FILE QC
       if(file %in% stFiles){ 
@@ -142,16 +142,18 @@ for(file in chFiles){
           inCurrent<- inCurrent %>% rename(C_poe = poe, C_poe2 = poe2)
           inNew<- inNew %>% rename(N_poe = poe, N_poe2 = poe2)
           
-          truckEE <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
-            mutate(flag1 = ifelse(C_poe == N_poe & (!is.na(N_poe) & !is.na(C_poe)), TRUE, FALSE),
-                   flag2 = ifelse(C_poe2 == N_poe2 & (!is.na(N_poe2) & !is.na(C_poe2)), TRUE, FALSE)) %>%
-            filter(flag1 != TRUE | flag2 != TRUE) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
+            mutate(flag_Poe = ifelse(C_poe == N_poe & (!is.na(N_poe) & !is.na(C_poe)), TRUE, FALSE),
+                   flag_Poe2 = ifelse(C_poe2 == N_poe2 & (!is.na(N_poe2) & !is.na(C_poe2)), TRUE, FALSE)) %>%
+            filter(flag_Poe != TRUE | flag_Poe2 != TRUE) %>%
             mutate(Year = yr, Scenario = sc) %>%
-            select(Scenario, Year, Production_zone:flag2)
+            select(colnames(all_TruckEE))
           
-          check <- truckEE %>%
+          check <- qcOut %>%
             filter((!(N_poe %in% poeIDs))|(!(C_poe %in% poeIDs)))
           #if(nrow(check) != 0){stop()}
+          
+          all_TruckEE <- rbind(all_TruckEE, qcOut)
           
         }else if(file == "cmap_data_zone_employment"){
           print(paste(file, yr, sc, sep = "-"))
@@ -159,8 +161,8 @@ for(file in chFiles){
           inCurrent<- inCurrent %>% rename(currentEmp = totalemp)
           inNew<- inNew %>% rename(newEmp = totalemp)
           
-          znEmp <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>%
-            left_join(zoneCrosswalk, by = join_by(Zone)) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>%
+            left_join(in_zones, by = c("Zone" = "Zone17")) %>%
             summarize(currentEmp = sum(currentEmp),
                       newEmp = sum(newEmp),
                       .by = "County") %>%
@@ -168,16 +170,19 @@ for(file in chFiles){
                    Scenario = sc,
                    Difference = newEmp - currentEmp,
                    Percent = Difference/(newEmp + currentEmp)) %>%
-            select(Scenario, Year, County, currentEmp, newEmp, Difference, Percent)
+            select(colnames(all_znEmp)) %>%
+            filter(Difference != 0)
           
-          if(sum(znEmp$Difference) > 0 & planUpdate != "yes"){stop()}
+          if(sum(qcOut$Difference) > 0 & planUpdate != "yes"){stop()}
+          
+          all_znEmp <- rbind(all_znEmp, qcOut)        #Building export because if there is a plan update we'd like to see results
           
         }else if(file == "cmap_data_zone_skims"){
           print(paste(file, yr, sc, sep = "-"))
           inCurrent <- inCurrent %>%
-            left_join(zoneCrosswalk, by = c("Origin" = "Zone")) %>%
+            left_join(in_zones, by = c("Origin" = "Zone17")) %>%
             rename(OCounty = County) %>%
-            left_join(zoneCrosswalk, by = c("Destination" = "Zone")) %>%
+            left_join(in_zones, by = c("Destination" = "Zone17")) %>%
             rename(DCounty = County) %>%
             summarize(C_avPeak = mean(Peak, weight = Miles),
                       C_avOffPeak = mean(OffPeak, weight = Miles),
@@ -186,9 +191,9 @@ for(file in chFiles){
                       .by = c("OCounty", "DCounty"))
           
           inNew <- inNew %>%
-            left_join(zoneCrosswalk, by = c("Origin" = "Zone")) %>%
+            left_join(in_zones, by = c("Origin" = "Zone17")) %>%
             rename(OCounty = County) %>%
-            left_join(zoneCrosswalk, by = c("Destination" = "Zone")) %>%
+            left_join(in_zones, by = c("Destination" = "Zone17")) %>%
             rename(DCounty = County) %>%
             summarize(N_avPeak = mean(Peak, weight = Miles),
                       N_avOffPeak = mean(OffPeak, weight = Miles),
@@ -196,7 +201,7 @@ for(file in chFiles){
                       N_totMiles = sum(Miles),
                       .by = c("OCounty", "DCounty")) 
 
-          ZnSkim <- full_join(inCurrent, inNew, by = join_by(OCounty, DCounty)) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(OCounty, DCounty)) %>%
             mutate(diff_Peak = N_avPeak - C_avPeak,
                    diff_OffPeak = N_avOffPeak - C_avOffPeak,
                    diff_avMi = N_avMiles - C_avMiles,
@@ -205,8 +210,10 @@ for(file in chFiles){
                    Scenario = sc,
                    difSum = abs(diff_Peak) + abs(diff_OffPeak) + abs(diff_avMi) + abs(diff_totMi)) %>%
             filter(difSum > 0) %>%
-            select(-difSum)
+            select(-difSum) %>%
+            select(colnames(all_znSkim))
           
+          all_znSkim <- rbind(all_znSkim, qcOut)
           
         }else if(file == "data_mesozone_skims"){
           print(paste(file, yr, sc, sep = "-"))
@@ -214,10 +221,10 @@ for(file in chFiles){
           inCurrent<- inCurrent %>% rename(currentTime = Time)
           inNew<- inNew %>% rename(newTime = Time)
           
-          MesSkim <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%
-            left_join(cmapMesoCross, by = c("Origin" = "Mesozone")) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%
+            left_join(in_mesozones, by = c("Origin" = "Mesozone")) %>%
             rename(OCounty = County) %>%
-            left_join(cmapMesoCross, by = c("Destination" = "Mesozone")) %>%
+            left_join(in_mesozones, by = c("Destination" = "Mesozone")) %>%
             rename(DCounty = County) %>%
             summarize(currentTime = sum(currentTime),
                       newTime = sum(newTime),
@@ -226,8 +233,10 @@ for(file in chFiles){
                    Scenario = sc,
                    Difference = newTime - currentTime,
                    Percent = round(Difference/(newTime + currentTime),3)) %>%
-            select(Scenario, Year, OCounty, DCounty, currentTime, newTime, Difference, Percent) %>%
+            select(colnames(all_mesoSkim)) %>%
             filter(abs(Percent) >= 0.01)
+          
+          all_mesoSkim <- rbind(all_mesoSkim, qcOut)
           
         }else if(file == "cmap_data_truck_IE_poe"){
           print(paste(file, yr, sc, sep = "-"))
@@ -235,30 +244,78 @@ for(file in chFiles){
           inCurrent<- inCurrent %>% rename(C_poe = poe)
           inNew<- inNew %>% rename(N_poe = poe)
           
-          truckIE <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
             filter(N_poe != C_poe)%>%
             mutate(Year = yr, Scenario = sc) %>%
-            select(Scenario, Year, Production_zone:N_poe)
+            select(colnames(all_TruckIE))
           
-          check <- truckIE %>%
+          check <- qcOut %>%
             filter(!(N_poe %in% poeIDs))
           if(nrow(check) != 0){stop()}
+          
+          all_TruckIE<- rbind(all_TruckIE, qcOut)
           
         }else if(file == "data_modepath_skims"){
           print(paste(file, yr, sc, sep = "-"))
           
-          T_inNew <- inNew %>%
+          T_New <- inNew %>%
+            select(-(cost1:cost57)) %>%
             pivot_longer(cols = time1:time57, names_to = "timeMode", values_to = "time") %>%
+            summarize(N_Time = sum(time, na.rm = TRUE),
+                      .by = "timeMode") %>%
+            mutate(Modepath = as.numeric(str_split_i(timeMode, "time", 2))) %>%
+            left_join(in_modePath, by = join_by("Modepath" == "Path")) %>%
+            select(Mode, LogNode,  N_Time) %>%
+            summarize(N_Time = sum(N_Time), .by = c("Mode", "LogNode"))
+          C_New <- inNew %>%
+            select(-(time1:time57)) %>%
             pivot_longer(cols = cost1:cost57, names_to = "costMode", values_to = "cost") %>%
-            summarize(Time = sum(time, na.rm = TRUE),
-                      Cost = sum(cost, na.rm = TRUE),
-                      .by = c("timeMode","costMode"))
-            
+            summarize(N_Cost = sum(cost, na.rm = TRUE),
+                      .by = "costMode") %>%
+            mutate(Modepath = as.numeric(str_split_i(costMode, "cost", 2))) %>%
+            left_join(in_modePath, by = join_by("Modepath" == "Path")) %>%
+            select(Mode, LogNode,  N_Cost)%>%
+            summarize(N_Cost = sum(N_Cost), .by = c("Mode", "LogNode"))
+          
+          T_inNew <- full_join(T_New, C_New, by = join_by(Mode, LogNode))
+          
+          T_Current <- inCurrent %>%
+            select(-(cost1:cost57)) %>%
+            pivot_longer(cols = time1:time57, names_to = "timeMode", values_to = "time") %>%
+            summarize(C_Time = sum(time, na.rm = TRUE),
+                      .by = "timeMode") %>%
+            mutate(Modepath = as.numeric(str_split_i(timeMode, "time", 2))) %>%
+            left_join(in_modePath, by = join_by("Modepath" == "Path")) %>%
+            select(Mode, LogNode, C_Time)%>%
+            summarize(C_Time = sum(C_Time), .by = c("Mode", "LogNode"))
+          C_Current <- inCurrent %>%
+            select(-(time1:time57)) %>%
+            pivot_longer(cols = cost1:cost57, names_to = "costMode", values_to = "cost") %>%
+            summarize(C_Cost = sum(cost, na.rm = TRUE),
+                      .by = "costMode") %>%
+            mutate(Modepath = as.numeric(str_split_i(costMode, "cost", 2))) %>%
+            left_join(in_modePath, by = join_by("Modepath" == "Path")) %>%
+            select(Mode, LogNode, C_Cost)%>%
+            summarize(C_Cost = sum(C_Cost), .by = c("Mode", "LogNode"))
+          
+          T_inCurrent <- full_join(T_Current, C_Current, by = join_by(Mode, LogNode))
+          
+          qcOut <- full_join(T_inCurrent, T_inNew, by = join_by(Mode, LogNode)) %>%
+            mutate(diff_Time = N_Time - C_Time,
+                   diff_Cost = N_Cost - C_Cost,
+                   perc_Time = round(diff_Time/(N_Time+C_Time),3),
+                   perc_Cost = round(diff_Cost/(N_Cost+C_Cost),3),
+                   Scenario = sc, Year = yr) %>%
+            filter(perc_Cost >= 0.01 | perc_Cost >= 0.01) %>%
+            select(colnames(all_modeSkim)) 
+
+          all_modeSkim <- rbind(all_modeSkim, qcOut)
+          
         }else if(file == "data_modepath_miles"){
           print(paste(file, yr, sc, sep = "-"))
           
           inCurrent<- inCurrent %>%
-            left_join(modeCrosswalk, by = c("MinPath" = "Modepath")) %>%
+            left_join(in_modePath, by = c("MinPath" = "Path")) %>%
             mutate(NARail = ifelse(is.na(RlTrnfr), 1, 0),
                    codeZero = ifelse(RlDwlCode != 0, 1, 0)) %>%
             summarize(C_TotMi = sum(TotalNtwkMiles),
@@ -269,9 +326,9 @@ for(file in chFiles){
                    C_PsRL = sum(CmapPsRL),
                    C_NATrnFr = sum(NARail),
                    C_NoZeroCode = sum(codeZero),
-                   .by = "Path")
+                   .by = c("LogNode", "Mode"))
           inNew<- inNew %>%
-            left_join(modeCrosswalk, by = c("MinPath" = "Modepath")) %>%
+            left_join(in_modePath, by = c("MinPath" = "Path")) %>%
             mutate(NARail = ifelse(is.na(RlTrnfr), 1, 0),
                    codeZero = ifelse(RlDwlCode != 0, 1, 0)) %>%
             summarize(N_TotMi = sum(TotalNtwkMiles),
@@ -282,10 +339,9 @@ for(file in chFiles){
                       N_PsRL = sum(CmapPsRL),
                       N_NATrnFr = sum(NARail),
                       N_NoZeroCode = sum(codeZero),
-                      .by = "Path")
-          
+                      .by = c("LogNode", "Mode"))          
 
-          modeMi <- full_join(inCurrent, inNew, by = join_by(Path)) %>%
+          qcOut <- full_join(inCurrent, inNew, by = join_by(LogNode, Mode)) %>%
             mutate(diff_TotMi = N_TotMi - C_TotMi,
                    diff_DmsLh = N_DmsLh - C_DmsLh,
                    diff_DmsDray = N_DmsDray- C_DmsDray,
@@ -304,7 +360,12 @@ for(file in chFiles){
                    Perc_NoZeroCode = round(diff_NoZeroCode/(N_NoZeroCode + C_NoZeroCode),3),
                    Year = yr,
                    Scenario = sc) %>%
-            select(Scenario, Year, Path, Perc_TotMi:Perc_NoZeroCode)
+            rowwise() %>%
+            mutate(sumDiff = sum(c_across(Perc_TotMi:Perc_NoZeroCode), na.rm = TRUE)) %>%
+            filter(sumDiff >= 0.01) %>%
+            select(colnames(all_modeMi))
+          
+          all_modeMi<- rbind(all_modeMi, qcOut)
           
         }else if(file == "data_modepath_ports"){
           print(paste(file, yr, sc, sep = "-"))
@@ -312,21 +373,30 @@ for(file in chFiles){
           inCurrent<- inCurrent %>% mutate(flagC = 1)
           inNew<- inNew %>% mutate(flagN = 1)
           
-          modePort <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone, Port_mesozoneNB, Port_NameNB, Port_mesozoneB, Port_NameB)) %>%
-            mutate(flags = flagC + flagN) %>%
-            filter(is.na(flags))
+          qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone, Port_mesozoneNB, Port_NameNB, Port_mesozoneB, Port_NameB)) %>%
+            mutate(flags = flagC + flagN, Scenario = sc, Year = yr) %>%
+            filter(is.na(flags)) %>%
+            select(colnames(all_modePort))
+          
+          all_modePort<- rbind(all_modePort, qcOut)
+          
         }
       }
-      
-      #depending on format, amend to full df then export as tab in xlsx, or just export
-      #truckIE as supplemental tab
-      #truckEE as supplemental tab
-      #znEmp as supplemental tab
-      #modePort - visual QC; can try to build a geography crosswalk based on nearby ports
-      #ZnSkim - filter to keep only OD pairs with differences
-      #MesSkim - filter to keep only OD pairs with differences >= 1%
-      #modeMi  - find a filter; 
-      #
     }
   }
 }
+
+#Final Output Formatting####
+#--Modepath Port --> amend with crosswalk and check any that dramatically changes coast
+#--Truck EE --> edit with crosswalk to ensure changes aren't dramatic
+##--Truck IE --> edit with crosswalk to ensure changes aren't dramatic
+
+
+#Output: Any differences in modepath greater than 1%
+#Export as tab
+#--Mesozone Skims
+#--Modepath Miles
+#--Modepath Skims
+#--Zone Employment
+#--Zone Skim
+
