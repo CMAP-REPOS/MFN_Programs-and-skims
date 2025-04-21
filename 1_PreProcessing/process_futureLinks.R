@@ -1,10 +1,19 @@
 #KCC
 #script to read MHN future network coding and produce future MFN networks
+print(getwd())
+args = commandArgs(trailingOnly=T)
+#setwd('D://cmh_data//FY18_Meso_Freight_Skim_Setup//Database//SAS') 
+#source("../get_dir.R")  		## -- Intelligently create DirPath variable
 
 #--SET KEY PARAMETERS--####
-inputDir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
-outputDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"   ### Current MFN
-outPath = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output"
+inputDir = args[1]    ### Current MHN
+outputDir = "../Output/MFN_temp.gdb"   ### Current MFN
+outPath = "../Output"
+outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
+outDir1 = "../Output/QC/"
+outDir2 = "../Output/Lognodes/"
+dir.create(outDir1)
+dir.create(outDir2)
 
 #--SETUP--
 library(scales)
@@ -61,7 +70,6 @@ logisticCMAP <- in_logisticNodes %>%
 qc_coreNodes = list(centroidsCMAP, logisticCMAP)
 qc_coreNodesMatch = list(qc_centroidsCMAP, qc_logisticCMAP)
 
-outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
 sink(outFile, append = FALSE)
 i = 1
 for(df in qc_coreNodes){

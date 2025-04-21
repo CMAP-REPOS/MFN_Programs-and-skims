@@ -5,7 +5,7 @@ library(readxl)
 library(filesstrings)
 
 #--Read input####
-in1 <- suppressWarnings(read.table("../../Input/finalQC_inputs.txt", header=TRUE, sep = "="))
+in1 <- suppressWarnings(read.table("../../Input/path_inputs.txt", header=TRUE, sep = "="))
 
 #--Define paths and create folders####
 inConf = str_replace_all(in1$value[1], " ", "")

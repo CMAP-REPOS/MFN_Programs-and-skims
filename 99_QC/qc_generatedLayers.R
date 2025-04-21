@@ -1,15 +1,18 @@
 #Compares output from XXX to previous version
 #KCazzato 3/19/2025
+args = commandArgs(trailingOnly=T)
+#setwd('D://cmh_data//FY18_Meso_Freight_Skim_Setup//Database//SAS') 
+#source("../get_dir.R")  		## -- Intelligently create DirPath variable
 
 library(tidyverse)
 library(sf)
 library(openxlsx)        #for writing to an xl
 library(readxl)
 #SET PARAMETERS & VARIABLES####
-oldDir = "V:/Secure/Master_Freight/Current/MFN_currentFY25.gdb"
-newDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_tempFY25.gdb"
-MHN_Dir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
-outFile = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/QC/changedTIPIDs.xlsx"
+oldDir = args[1]
+newDir = "../Output/MFN_temp.gdb"
+MHN_Dir = args[2]    ### Current MHN
+outFile = "../Output/QC/changedTIPIDs.xlsx"
 
 years = c(2022, 2030, 2040, 2050, 2060)
 layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways", 
@@ -21,7 +24,7 @@ layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways",
 #MHN formatting data
 in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
 in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
-in_TIPIDs <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/mhn_highway_project_coding_c24q4.xlsx")
+in_TIPIDs <- read_xlsx("../Input/mhn_highway_project_coding_c24q4.xlsx")
 
 #Format MHN Project Information####
 TIPIDs <- in_MHN_hwyproj %>% select(TIPID:RSP_ID) %>% st_drop_geometry() %>% filter(COMPLETION_YEAR != 9999)
@@ -77,6 +80,9 @@ for(year in years){
   links = paste("CMAP_HWY_LINK_y", year, sep = "")
   nodes = paste("CMAP_HWY_NODE_y", year, sep = "")
   
+  print(newDir)
+  print(links)
+  print(nodes)
   #Import New Data
   in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
   in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
@@ -86,6 +92,9 @@ for(year in years){
     links = "CMAP_HWY_LINK_base"
     nodes = "CMAP_HWY_NODE_base"
   }
+  print(oldDir)
+  print(links)
+  print(nodes)
   in_old_links_cmap <- read_sf(dsn = oldDir, layer =links, crs = 26771) 
   in_old_nodes_cmap <- read_sf(dsn = oldDir, layer =nodes, crs = 26771)
   

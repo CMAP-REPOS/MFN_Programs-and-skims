@@ -50,8 +50,3 @@ dependencies:
   - tbb4py=2021.4
   - xarray=0.20
   - zarr=2.10
-  - pip:
-    - emat  
-    # Uses relative paths to local packages
-    - -e ../../../src/Mode-Dest-TOD
-    - -e ../../../src/Mode-Dest-TOD/sharrow

@@ -1,18 +1,19 @@
 #KCazzato 3/25/2025
 #This script reviews the batchin files for the Freight network skimming
 #Files produced by batch_domestic_scen_working.py
+args = commandArgs(trailingOnly=T)
 
-
-currentDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/BatchinFiles_current"
-newDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/BatchinFiles_testing"
-outputDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/QC"
-MHN_Dir = "V:/Secure/Master_Highway/mhn_c24q4.gdb"    ### Current MHN
-outFile = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/QC/batchinTIPIDs.xlsx"
+MHN_Dir = args[1]    ### Current MHN
+currentDir = "../Input/BatchinFiles_current"
+newDir = "../Output/Batchin"
+outputDir = "../Output/QC"
+outFile = "../Output/QC/batchinTIPIDs.xlsx"
 
 #LOAD LIBRARIES, DATA, AND VARIABLES####
 library(tidyverse)
 library(sf)
 library(readxl)
+library(openxlsx)
 
 years = c(2022, 2030, 2040, 2050, 2060)
 files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
