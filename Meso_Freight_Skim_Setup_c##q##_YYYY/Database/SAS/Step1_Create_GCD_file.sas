@@ -41,7 +41,7 @@ filename out2 "&outdir.\data_mesozone_centroids_&year..csv";         *** -- New 
 filename out3 "&outdir.\cmap_data_truck_IE_poe_&year..csv";          *** -- Output file of CMAP POEs used by truck I-E trips -- ***;
 filename out4 "&outdir.\cmap_data_truck_EE_poe_&year..csv";          *** -- Output file of CMAP POEs used by truck E-E trips -- ***;
 
-data _null_; command="if not exist &outdir (mkdir &outdir)"; call system(command); run;
+data _null_; command="if not exist &outdir. (mkdir &outdir.)"; call system(command); run;
 
 *###=================================================================================###
     READ ORIGINAL FILE

@@ -27,7 +27,7 @@
 *###=================================================================================###
     DEFINE INPUT/OUTPUT FILES
 *###=================================================================================###;
-%let conformity=c24q4;                                        *** -- Conformity analysis used for network data -- ***;
+%let conformity=%scan(&sysparm,3);                                        *** -- Conformity analysis used for network data -- ***;
 %let sasin=inputs\;	                                          *** -- Location of SAS input files -- ***;
 %let scen=%scan(&sysparm,1);					                            *** -- Scenario number -- ***; 
 %let year=%scan(&sysparm,2);					                            *** -- Flag Year -- ***; 

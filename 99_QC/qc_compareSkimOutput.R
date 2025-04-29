@@ -3,18 +3,21 @@
 library(tidyverse)
 library(readxl)
 library(openxlsx)
+library(terra)
 
-#--Read Input####
-in1 <- suppressWarnings(read.table("../../Input/path_inputs.txt", header=TRUE, sep = "="))
+TMPDIR="S:/AdminGroups/ResearchAnalysis/kcc/temp"
+terraOptions(tempdir = TMPDIR)  
 
 #--Define paths####
-inConf = str_replace_all(in1$value[1], " ", "")
-newDir = paste(str_replace_all(in1$value[2], " ", ""), "/Skim_Output/", sep = "")
-currentDir =  paste(str_replace_all(in1$value[3], " ", ""), "/Skim_Output/", sep = "")
+args = commandArgs(trailingOnly=T)
+
+inConf = args[1]
+newDir = "../Skim_New/Skim_Output/"
+currentDir =  "../Input/Skim_Output/"
 
 empUpdate = "no"
 
-rpDir = paste(str_replace_all(in1$value[2], " ", ""), "/Reports/", sep = "")
+rpDir = "../Output/QC/"
 outXL = paste(rpDir, "finalSkim_compareQC.xlsx", sep = "")
 report = paste(rpDir, "qc_CompareReport.txt", sep = "")
 
@@ -23,13 +26,13 @@ if(file.exists(outXL) == TRUE){unlink(outXL, recursive = TRUE)}
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 
 #--Import crosswalks####
-in_modePath <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "modePath")
-in_ports <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "Ports")
-in_POE <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/MFN_crosswalks.xlsx", sheet = "POE")
+in_modePath <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "modePath")
+in_ports <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "Ports")
+in_POE <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "POE")
 
 #--Define Lists & Variables####
 allFiles = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
-
+print(allFiles)
 chFiles = c("cmap_data_truck_EE_poe.csv", "cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims",
             "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports")
 stFiles = c("cmap_data_zone_centroids.csv", "data_mesozone_centroids.csv", "data_mesozone_gcd.csv", "data_modepath_airports.csv")
@@ -73,6 +76,9 @@ all_modeSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Mode=as
 #3. Compare against previous version####
 for(file in allFiles){
   #Load data
+  print(currentDir)
+  print(newDir)
+  
   inCurrent <- read.csv(paste(currentDir, file, sep = ""))
   inNew <- read.csv(paste(newDir, file, sep = ""))
   
