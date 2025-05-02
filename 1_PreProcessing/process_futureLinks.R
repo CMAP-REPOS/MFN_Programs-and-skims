@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly=T)
 #source("../get_dir.R")  		## -- Intelligently create DirPath variable
 
 #--SET KEY PARAMETERS--####
-inputDir = args[1]    ### Current MHN
+inputDir = "../Input/MHN_temp.gdb"    ### Current MHN
 outputDir = "../Output/MFN_temp.gdb"   ### Current MFN
 outPath = "../Output"
 outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))

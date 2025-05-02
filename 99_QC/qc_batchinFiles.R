@@ -1,9 +1,8 @@
 #KCazzato 3/25/2025
 #This script reviews the batchin files for the Freight network skimming
 #Files produced by batch_domestic_scen_working.py
-args = commandArgs(trailingOnly=T)
 
-MHN_Dir = args[1]    ### Current MHN
+MHN_Dir = "../Input/MHN_temp.gdb"    ### Current MHN
 currentDir = "../Input/BatchinFiles_current"
 newDir = "../Output/Batchin"
 outputDir = "../Output/QC"

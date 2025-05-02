@@ -11,7 +11,7 @@ library(readxl)
 #SET PARAMETERS & VARIABLES####
 oldDir = args[1]
 newDir = "../Output/MFN_temp.gdb"
-MHN_Dir = args[2]    ### Current MHN
+MHN_Dir = "../Input/MHN_temp.gdb"    ### Current MHN
 outFile = "../Output/QC/changedTIPIDs.xlsx"
 
 years = c(2022, 2030, 2040, 2050, 2060)
