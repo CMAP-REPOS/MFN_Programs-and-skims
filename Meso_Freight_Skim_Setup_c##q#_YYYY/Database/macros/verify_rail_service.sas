@@ -12,24 +12,16 @@ filename out1 "output_data\qc\zone_connections.csv";
 
 options noxwait;
 
-data _null_; command="if not exist output_data\qc (md output_data\qc)" ; 
+data _null_; command="if not exist output_data\qc (md ..\output_data\qc)" ; 
     call system(command); 
 	
 *###=================================================================================###
     -- PROCESS EMME SKIMS --
 *###=================================================================================###;
-%let i=1; %let j=2;
+%let i=61; %let j=62;
 %macro ReadSkims;
 
-   %do %while (&i le 25);
-      *** -- Each set of skim matrices represents a specific rail carrier or mode -- ***;
-	  %if &i>=1 & &i<=4 %then %let OP=B;
-	  %if &i>=5 & &i<=8 %then %let OP=U;
-	  %if &i>=9 & &i<=12 %then %let OP=X;
-	  %if &i>=13 & &i<=16 %then %let OP=N;
-	  %if &i>=17 & &i<=20 %then %let OP=cp;
-	  %if &i>=21 & &i<=24 %then %let OP=cn;
-	  %if &i>=25 & &i<=28 %then %let OP=K;
+   %do %while (&i le 63);
 	 run;
       data dist&i(keep=o dest dist); infile "&emdir.mf&i..in" missover dlm=' :' firstobs=5;
 	    input o d1 v1 d2 v2 d3 v3;
@@ -62,7 +54,7 @@ data _null_; command="if not exist output_data\qc (md output_data\qc)" ;
 %ReadSkims
 /* end of macro */
 
-data review; set rail1 rail5 rail9 rail13 rail17 rail21 rail25;
+data review; set rail61;
   if o<dest;   *** only need one direction of zonal interchange ***;
    proc sort; by o dest;
   proc transpose out=zones prefix=mode; by o dest; var mode;

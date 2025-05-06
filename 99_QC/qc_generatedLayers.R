@@ -24,7 +24,6 @@ layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways",
 #MHN formatting data
 in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
 in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
-in_TIPIDs <- read_xlsx("../Input/mhn_highway_project_coding_c24q4.xlsx")
 
 #Format MHN Project Information####
 TIPIDs <- in_MHN_hwyproj %>% select(TIPID:RSP_ID) %>% st_drop_geometry() %>% filter(COMPLETION_YEAR != 9999)
@@ -50,11 +49,10 @@ allNodes <- rbind(t1, t2) %>%
   mutate(count = n()) %>%
   ungroup()
 
-confIDs <- in_TIPIDs %>%
-  select(tipid) %>%
+confIDs <- in_MHN_hwyproj_coding %>%
+  select(TIPID) %>%
   unique() %>%
-  mutate(flag = "conformity") %>%
-  rename(TIPID=tipid)
+  mutate(flag = "conformity") 
 
 #COMPARE STATIC DATA####
 for(layer in layers){
@@ -188,7 +186,7 @@ t2 <- loopLinks %>%
 add_chTIPID <- rbind(t1, t2) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
-  mutate(TIPID = as.numeric(TIPID)) %>%
+  #mutate(TIPID = as.numeric(TIPID)) %>%
   distinct()%>%
   left_join(confIDs, by = "TIPID") %>%
   filter(is.na(flag))
@@ -215,7 +213,7 @@ t2 <- loopLinks %>%
 rem_chTIPID <- rbind(t1, t2) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
-  mutate(TIPID = as.numeric(TIPID)) %>%
+  #mutate(TIPID = as.numeric(TIPID)) %>%
   distinct()%>%
   left_join(confIDs, by = "TIPID") %>%
   filter(is.na(flag))
@@ -225,6 +223,7 @@ if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
   write.xlsx(exportList, outFile)
+  stop()
 }else{
-  print("all good to go")
+  print("NETWORK CHANGES CONFIRMED TO BE ASSOCIATED WITH CONFORMITY UPDATES ONLY")
 }
