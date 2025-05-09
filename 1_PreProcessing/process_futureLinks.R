@@ -1,9 +1,5 @@
 #KCC
 #script to read MHN future network coding and produce future MFN networks
-print(getwd())
-args = commandArgs(trailingOnly=T)
-#setwd('D://cmh_data//FY18_Meso_Freight_Skim_Setup//Database//SAS') 
-#source("../get_dir.R")  		## -- Intelligently create DirPath variable
 
 #--SET KEY PARAMETERS--####
 inputDir = "../Input/MHN_temp.gdb"    ### Current MHN
@@ -16,15 +12,16 @@ dir.create(outDir1)
 dir.create(outDir2)
 
 #--SETUP--
-library(scales)
-#library(plotrix)
-library(tidyverse)
-library(sf)
-library(openxlsx)
-library(sfheaders)
-library(sp)
-library(geosphere)
-
+packages <- c("tidyverse", "scales", "openxlsx", "sf", "sfheaders", "sp", "geosphere")
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 #--DEFINE NODES for QC
 qc_centroidsCMAP <- data.frame(NODE_ID = c(1:132))                   ### 1-132 CMAP Centroids
 qc_logisticCMAP <- data.frame(NODE_ID =c(133:150))                   ### 133-150 CMAP Logistic Nodes
@@ -48,8 +45,8 @@ in_mesozoneGeo<- read_sf(dsn = outputDir, layer ="Meso_External_CMAP_merge", crs
 in_Rail<- read_sf(dsn = outputDir, layer ="CMAP_Rail", crs = 26771)
 
 #For links not flagged as base MESO in MHN but should be (to fix w/Tim at a later time)
-in_forceMESO <- read.xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
-in_removeMESO <- read.xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/removeLinks.xlsx")
+in_forceMESO <- read.xlsx("../Input/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
+in_removeMESO <- read.xlsx("../Input/removeLinks.xlsx")
 #--FORMAT DATA--####
 #Important Nodes####
 #work to ensure all centroids and logistic nodes are properly included
@@ -76,7 +73,7 @@ for(df in qc_coreNodes){
   qcFile = as.data.frame(qc_coreNodesMatch[1]) 
   checkDF <- centroidsCMAP %>%
     filter(!(NODE_ID %in% qcFile$NODE_ID))
-  print(nrow(checkDF))
+ # print(nrow(checkDF))
   i = i+1
 }
 sink()

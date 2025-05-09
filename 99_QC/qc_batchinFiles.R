@@ -9,20 +9,23 @@ outputDir = "../Output/QC"
 outFile = "../Output/QC/batchinTIPIDs.xlsx"
 
 #LOAD LIBRARIES, DATA, AND VARIABLES####
-library(tidyverse)
-library(sf)
-library(readxl)
-library(openxlsx)
+packages <- c("tidyverse", "readxl", "openxlsx", "sf")
 
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 years = c(2022, 2030, 2040, 2050, 2060)
 files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
 
 #MHN formatting data
 in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
 in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
-
-#TIP CHANGES
-in_TIPIDs <- read_xlsx("S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Input/mhn_highway_project_coding_c24q4.xlsx")
 
 #Define function for reading base_ntwk.txt and formatting####
 readBaseNtwk <- function(file){
@@ -76,18 +79,15 @@ allNodes <- rbind(t1, t2) %>%
   mutate(count = n()) %>%
   ungroup()
 
-confIDs <- in_TIPIDs %>%
-  select(tipid) %>%
+confIDs <- in_MHN_hwyproj_coding %>%
+  select(TIPID) %>%
   unique() %>%
-  mutate(flag = "conformity") %>%
-  rename(TIPID=tipid)
+  mutate(flag = "conformity") 
 
 #Compare static data####
+print("QA/QC STATIC DATA")
 for(yr in years){
-  print(yr)
   for(file in files){
-    print(file)
-    
     #Load current data
     fileC = paste(currentDir, "/scen_", yr, "/", file, sep = "")
     in1 <- scan(fileC, what = character(), sep = "\n", skip = 2)
@@ -112,8 +112,9 @@ loopLinks <- data.frame(c=as.character(), i=as.numeric(), j=as.numeric(), mi=as.
                         flag.x=as.character(), flag.y=as.character(), modYear = as.numeric())
 loopDistance <- data.frame(cINODE=as.numeric(), JNODE=as.numeric(), LENGTH=as.numeric(), 
                            dom_ratio=as.numeric(), DmstDist=as.numeric(), flag.x=as.character(), flag.y=as.character())
+
+print("QA/QC HIGHWAY DATA")
 for(yr in years){
-  print(yr)
   #LOAD DATA####
   #Load current data
   fileC = paste(currentDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
@@ -244,6 +245,7 @@ if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
   write.xlsx(exportList, outFile)
+  stop("REVIEW ../Output/QC/batchinTIPIDs.xlsx")
 }else{
   print("all good to go")
 }

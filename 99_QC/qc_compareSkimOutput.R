@@ -1,10 +1,17 @@
 
 #1. SET UP####
-library(tidyverse)
-library(readxl)
-library(openxlsx)
-library(terra)
+packages <- c("tidyverse", "readxl", "openxlsx", "terra")
 
+## Now load or install&load all
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 TMPDIR="S:/AdminGroups/ResearchAnalysis/kcc/temp"
 terraOptions(tempdir = TMPDIR)  
 
@@ -32,7 +39,6 @@ in_POE <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "POE")
 
 #--Define Lists & Variables####
 allFiles = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
-print(allFiles)
 chFiles = c("cmap_data_truck_EE_poe.csv", "cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims",
             "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports")
 stFiles = c("cmap_data_zone_centroids.csv", "data_mesozone_centroids.csv", "data_mesozone_gcd.csv", "data_modepath_airports.csv")
@@ -74,11 +80,9 @@ all_modeSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Mode=as
                            N_Time= as.numeric(), N_Cost= as.numeric(), perc_Time= as.numeric(), perc_Cost= as.numeric())
 
 #3. Compare against previous version####
+print("QA/QC COMPARING NEW DATA TO V DRIVE CURRENT DATA")
 for(file in allFiles){
   #Load data
-  print(currentDir)
-  print(newDir)
-  
   inCurrent <- read.csv(paste(currentDir, file, sep = ""))
   inNew <- read.csv(paste(newDir, file, sep = ""))
   

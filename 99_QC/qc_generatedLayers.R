@@ -1,13 +1,19 @@
 #Compares output from XXX to previous version
 #KCazzato 3/19/2025
 args = commandArgs(trailingOnly=T)
-#setwd('D://cmh_data//FY18_Meso_Freight_Skim_Setup//Database//SAS') 
-#source("../get_dir.R")  		## -- Intelligently create DirPath variable
 
-library(tidyverse)
-library(sf)
-library(openxlsx)        #for writing to an xl
-library(readxl)
+packages <- c("tidyverse", "readxl", "openxlsx", "sf")
+
+## Now load or install&load all
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 #SET PARAMETERS & VARIABLES####
 oldDir = args[1]
 newDir = "../Output/MFN_temp.gdb"
@@ -55,11 +61,11 @@ confIDs <- in_MHN_hwyproj_coding %>%
   mutate(flag = "conformity") 
 
 #COMPARE STATIC DATA####
+print("QA/QC STATIC DATA")
 for(layer in layers){
-  print(layer)
   #Import Data
-  in_new <- read_sf(dsn = newDir, layer =layer, crs = 26771) 
-  in_old <- read_sf(dsn = oldDir, layer =layer, crs = 26771)
+  in_new <- read_sf(dsn = newDir, layer =layer, crs = 26771, quiet = TRUE) 
+  in_old <- read_sf(dsn = oldDir, layer =layer, crs = 26771, quiet = TRUE)
   
   resp = all.equal(in_new, in_old)
   if(resp != TRUE){stop()}
@@ -72,15 +78,12 @@ loopNodes <- data.frame(Year = as.numeric(), NODE_ID_T = as.numeric(), MESOZONE 
 loopLinks <- data.frame(Year = as.numeric(), INODE = as.numeric(), JNODE = as.numeric(), Type = as.numeric(),
                         VDF = as.numeric(), Miles = as.numeric(), Modes = as.character(), LANES = as.numeric(),
                         LANES2 = as.numeric(), Shape_Length = as.numeric(), dfFlag = as.character())
+print("QA/QC HIGHWAY NETWORK")
 for(year in years){
-  print(year)
   #Define Link 
   links = paste("CMAP_HWY_LINK_y", year, sep = "")
   nodes = paste("CMAP_HWY_NODE_y", year, sep = "")
   
-  print(newDir)
-  print(links)
-  print(nodes)
   #Import New Data
   in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
   in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
@@ -90,16 +93,13 @@ for(year in years){
     links = "CMAP_HWY_LINK_base"
     nodes = "CMAP_HWY_NODE_base"
   }
-  print(oldDir)
-  print(links)
-  print(nodes)
+
   in_old_links_cmap <- read_sf(dsn = oldDir, layer =links, crs = 26771) 
   in_old_nodes_cmap <- read_sf(dsn = oldDir, layer =nodes, crs = 26771)
   
   #NODES
   resp = all.equal(in_old_nodes_cmap, in_new_nodes_cmap)
   if(length(resp) != 1){
-    print('NODES NOT EQUAL')
     in_old_nodes_cmap <- in_old_nodes_cmap %>% mutate(flagOld = 1) %>% select(NODE_ID_T, MESOZONE, POINT_X, POINT_Y, flagOld, SHAPE)
     in_new_nodes_cmap <- in_new_nodes_cmap %>% mutate(flagNew = 1)%>% select(NODE_ID_T, MESOZONE, POINT_X, POINT_Y, flagNew, SHAPE)
     
@@ -121,15 +121,10 @@ for(year in years){
   
     loopNodes <- loopNodes %>% rbind(tNodes)  
     #
-  }else{
-    print('NODES ARE EQUAL')
   }
-  
   #LINKS
   resp = all.equal(in_new_links_cmap, in_old_links_cmap)
   if(length(resp) != 1){
-    print("LINKS NOT EQUAL")
-    
     in_old_links_cmap <- in_old_links_cmap %>% mutate(flagOld = 1) %>% select(INODE:Shape_Length, flagOld, SHAPE)
     in_new_links_cmap <- in_new_links_cmap %>% mutate(flagNew = 1)%>% select(INODE:Shape_Length, flagNew, SHAPE)
     
@@ -155,12 +150,7 @@ for(year in years){
       distinct()
     
     loopLinks <- loopLinks %>% rbind(tLinks)
-
-    #
-    }else{
-    print("LINKS ARE EQUAL")
-  }
-  
+    }
 }
 
 #QC With TIPIDs####
@@ -223,7 +213,8 @@ if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
   write.xlsx(exportList, outFile)
-  stop()
+  stop('REVIEW ../Output/QC/changedTIPIDs.xlsx')
 }else{
   print("NETWORK CHANGES CONFIRMED TO BE ASSOCIATED WITH CONFORMITY UPDATES ONLY")
 }
+

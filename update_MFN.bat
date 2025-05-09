@@ -4,6 +4,32 @@ rem update gdb name to include c25q2 rather than FY25
 rem add cleanup of files prior to Running
 
 REM ###################################################################################################################################################
+rem FIND R Installation
+set infile=pathR.txt
+if exist %infile% (del %infile% /Q)
+rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\x64\R.exe" /s /b >> %infile% 2>nul
+rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\Rscript.exe" /s /b >> %infile% 2>nul
+dir "C:\Program Files\R\*Rscript.exe" /s /b >> %infile% 2>nul
+set /p path2=<%infile%
+set paren="
+set rpath=%paren%%path2%%paren%
+echo rpath = %rpath%
+CD %~dp0
+
+rem FIND SAS Installation
+set infile=pathSAS.txt
+if exist %infile% (del %infile% /Q)
+dir "C:\Program Files\SASHome\SASFoundation\*sas.exe" /s /b >> %infile% 2>nul
+set /p path2=<%infile%
+set saspath=%paren%%path2%%paren%
+echo saspath = %saspath%
+CD %~dp0
+
+rem FIND PYTHON Installation
+call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd MFN_env
+CD %~dp0
+
+REM ###################################################################################################################################################
 rem HEADER INFO
 
 @echo SELECT RUN MODE
@@ -15,31 +41,6 @@ set /p flagModule="[RUN analyze_mode_access? (enter 1, 2, 3, or 4)] "
 @echo.
 @echo ENTER CONFORMITY NUMBER FOR MFN UPDATE
 set /p conf="[Conformity number (enter c##q##)] "
-
-REM ###################################################################################################################################################
-rem FIND R Installation
-set infile=pathR.txt
-if exist %infile% (del %infile% /Q)
-rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\x64\R.exe" /s /b >> %infile% 2>nul
-dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\Rscript.exe" /s /b >> %infile% 2>nul
-set /p path2=<%infile%
-set paren="
-set rpath=%paren%%path2%%paren%
-echo rpath = %rpath%
-CD %~dp0
-
-rem FIND SAS Installation
-set infile=pathSAS.txt
-if exist %infile% (del %infile% /Q)
-dir "C:\Program Files\SASHome\SASFoundation\9.4\sas.exe" /s /b >> %infile% 2>nul
-set /p path2=<%infile%
-set saspath=%paren%%path2%%paren%
-echo saspath = %saspath%
-CD %~dp0
-
-rem FIND PYTHON Installation
-call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
-CD %~dp0
 
 if exist model_run_timestamp.txt (del model_run_timestamp.txt /Q)
 @Echo Press enter to begin run
@@ -104,6 +105,7 @@ rem RUN PREP SCRIPTS
 %rpath% 1_PreProcessing\process_futureLinks.R
 @ECHO Running qc_generatedLayers.R  >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_generatedLayers.R %gdbDir% 
+pause
 @ECHO Running batch_domestic_scen_working.py 
 call python 2_ArcGIS_Processing\batch_domestic_scen_working.py 
 @ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
@@ -173,16 +175,16 @@ call :CheckEmpty %infile%
 if exist %infile% (del %infile% /Q)
 cd Database
 
-@Echo RUNNING 1_remove_old_scenarios >> %~dp0/model_run_timestamp.txt
+@Echo -----RUNNING 1_remove_old_scenarios >> %~dp0/model_run_timestamp.txt
 call emme -ng 000 -m macros\1_remove_old_scenarios.mac %scen% %scenMax%
-@Echo RUNNING 2_build_network >> %~dp0/model_run_timestamp.txt
+@Echo -----RUNNING 2_build_network >> %~dp0/model_run_timestamp.txt
 call emme -ng 000 -m macros\2_build_network.mac %scen% %flag140% %flag143% 
-@Echo RUNNING 3_run_skims >> %~dp0/model_run_timestamp.txt
+@Echo -----RUNNING 3_run_skims >> %~dp0/model_run_timestamp.txt
 call emme -ng 000 -m macros\3_run_skims.mac %scen% %flag140% 
-rem @Echo RUNNING analyze_mode_access >> %~dp0/model_run_timestamp.txt
+rem @Echo -----RUNNING analyze_mode_access >> %~dp0/model_run_timestamp.txt
 rem @ECHO NOTE: this may take over an hour per network >> %~dp0/model_run_timestamp.txt
 rem call emme -ng 000 -m macros\analyze_mode_access.mac %scen%
-@ECHO running verify rail service >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING verify rail service >> %~dp0/model_run_timestamp.txt
 if exist macros\Verify_rail_service.lst (del Step1_Create_GCD_file.lst /Q)
 %saspath% macros\Verify_rail_service.sas -sysparm "%scen%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
@@ -193,20 +195,20 @@ if exist Step3_Verify_Costs_Times.lst (del Step3_Verify_Costs_Times.lst /Q)
 if exist Step4_Create_Zonal_Truck_Tour_files.lst (del Step4_Create_Zonal_Truck_Tour_files.lst /Q)
 
 @echo %CD%
-@ECHO running step 1 >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING step 1 >> %~dp0/model_run_timestamp.txt
 %saspath% Step1_Create_GCD_file.sas -sysparm "%scen% %counter%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO running step 2 >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING step 2 >> %~dp0/model_run_timestamp.txt
 %saspath% Step2_Create_ModePath_Skim_file.sas -sysparm "%scen% %flag140% %flag143% %counter%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO running step 3 >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING step 3 >> %~dp0/model_run_timestamp.txt
 %saspath% Step3_Verify_Costs_Times.sas -sysparm "%scen% %flag143%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO running step 4 >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING step 4 >> %~dp0/model_run_timestamp.txt
 if exist Step3_Verify_Costs_Times.lst (goto mode_err)
 %saspath% Step4_Create_Zonal_Truck_Tour_files.sas -sysparm "%scen% %counter% %conf%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO running step 5 >> %~dp0/model_run_timestamp.txt
+@ECHO -----RUNNING step 5 >> %~dp0/model_run_timestamp.txt
 %rpath% Step5_determine_pipeline_costs.R %scen% %counter%
 CD %~dp0
 if %counter% GTR 2025 (set /A counter=counter+10)
@@ -221,14 +223,17 @@ CD %~dp0
 
 REM ###################################################################################################################################################
 :run4
+CD %~dp0
+@Echo .
 @Echo %date% %time% Final QC and Clean Up...  >> %~dp0/model_run_timestamp.txt
 rem RUN FINAL QC SCRIPTS
 @ECHO Running qc_finalSkimOutput.R >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_finalSkimOutput.R %conf%
+pause
 @ECHO Running qc_compareSkimOutput.R >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_compareSkimOutput.R %conf%
 
-goto end
+goto last
 REM ###################################################################################################################################################
 :CheckEmpty
 if %~z1 == 0 (goto badfile)

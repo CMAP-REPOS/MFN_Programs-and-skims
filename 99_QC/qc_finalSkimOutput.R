@@ -1,9 +1,16 @@
-print(getwd())
 #1. SET UP####
-library(tidyverse)
-library(readxl)
-library(filesstrings)
+packages <- c("tidyverse", "readxl", "filesstrings")
 
+## Now load or install&load all
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 #--Define paths and create folders####
 args = commandArgs(trailingOnly=T)
 inConf = args[1]
@@ -39,7 +46,7 @@ scFiles = c("cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skim
 
 #2. Compare within new run####
 #--Confirm universal data is consistent across folders####
-print("CHECKING UNIVERSAL DATA")
+print("QA/QC CHECKING UNIVERSAL DATA")
 cat("CHECKING UNIVERSAL DATA", file=report,append=TRUE)
 
 i = 1
@@ -66,7 +73,6 @@ for(file in smFiles){
         i=i+1
         if(i > length(scen)*length(years)){
           i = 1
-          print(paste(file, " completed", sep = ""))
           }
         
       }
@@ -75,7 +81,7 @@ for(file in smFiles){
 }
 
 #--Confirm non-scenario specific data is consistent across scenarios (different years)####
-print("CHECKING YEAR SPECIFIC DATA")
+print("QA/QC CHECKING YEAR SPECIFIC DATA")
 cat("CHECKING YEAR SPECIFIC DATA \n", file =report,append=TRUE)
 
 for(file in yrFiles){
