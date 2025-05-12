@@ -39,9 +39,12 @@ arcpy.OverwriteOutput = 1
 # ---------------------------------------------------------------
 # Read Script Arguments
 # ---------------------------------------------------------------
-gdbDir = arcpy.GetParameterAsText(0)
-outputPath_T = arcpy.GetParameterAsText(1)
-years = str(arcpy.GetParameterAsText(2))
+programDir = os.path.dirname(__file__)
+mainDir = os.path.abspath(os.path.join(__file__, "../../../"))
+gdbDir = mainDir + "/Output/MFN_temp.gdb"
+outputPath_T = mainDir + "/Output/Batchin"
+
+years = "all"
 if years == 'all':
     years = ['2022', '2030', '2040', '2050', '2060']
 else:
@@ -49,7 +52,6 @@ else:
     years = years.split(",")
 arcpy.AddMessage(years)
 
-programDir = os.path.dirname(__file__)
 for yr in years:
 # ---------------------------------------------------------------
 # Local variables
@@ -120,11 +122,7 @@ for yr in years:
     if not os.path.exists(outputPath_T):
         arcpy.AddMessage("---> Directory created: " + outputPath_T)
         os.mkdir(outputPath_T)
-
-    if not os.path.exists(outputPath_T):
-        arcpy.AddMessage("---> Directory created: " + outputPath_T)
-        os.mkdir(outputPath_T)
-        
+       
     # ---------------------------------------------------------------
     # Create Emme Batchin Files
     # ---------------------------------------------------------------
@@ -139,7 +137,6 @@ for yr in years:
     z1 = programDir + "/" + fl + ".sas"
     sas_log_file1 = Temp + "\\" + fl + ".log"
     sas_list_file1 =  Temp + "\\" + fl + ".lst"
-    arcpy.AddMessage(y1)
     cmd1 = [ bat1, z1, y1, sas_log_file1, sas_list_file1 ]
 
     y1 = Temp + "$" + outputPath
@@ -273,7 +270,7 @@ for yr in years:
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(outputPath + "/DomesticNetwork.csv", index=False)
+    df.to_csv(outputPath+"/DomesticNetwork.csv", index=False)
     arcpy.AddMessage("---> domesticnetwork file saved")
 
 
@@ -294,7 +291,7 @@ for yr in years:
     df = pd.concat([x for x in pipedflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(outputPath + "/DomesticPipelineNetwork.csv", index=False)
+    df.to_csv(outputPath+"/DomesticPipelineNetwork.csv", index=False)
     arcpy.AddMessage("---> pipelinenetwork file saved")
 
     # ---------------------------------------------------------------
@@ -303,7 +300,6 @@ for yr in years:
     arcpy.AddMessage("---> Removing Temporary Files")
 
     toclean = [f for f in os.listdir(Temp)]
-
     for f in toclean:
         try:
             os.remove(os.path.join(Temp, f))

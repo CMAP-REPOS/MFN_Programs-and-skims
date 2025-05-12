@@ -1,0 +1,7 @@
+# To use this file:
+# conda env create -f MFN_env.yml
+name: MFN_env
+channels:
+  - esri
+dependencies:
+  - arcpy=3.3 

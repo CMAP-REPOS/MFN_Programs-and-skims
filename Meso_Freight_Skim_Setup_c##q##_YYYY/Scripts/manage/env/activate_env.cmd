@@ -14,14 +14,14 @@ if [%~1] == [emme] (set EMME_ENV=y) else (set EMME_ENV=n)
 set PDIR=%~dp0
 
 rem Define here the name of the TBM environment to be used.
-set TBM_ENVNAME=CMAP-TRIP2
+set MFN_ENVNAME=MFN_env
 rem Define here the name of the custom Emme environment to be used.
 set EMME_ENVNAME=emme-plus
 
 call "%PDIR%set_condapath.cmd"
 if %ERRORLEVEL% neq 0 (goto end)
 
-if %EMME_ENV%==y (set ENVNAME=%EMME_ENVNAME%) else (set ENVNAME=%TBM_ENVNAME%)
+if %EMME_ENV%==y (set ENVNAME=%EMME_ENVNAME%) else (set ENVNAME=%MFN_ENVNAME%)
 set ENVPATH=%CONDAPATH%\envs\%ENVNAME%
 
 rem Create it if it doesn't exist.
