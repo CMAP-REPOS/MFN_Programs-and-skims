@@ -1,11 +1,42 @@
 @echo off
-
 rem Submit_MFN_Skims.bat
 rem Karly Cazzato, CMAP
 
 @echo BATCH FILE TO SUBMIT SKIMS and Post-Processing for Master Freight Network
 @echo ==================================================================
 @echo.
+@echo %~dp0
+rem =========================================================================================
+rem =========================================================================================
+REM USER INPUT
+set choiceYR=%1
+
+if "%choiceYR%"=="2022" (
+	set /A flag143=0
+	goto proceed143)
+if NOT "%choiceYR%" == "2022" (
+	set /A flag143=1
+	goto proceed143)
+:proceed143
+
+set choice=%2
+if "%choice%"=="200" (
+	set /A scenario=200
+	set /A flag140=1
+	goto proceed140)
+
+if "%choice%"=="100" (
+	set /A scenario=100
+	set /A flag140=0
+	goto proceed140)
+
+:proceed140
+pause
+@echo Model run year: %choiceYR%
+@echo Model run scenario: %scenario%
+@echo Model Node 140 Flag: %flag140%
+@echo.
+pause
 
 rem =========================================================================================
 rem Activate Emme Python env
@@ -24,64 +55,12 @@ call :CheckEmpty %infile%
 if exist %infile% (del %infile% /Q)
 cd Database
 
-
-REM Now find R executable
-CD %~dp0
-set infile=path.txt
-if exist %infile% (del %infile% /Q)
-rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\x64\R.exe" /s /b >> %infile% 2>nul
-dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\Rscript.exe" /s /b >> %infile% 2>nul
-set /p path2=<%infile%
-set paren="
-set rpath=%paren%%path2%%paren%
-echo rpath = %rpath%
-call :CheckEmpty2 %infile%
-:Rpass
-
-REM Find SAS executable
-
-rem =========================================================================================
-rem =========================================================================================
-REM USER INPUT
-echo.
-echo Enter Year (2022, 2030, 2040, 2050, 2060)
-set /p choiceYR="[YEAR] "
-echo.
-if "%choiceYR%"=="2022" (
-	set /a flag143=0
-	goto proceed143)
-if NOT "%choiceYR%" == "2022" (
-	set /a flag143=1
-	goto proceed143)
-
-:proceed143
-
-echo.
-echo Include Logistics node 140 ('y' or 'n')
-set /p choice="[INCLUDE 140] "
-echo.
-if not "%choice%"=="" (
-    set choice=%choice:~0,1%
-    if "%choice%"=="y" (
-		set /a scenario=200
-		set /a flag140=1
-		goto proceed140)
-    if "%choice%"=="n" (
-		set /a scenario=100
-		set /a flag140=0
-		goto proceed140
-	)
-)
-:proceed140
-
-@echo Model run year: %choiceYR%
-@echo Model run scenario: %scenario%
-@echo Model Node 140 Flag: %flag140%
-@echo.
-
 @echo Run analyze_mode_access ('y' or 'no'; note, this will take at least an hour)
 set /p flagAccess="[RUN analyze_mode_access? (y/n)] "
 @echo.
+@echo conf %conf%
+set conf2=%conf%
+@echo conf2 %conf2%
 pause
 rem goto skip1
 @echo ==================================================================
@@ -91,8 +70,8 @@ rem goto skip1
 @ECHO.
 @ECHO -- Running Scenario %scenario% --
 @ECHO.
-
-set /a scenMax = scenario + 12
+@ECHO %CD%
+set /a scenMax = 212
 @Echo RUNNING 1_remove_old_scenarios
 call emme -ng 000 -m macros\1_remove_old_scenarios.mac %scenario% %scenMax%
 @Echo RUNNING 2_build_network
@@ -130,7 +109,7 @@ if exist Step3_Verify_Costs_Times.lst (del Step3_Verify_Costs_Times.lst /Q)
 if %counter% EQU 1 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR%")
 if %counter% EQU 2 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag140% %flag143% %choiceYR%")
 if %counter% EQU 3 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag143%")
-if %counter% EQU 4 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR%")
+if %counter% EQU 4 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR% %conf2%")
 if %counter% EQU 5 (%rpath% %script% %scenario% %choiceYr%)
 @ECHO.
 @echo ran step %counter%
@@ -142,7 +121,6 @@ if exist Step3_Verify_Costs_Times.lst (goto mode_err)
 set /A counter=counter+1
 goto while
 REM ======================================================================
-
 goto end
 
 
@@ -217,5 +195,7 @@ goto end
 @ECHO ==================================================================
 
 :end
+
+echo. done
 pause
-exit
+exit /B 0

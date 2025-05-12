@@ -105,7 +105,6 @@ rem RUN PREP SCRIPTS
 %rpath% 1_PreProcessing\process_futureLinks.R
 @ECHO Running qc_generatedLayers.R  >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_generatedLayers.R %gdbDir% 
-pause
 @ECHO Running batch_domestic_scen_working.py 
 call python 2_ArcGIS_Processing\batch_domestic_scen_working.py 
 @ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
@@ -229,7 +228,6 @@ CD %~dp0
 rem RUN FINAL QC SCRIPTS
 @ECHO Running qc_finalSkimOutput.R >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_finalSkimOutput.R %conf%
-pause
 @ECHO Running qc_compareSkimOutput.R >> %~dp0/model_run_timestamp.txt
 %rpath% 99_QC\qc_compareSkimOutput.R %conf%
 

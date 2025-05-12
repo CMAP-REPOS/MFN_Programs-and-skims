@@ -22,6 +22,12 @@ package.check <- lapply(
     }
   }
 )
+#if (!require("arcgisbinding", character.only = TRUE)) {
+#  install.packages("arcgisbinding", repos="https://r.esri.com", type="win.binary")
+#  library("arcgisbinding", character.only = TRUE)
+#  arc.check_product()
+#}
+
 #--DEFINE NODES for QC
 qc_centroidsCMAP <- data.frame(NODE_ID = c(1:132))                   ### 1-132 CMAP Centroids
 qc_logisticCMAP <- data.frame(NODE_ID =c(133:150))                   ### 133-150 CMAP Logistic Nodes
@@ -126,7 +132,7 @@ base_MHN_MESO_nodes <- base_MHN_MESO %>%
 #2=replace link
 #3=delete link
 #4=add link
-#years = list(2022)
+
 years = list(2022, 2030, 2040, 2050, 2060)
 for(yr in years){
   #Set year
@@ -158,8 +164,10 @@ for(yr in years){
            THRULANES2 = ifelse(!is.na(NEW_THRULANES2), NEW_THRULANES2, THRULANES2),
            type = ifelse(!is.na(NEW_TYPE1), NEW_TYPE1, as.numeric(TYPE1)),
            DIRECTIONS = ifelse(!is.na(NEW_DIRECTIONS), NEW_DIRECTIONS, as.numeric(DIRECTIONS)),
-           MESO = ifelse((ANODE %in% qc_poe$NODE_ID) | (BNODE %in% qc_poe$NODE_ID), 1, MESO)) %>%      #flag POE to keep in list
-    filter(MESO == 1)
+           MESO = ifelse((ANODE %in% qc_poe$NODE_ID) | (BNODE %in% qc_poe$NODE_ID), 1, MESO),
+           remNA = ifelse((is.na(NEW_DIRECTIONS) & is.na(NEW_TYPE1)) & (is.na(NEW_THRULANES1) & is.na(NEW_THRULANES2)),1,0)) %>%      #flag POE to keep in list
+    filter(MESO == 1) %>%
+    filter(remNA != 1)
   
   #grab list of removal
   removeBaseMeso <- updated_MHN_MESO %>%
@@ -211,7 +219,10 @@ for(yr in years){
     full_join(futureLinks_baseT, by = c("linkID")) %>%
     filter(!is.na(flag)) %>%
     filter(ABB %in% futureLinks_baseT$ABB) %>%
-    select(colnames(futureLinks_baseT), SHAPE)
+    select(colnames(futureLinks_baseT), SHAPE) %>%
+    distinct() %>%
+    group_by(ABB) %>%
+    mutate(count = n())
   
   tempNodes2 <- futureLinks_baseT %>%
     select(INODE, JNODE) %>%
@@ -283,61 +294,41 @@ for(yr in years){
     rename(SHAPE = geometry) %>%
     mutate(count = NA, typeMHN = NA, ABB = paste(INODE, JNODE, type, sep = "-")) %>%
     select(colnames(futureLinks_baseGeo))
-  
-  #ADD Special Links TO BASE####
-  finalLinks1 <- futureLinks_baseGeo %>% 
-    filter(!(INODE %in% duplicateNodes$MHN_ID)) %>%         #remove links associated with duplicate nodes first
-    filter(!(JNODE %in% duplicateNodes$MHN_ID)) %>%
-    rbind(allConnectors_f) %>%
-    st_as_sf() %>% 
-    st_cast("MULTILINESTRING") %>%
-    select(linkID:type, vdf, Miles:lanes2, SHAPE) %>%
-    mutate(type = as.numeric(type),
-           lanes = ifelse(lanes < 2, 2, lanes),
-           lanes2 = ifelse(lanes2 == 0 | is.na(lanes2), lanes, lanes2)) %>%
-    filter(!is.na(type)) %>%
-    filter(!is.na(lanes)) %>%
-    distinct() %>%
-    mutate(lanes = ifelse(INODE <= 150, 1, lanes),
-           lanes2 = ifelse(INODE <= 150, 1, lanes2),
-      #     DIRECTIONS = case_when(
-      #       INODE > 5000 & (lanes == lanes2 & lanes == 1) ~ 1,
-      #       INODE > 5000 & (lanes == lanes2 & lanes == 2) ~ 2,
-      #       .default = DIRECTIONS
-      #     )
-  ) %>%
-    rename(Type = type, VDF = vdf, LANES = lanes, LANES2 = lanes2)%>%
-    select(DIRECTIONS, Type, VDF, 
-           INODE, JNODE, Miles, Modes, LANES, LANES2) %>%
-    mutate(MESOZONE = 1)
-  
   #3. FINALIZE####
   #--Format final MFN link fields####
-  finalLinks <- finalLinks1 %>% 
-    distinct() %>%
-    mutate(Meso = 1, 
-           Type = case_when(
+  
+  #ADD Special Links TO BASE####
+  finalLinks <- futureLinks_baseGeo %>% 
+    filter(!(INODE %in% duplicateNodes$MHN_ID)) %>%         #remove links associated with duplicate nodes first
+    filter(!(JNODE %in% duplicateNodes$MHN_ID)) %>%
+    rbind(allConnectors_f) %>%                              #Add connectors to link df
+    st_as_sf() %>% 
+    st_cast("MULTILINESTRING") %>%
+    #select(linkID:type, vdf, Miles:lanes2, SHAPE) %>%
+    mutate(Type = case_when(
              INODE < 133 ~ 4,
              INODE >= 133 & INODE <=150 ~ 7,
              INODE > 150 ~ 1
            ),
-        #   DIRECTIONS = ifelse(INODE <= 1999, 2, DIRECTIONS),
-        #   DIRECTIONS = ifelse(INODE %in% qc_poe$NODE_ID, 2, DIRECTIONS),
-           Shape_Length = st_length(SHAPE)
-           ) %>%
-    select(INODE, JNODE, Meso, DIRECTIONS:LANES2, SHAPE, Shape_Length) %>%
-    mutate(DIRECTIONS = as.character(DIRECTIONS)) %>%
+           Meso = 1,
+           lanes = ifelse(lanes < 2, 2, lanes),
+           lanes2 = ifelse(lanes2 == 0 | is.na(lanes2), lanes, lanes2),
+           Shape_Length = st_length(SHAPE),
+           DIRECTIONS = as.character(DIRECTIONS)) %>%
+    filter(!is.na(type)) %>%
+    filter(!is.na(lanes)) %>%
+    distinct() %>%
+    mutate(lanes = ifelse(INODE <= 150, 1, lanes),
+           lanes2 = ifelse(INODE <= 150, 1, lanes2)) %>%
+    rename(VDF = vdf, LANES = lanes, LANES2 = lanes2)%>%
+    distinct() %>%
+    select(INODE, JNODE, Meso, DIRECTIONS, Type, VDF, Miles, Modes, LANES, LANES2, SHAPE, Shape_Length)
+  
+  qcLinks <- finalLinks %>%
     group_by(INODE, JNODE) %>%
     mutate(count = n()) %>%
-    filter(count == 1 | row_number() == 1) %>%
-    group_by(INODE, JNODE) %>%
-    mutate(count = n())
-  
-  qc_final <- finalLinks %>%
-    group_by(INODE) %>%
-    mutate(Icount = n()) %>%
-    group_by(JNODE) %>%
-    mutate(Jcount = n())
+    filter(count >1)
+  if(nrow(qcLinks) > 0){stop("UH OH, MULTIPLE LINKS EXIST FOR IJ PAIRS")}
 
   #--Format final MFN node fields####
   finalNodes <- finalLinks %>%
@@ -387,8 +378,11 @@ for(yr in years){
   file = paste("y", as.character(yr), sep = "")
   outLinkFile = paste("CMAP_HWY_LINK_", file, sep = "")
   st_write(obj = finalLinks, layer = outLinkFile, dsn = outputDir, append = FALSE)
+  #arc.write(file.path(outputDir, paste("MFN/", outLinkFile, sep = "")), data = finalLinks, overwrite = TRUE)
   outNodeFile = paste("CMAP_HWY_NODE_", file, sep = "")
   st_write(obj =finalNodes, layer = outNodeFile, dsn = outputDir, append = FALSE)
+  #arc.write(file.path(outputDir, paste("MFN/", outNodeFile, sep = "")), data = finalNodes, overwrite = TRUE)
+  
   
   #Write Node 140 file####
   out140File = paste(outPath, "/Lognodes/unlink_lognode140_", file, ".txt", sep = "")
