@@ -2,8 +2,15 @@
 #script to read MHN future network coding and produce future MFN networks
 
 #--SET KEY PARAMETERS--####
-inputDir = "../Input/MHN_temp.gdb"    ### Current MHN
-outputDir = "../Output/MFN_temp.gdb"   ### Current MFN
+args = commandArgs(trailingOnly=T)
+oldConf = as.character(args[1])
+newConf = as.character(args[2])
+inBaseYr = as.numeric(args[3])
+inFirstYr = as.numeric(args[4])
+inLastYr = as.numeric(args[5])
+
+inputDir = paste("../Input/MHN_", oldConf, ".gdb", sep="")    ### Current MHN
+outputDir = paste("../Output/MFN_updated_", newConf, ".gdb", sep="")   ### Current MFN
 outPath = "../Output"
 outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
 outDir1 = "../Output/QC/"
@@ -22,6 +29,7 @@ package.check <- lapply(
     }
   }
 )
+
 #if (!require("arcgisbinding", character.only = TRUE)) {
 #  install.packages("arcgisbinding", repos="https://r.esri.com", type="win.binary")
 #  library("arcgisbinding", character.only = TRUE)
@@ -132,8 +140,16 @@ base_MHN_MESO_nodes <- base_MHN_MESO %>%
 #2=replace link
 #3=delete link
 #4=add link
-
-years = list(2022, 2030, 2040, 2050, 2060)
+i = inFirstYr
+while(i <= inLastYr){
+  if(i == inFirstYr){
+    years <- list(inBaseYr, inFirstYr)
+  }else{
+    years <-append(years, i)
+  }
+  i = i+5
+}
+print(years)
 for(yr in years){
   #Set year
   if(yr == 2060){

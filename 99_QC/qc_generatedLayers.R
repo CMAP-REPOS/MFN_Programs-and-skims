@@ -15,12 +15,26 @@ package.check <- lapply(
   }
 )
 #SET PARAMETERS & VARIABLES####
-oldDir = args[1]
-newDir = "../Output/MFN_temp.gdb"
-MHN_Dir = "../Input/MHN_temp.gdb"    ### Current MHN
+oldconf = args[1]
+newconf = args[2]
+inBaseYr = as.numeric(args[3])
+inFirstYr = as.numeric(args[4])
+inLastYr = as.numeric(args[5])
+MHN_Dir = paste("../Input/MHN_", oldconf, ".gdb", sep="")
+oldconfMFN = paste("../Input/MFN_", oldconf, ".gdb", sep="")
+newDir = paste("../Output/MFN_updated_", newconf, ".gdb", sep="")
 outFile = "../Output/QC/changedTIPIDs.xlsx"
 
-years = c(2022, 2030, 2040, 2050, 2060)
+i = inFirstYr
+while(i <= inLastYr){
+  if(i == inFirstYr){
+    years <- list(inBaseYr, inFirstYr)
+  }else{
+    years <-append(years, i)
+  }
+  i = i+5
+}
+
 layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways", 
            "Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System", "CMAP_Rail_nodes", 
            "National_Rail_nodes", "National_Hwy_nodes", "Inland_Waterway_nodes", "Crude_Oil_System_nodes", 
@@ -65,7 +79,7 @@ print("QA/QC STATIC DATA")
 for(layer in layers){
   #Import Data
   in_new <- read_sf(dsn = newDir, layer =layer, crs = 26771, quiet = TRUE) 
-  in_old <- read_sf(dsn = oldDir, layer =layer, crs = 26771, quiet = TRUE)
+  in_old <- read_sf(dsn = oldconfMFN, layer =layer, crs = 26771, quiet = TRUE)
   
   resp = all.equal(in_new, in_old)
   if(resp != TRUE){stop()}
@@ -87,15 +101,9 @@ for(year in years){
   #Import New Data
   in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
   in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
-  
-  #Import Old Data
-  if(year == 2022){
-    links = "CMAP_HWY_LINK_base"
-    nodes = "CMAP_HWY_NODE_base"
-  }
 
-  in_old_links_cmap <- read_sf(dsn = oldDir, layer =links, crs = 26771) 
-  in_old_nodes_cmap <- read_sf(dsn = oldDir, layer =nodes, crs = 26771)
+  in_old_links_cmap <- read_sf(dsn = oldconfMFN, layer =links, crs = 26771) 
+  in_old_nodes_cmap <- read_sf(dsn = oldconfMFN, layer =nodes, crs = 26771)
   
   #NODES
   resp = all.equal(in_old_nodes_cmap, in_new_nodes_cmap)
@@ -209,7 +217,7 @@ rem_chTIPID <- rbind(t1, t2) %>%
   filter(is.na(flag))
 
 #Export####
-if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
+if(nrow(add_chTIPID) > 1 | nrow(rem_chTIPID) > 1){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
   write.xlsx(exportList, outFile)

@@ -1,11 +1,11 @@
 library(tidyverse)
 in_crosswalk <- read.csv("S:/AdminGroups/ResearchAnalysis/CMH/FY25/freight model/truck_tours/new input files/subzone-mesozone.csv")
 
-scenarios = c(200, 300, 500, 700)
-#where 200 = 2025, 300 = 2030, 500 = 2040, 700 = 2050
+scenarios = c(200, 300, 400, 500, 700)
+#where 200 = 2025, 300 = 2030, 400 = 2035, 500 = 2040, 700 = 2050
 
-folder = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/proUpdate/finalGDB/3_finalRuns/Intermediate Files/TBM_Inputs/c24q4_"
-outpath = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/proUpdate/finalGDB/3_finalRuns/Intermediate Files/TBM_Inputs/subzn_emp/"
+folder = "E:/kcc/FY25/MFN/develop_inputs/c24q4/c24q4_"
+outpath = "E:/kcc/FY25/MFN/develop_inputs/Outputs/c24q4/subzn_emp/"
 
 folder2 = "_20241031/cmap_trip-based_model/Database/tg/fortran/ATTR_IN.TXT"
 folder3 = "_20241101/cmap_trip-based_model/Database/tg/fortran/ATTR_IN.TXT"
@@ -22,7 +22,7 @@ for(scen in scenarios){
     inFile = paste(folder, scen, folder4, sep = "")
   }
   
-  outFile = paste(outpath, scen, "_subzn_emp.csv")
+  outFile = paste(outpath, scen, "_subzn_emp.csv", sep="")
   
   in_att <- read.table(inFile, sep = ",")
   colnames(in_att) <- c("subzone", "retailEmp", "totalEmp", "fractionHighEarn")

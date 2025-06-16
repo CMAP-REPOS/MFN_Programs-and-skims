@@ -7,8 +7,6 @@ REM ############################################################################
 rem FIND R Installation
 set infile=pathR.txt
 if exist %infile% (del %infile% /Q)
-rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\x64\R.exe" /s /b >> %infile% 2>nul
-rem dir "C:\Users\kcazzato\AppData\Local\Programs\R\R-4.4.1\bin\Rscript.exe" /s /b >> %infile% 2>nul
 dir "C:\Program Files\R\*Rscript.exe" /s /b >> %infile% 2>nul
 set /p path2=<%infile%
 set paren="
@@ -26,7 +24,13 @@ echo saspath = %saspath%
 CD %~dp0
 
 rem FIND PYTHON Installation
-call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd MFN_env
+rem call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd MFN_env
+set infile=pathPY.txt
+if exist %infile% (del %infile% /Q)
+dir "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe" /s /b >> %infile% 2>nul
+set /p path2=<%infile%
+set pypath=%paren%%path2%%paren%
+echo pypath = %pypath%
 CD %~dp0
 
 REM ###################################################################################################################################################
@@ -39,26 +43,29 @@ rem HEADER INFO
 @echo Mode 4: Run only final QC
 set /p flagModule="[RUN analyze_mode_access? (enter 1, 2, 3, or 4)] "
 @echo.
-@echo ENTER CONFORMITY NUMBER FOR MFN UPDATE
-set /p conf="[Conformity number (enter c##q##)] "
+@echo ENTER CONFORMITY NUMBER FOR NEW MFN UPDATE
+set /p newconf="[Conformity number (enter c##q##)] "
+@echo ENTER CONFORMITY NUMBER FOR TO COMPARE UPDATE TO 
+@echo Usually the previous conformity number
+@echo EX: if you're updating to c25q2, enter c24q4
+set /p oldconf="[Conformity number (enter c##q##)] "
 
-if exist model_run_timestamp.txt (del model_run_timestamp.txt /Q)
-@Echo Press enter to begin run
-pause
-@ECHO ============================================================= >> %~dp0/model_run_timestamp.txt
-@ECHO BEGIN CMAP FREIGHT NETWORK UPDATE AND SKIMS >> %~dp0/model_run_timestamp.txt
-@ECHO Model Run Start Time: %date% %time% >> %~dp0/model_run_timestamp.txt
-@ECHO ============================================================= >> model_run_timestamp.txt
+rem SET PATHS
+set mhnDir="V:/Secure/Master_Highway/archive/gdb/conformity/mhn_%newconf%.gdb"
+set mfnDir=V:/Secure/Master_Freight/Archive/%oldconf%
+set tbmInputDir=V:/Secure/Master_Freight/TBM_Inputs/%newconf%
+set procDir=V:/Secure/Master_Freight/Processing_Data
+
+rem SET VARIABLES
+set /a scenMax = 212
+set /a baseYr = 2022
+set /a firstYr = 2025
+set /a lastYr = 2050
 
 REM ###################################################################################################################################################
-rem SET VARIABLES AND PATHS
-set mhnDir="V:/Secure/Master_Highway/archive/gdb/conformity/mhn_%conf%.gdb"
-set outGDB="..\Output\MFN_temp.gdb"
-set currentDir=V:\Secure\Master_Freight\Current
-set inputDir=%currentDir%\Input
-set emmebankDir=%currentDir%\EmmeBank
-set gdbDir=%currentDir%\MFN_currentFY25.gdb
-set /a scenMax = 212
+rem BEGIN RUN
+@Echo Press enter to begin run
+pause
 
 if "%flagModule%"=="1" (goto run1)
 if "%flagModule%"=="2" (goto run2)
@@ -66,35 +73,63 @@ if "%flagModule%"=="3" (goto run3)
 if "%flagModule%"=="4" (goto run4)
 
 :run1
+CD %~dp0
+if exist model_run_timestamp.txt (del model_run_timestamp.txt /Q)
+@ECHO ============================================================= >> %~dp0/model_run_timestamp.txt
+@ECHO BEGIN CMAP FREIGHT NETWORK UPDATE AND SKIMS >> %~dp0/model_run_timestamp.txt
+@ECHO Model Run Start Time: %date% %time% >> %~dp0/model_run_timestamp.txt
+@ECHO ============================================================= >> model_run_timestamp.txt
 @Echo %date% %time% Copying Base Data from V Drive...  >> %~dp0/model_run_timestamp.txt
 
 REM ###################################################################################################################################################
 rem DEVELOP REMAINING FOLDER STRUCTURE
-if not exist %outGDB% (mkdir %outGDB%)
-if not exist "..\Skim_New\Model_Setups" (mkdir "..\Skim_New\Model_Setups")
 if not exist "..\Input" (mkdir "..\Input")
-if not exist "..\Input\MHN_temp.gdb" (mkdir "..\Input\MHN_temp.gdb")
-if not exist "..\Output\Batchin" (mkdir "..\Output\Batchin")
+if not exist "..\Input\Skim_Output_%oldconf%" (mkdir "..\Input\Skim_Output_%oldconf%")
+if not exist "..\Input\BatchinFiles_%oldconf%" (mkdir "..\Input\BatchinFiles_%oldconf%")
+if not exist "..\Input\MFN_%oldconf%.gdb" (mkdir "..\Input\MFN_%oldconf%.gdb")
+if not exist "..\Input\MHN_%oldconf%.gdb" (mkdir "..\Input\MHN_%oldconf%.gdb")
+if not exist "..\Output\MFN_updated_%newconf%.gdb" (mkdir "..\Output\MFN_updated_%newconf%.gdb")
+if not exist "..\Skim_New\Model_Setups" (mkdir "..\Skim_New\Model_Setups")
+if not exist "..\Output\BatchinFiles" (mkdir "..\Output\BatchinFiles")
+@echo created folder structure
 
-rem COPY INPUT FILE FOLDER
-xcopy %inputDir% "..\Input" /s
-
-rem COPY GDB TO TEMPORARY FOLDER
-copy %gdbDir% "..\Output\MFN_temp.gdb"
-copy %mhnDir% "..\Input\MHN_temp.gdb"
+rem COPY FILES FROM V DRIVE TO WORKSPACE
+xcopy "%mfnDir%\Skim_Output" "..\Input\Skim_Output_%oldconf%" /s
+xcopy "%mfnDir%\BatchinFiles" "..\Input\BatchinFiles_%oldconf%" /s
+copy "%mfnDir%\MFN_%oldconf%.gdb" "..\Input\MFN_%oldconf%.gdb"
+copy "%mfnDir%\MFN_%oldconf%.gdb" "..\Output\MFN_updated_%newconf%.gdb"
+copy %mhnDir% "..\Input\MHN_%oldconf%.gdb"
+copy "%procDir%\NetworkUpdate" "..\Input"
+@echo copied files
 
 rem COPY AND RENAME SKIMS SETUPS, INCLUDING EMMEBANK FROM V DRIVE
-set /A counter=2022
+set /A counter=%baseYr%
 :while
-if %counter% GTR 2050 (goto loopend)
-set nameMod=Meso_Freight_Skim_Setup_%conf%_%counter%
-mkdir = "..\Skim_New\Model_Setups\%nameMod%"
+if %counter% GTR %lastYr% (goto loopend)
+rem create folders if they do not exist
+set nameMod=Meso_Freight_Skim_Setup_%newconf%_%counter%
+set sasInDIR="..\Skim_New\Model_Setups\%nameMod%\Database\SAS\inputs\%newconf%\"
+if not exist "..\Skim_New\Model_Setups\%nameMod%" (mkdir = "..\Skim_New\Model_Setups\%nameMod%")
+rem copy model set up for year
 xcopy "Meso_Freight_Skim_Setup_c##q##_YYYY\" "..\Skim_New\Model_Setups\%nameMod%" /s /e
-copy "%emmebankDir%\emmebank" "..\Skim_New\Model_Setups\%nameMod%\Database"
-if %counter% GTR 2025 (set /A counter=counter+10)
-if %counter% EQU 2022 (set /A counter=2030)
+if not exist %sasInDIR% (mkdir=%sasInDIR%)
+rem copy emmebank
+copy "%procDir%\EmmeBank\emmebank" "..\Skim_New\Model_Setups\%nameMod%\Database"
+rem add TBM data to the SAS FOLDER
+copy "%tbmInputDir%" %sasInDIR%
+if %counter% LEQ %firstYr% (set scen="scen200_yr2025")
+if %counter% EQU 2030 (set scen="scen300_yr%counter%")
+if %counter% EQU 2035 (set scen="scen400_yr%counter%")
+if %counter% EQU 2040 (set scen="scen500_yr%counter%")
+if %counter% EQU 2045 (set scen="scen500_yr2040")
+if %counter% EQU 2050 (set scen="scen700_yr%counter%")
+@echo %tbmInputDir%\%scen%
+copy "%tbmInputDir%\%scen%" %sasInDIR%
+if %counter% GTR %baseYr% (set /A counter=counter+5)
+if %counter% EQU %baseYr% (set /A counter=%firstYr%)
 goto while
 :loopend
+@echo created skim folders and copied Data
 
 REM ###################################################################################################################################################
 :run2
@@ -102,30 +137,29 @@ CD %~dp0
 @Echo %date% %time% Updating MFN and Generating Batchin Files...  >> %~dp0/model_run_timestamp.txt
 rem RUN PREP SCRIPTS
 @ECHO Running process_futureLinks.R >> %~dp0/model_run_timestamp.txt
-%rpath% 1_PreProcessing\process_futureLinks.R
+%rpath% 1_PreProcessing\process_futureLinks.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
 @ECHO Running qc_generatedLayers.R  >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_generatedLayers.R %gdbDir% 
+%rpath% 99_QC\qc_generatedLayers.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
 @ECHO Running batch_domestic_scen_working.py 
-call python 2_ArcGIS_Processing\batch_domestic_scen_working.py 
+rem call python 2_ArcGIS_Processing\batch_domestic_scen_working.py %baseYr% %firstYr% %lastYr%
+%pypath% 2_ArcGIS_Processing\batch_domestic_scen_working.py %newconf% %baseYr% %firstYr% %lastYr%
 @ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_batchinFiles.R 
+%rpath% 99_QC\qc_batchinFiles.R %oldconf% %baseYr% %firstYr% %lastYr% %mhnDir%
 
 REM ###################################################################################################################################################
 @Echo %date% %time% Copying MFN Batchin Data...  >> %~dp0/model_run_timestamp.txt
 rem COPY BATCHIN DATA TO APPROPRIATE FOLDER
-set /A counter=2022
+set /A counter=%baseYr%
 :while2
-if %counter% GTR 2050 (goto loopend2)
-set sasInDIR="..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\SAS\inputs\%conf%"
-copy "..\Output\Batchin\batchin_%counter%" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\input_data" 
-copy "..\Output\Lognodes\unlink_lognode140_y%counter%.txt" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\input_data" 
-rename "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\input_data\unlink_lognode140_y%counter%.txt" unlink_lognode140.txt
-copy "..\Output\Lognodes\unlink_lognode143_y%counter%.txt" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\input_data" 
-rename "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%conf%_%counter%\Database\input_data\unlink_lognode143_y%counter%.txt" unlink_lognode143.txt
-if not exist %sasInDIR% (mkdir %sasInDIR%)
-copy "..\Input\TBM_Data\c24q4_%counter%" %sasInDIR%
-if %counter% GTR 2025 (set /A counter=counter+10)
-if %counter% EQU 2022 (set /A counter=2030)
+if %counter% GTR %lastYr% (goto loopend2)
+%~dp0
+copy "..\Output\BatchinFiles\scen_%counter%" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%newconf%_%counter%\Database\input_data" 
+copy "..\Output\Lognodes\unlink_lognode140_y%counter%.txt" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%newconf%_%counter%\Database\input_data" 
+rename "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%newconf%_%counter%\Database\input_data\unlink_lognode140_y%counter%.txt" unlink_lognode140.txt
+copy "..\Output\Lognodes\unlink_lognode143_y%counter%.txt" "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%newconf%_%counter%\Database\input_data" 
+rename "..\Skim_New\Model_Setups\Meso_Freight_Skim_Setup_%newconf%_%counter%\Database\input_data\unlink_lognode143_y%counter%.txt" unlink_lognode143.txt
+if %counter% GTR %baseYr% (set /A counter=counter+5)
+if %counter% EQU %baseYr% (set /A counter=%firstYr%)
 goto while2
 :loopend2
 CD %~dp0
@@ -134,17 +168,17 @@ CD %~dp0
 
 REM ###################################################################################################################################################
 :run3
+CD %~dp0
 @Echo %date% %time% Running Skims...  >> %~dp0/model_run_timestamp.txt
 rem Activate Emme Python env
-call %~dp0..\Scripts\manage\env\activate_env.cmd emme
-
-set /A counter=2022
+call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd emme
+set /A counter=%baseYr%
 set /A scen=100
 :while3
-if %counter% GTR 2050 (set /A scen=scen+100) 
-if %counter% GTR 2050 (set /A counter=2022) 
+if %counter% GTR %lastYr% (set /A scen=scen+100) 
+if %counter% GTR %lastYr% (set /A counter=%baseYr%) 
 if %scen% GTR 200 (goto :loopend3) 
-set nameMod=Meso_Freight_Skim_Setup_%conf%_%counter%
+set nameMod=Meso_Freight_Skim_Setup_%newconf%_%counter%
 CD ..\Skim_New\Model_Setups\%nameMod%\Database
 @echo %date% %time% %nameMod% for scenario %scen%...  >> %~dp0/model_run_timestamp.txt
 if "%counter%"=="2022" (
@@ -205,13 +239,13 @@ if %ERRORLEVEL% GTR 1 (goto saserr)
 if %ERRORLEVEL% GTR 1 (goto saserr)
 @ECHO -----RUNNING step 4 >> %~dp0/model_run_timestamp.txt
 if exist Step3_Verify_Costs_Times.lst (goto mode_err)
-%saspath% Step4_Create_Zonal_Truck_Tour_files.sas -sysparm "%scen% %counter% %conf%"
+%saspath% Step4_Create_Zonal_Truck_Tour_files.sas -sysparm "%scen% %counter% %newconf%"
 if %ERRORLEVEL% GTR 1 (goto saserr)
 @ECHO -----RUNNING step 5 >> %~dp0/model_run_timestamp.txt
 %rpath% Step5_determine_pipeline_costs.R %scen% %counter%
 CD %~dp0
-if %counter% GTR 2025 (set /A counter=counter+10)
-if %counter% EQU 2022 (set /A counter=2030)
+if %counter% GTR %baseYr% (set /A counter=counter+5)
+if %counter% EQU %baseYr% (set /A counter=%firstYr%)
 goto while3
 :loopend3
 
@@ -219,7 +253,7 @@ CD %~dp0
 @ECHO Working Directory = %~dp0
 @ECHO All skims complete
 @ECHO %CD%
-
+pause
 REM ###################################################################################################################################################
 :run4
 CD %~dp0
@@ -227,9 +261,9 @@ CD %~dp0
 @Echo %date% %time% Final QC and Clean Up...  >> %~dp0/model_run_timestamp.txt
 rem RUN FINAL QC SCRIPTS
 @ECHO Running qc_finalSkimOutput.R >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_finalSkimOutput.R %conf%
+%rpath% 99_QC\qc_finalSkimOutput.R %newconf% %baseYr% %firstYr% %lastYr%
 @ECHO Running qc_compareSkimOutput.R >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_compareSkimOutput.R %conf%
+%rpath% 99_QC\qc_compareSkimOutput.R %oldconf%
 
 goto last
 REM ###################################################################################################################################################

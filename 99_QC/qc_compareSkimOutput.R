@@ -17,10 +17,10 @@ terraOptions(tempdir = TMPDIR)
 
 #--Define paths####
 args = commandArgs(trailingOnly=T)
+oldConf = args[1]
 
-inConf = args[1]
 newDir = "../Skim_New/Skim_Output/"
-currentDir =  "../Input/Skim_Output/"
+currentDir =  paste("../Input/Skim_Output_", oldConf, "/", sep = "")
 
 empUpdate = "no"
 

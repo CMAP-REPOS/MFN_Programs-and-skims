@@ -13,9 +13,12 @@ package.check <- lapply(
 )
 #--Define paths and create folders####
 args = commandArgs(trailingOnly=T)
-inConf = args[1]
+newConf = args[1]
+inBaseYr = as.integer(args[2])
+inFirstYr = as.integer(args[3])
+inLastYr = as.integer(args[4])
 setupName = "../Skim_New/Model_Setups/Meso_Freight_Skim_Setup_"
-newFolName = paste(setupName,inConf, "_", sep = "")
+newFolName = paste(setupName,newConf, "_", sep = "")
 
 outDir = "../Skim_New/Skim_Output"
 out100 = paste(outDir, "/No_LogNode140", sep = "")
@@ -37,7 +40,15 @@ dir.create(outReport)
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 
 #--Define Lists####
-years = c(2022, 2030, 2040, 2050)
+i = inFirstYr
+while(i <= inLastYr){
+  if(i == inFirstYr){
+    years <- list(inBaseYr, inFirstYr)
+  }else{
+    years <-append(years, i)
+  }
+  i = i+5
+}
 scen = c(100, 200)
 smFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_centroids", "data_mesozone_centroids",
             "data_mesozone_gcd", "data_modepath_airports")
@@ -105,7 +116,7 @@ cat("COPYING & RENNAMING DATA \n", file=report,append=TRUE)
 
 #--Move Files
 #Files that are the same all years, all scenarios, go in 'Skim_Output' with amended name to remove year
-year = 2022
+year = inBaseYr
 sc = 100
 for(file in smFiles){
   inFile = paste(newFolName, year, "/Database/SAS/outputs/", sc, "/", file, "_", year, ".csv", sep = "")

@@ -1,10 +1,27 @@
 #KCazzato 3/25/2025
 #This script reviews the batchin files for the Freight network skimming
 #Files produced by batch_domestic_scen_working.py
+args = commandArgs(trailingOnly=T)
+oldconf = as.character(args[1])
+inBaseYr = as.integer(args[2])
+inFirstYr = as.integer(args[3])
+inLastYr = as.integer(args[4])
+MHN_Dir = as.character(args[5])
+i = inFirstYr
+while(i <= inLastYr){
+  if(i == inFirstYr){
+    years <- list(inBaseYr, inFirstYr)
+  }else{
+    years <-append(years, i)
+  }
+  i = i+5
+}
 
-MHN_Dir = "../Input/MHN_temp.gdb"    ### Current MHN
-currentDir = "../Input/BatchinFiles_current"
-newDir = "../Output/Batchin"
+
+oldconfMFN = paste("../Input/MFN_", oldconf, ".gdb", sep="")
+currentDir = paste("../Input/BatchinFiles_", oldconf, sep="")
+
+newDir = "../Output/BatchinFiles"
 outputDir = "../Output/QC"
 outFile = "../Output/QC/batchinTIPIDs.xlsx"
 
@@ -20,7 +37,7 @@ package.check <- lapply(
     }
   }
 )
-years = c(2022, 2030, 2040, 2050, 2060)
+
 files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
 
 #MHN formatting data
@@ -93,7 +110,7 @@ for(yr in years){
     in1 <- scan(fileC, what = character(), sep = "\n", skip = 2)
     
     #Load new data
-    fileN = paste(newDir, "/batchin_", yr, "/", file, sep = "")
+    fileN = paste(newDir, "/scen_", yr, "/", file, sep = "")
     in2 <- scan(fileN, what = character(), sep = "\n", skip = 2)
     
     #Compare
@@ -126,12 +143,12 @@ for(yr in years){
   cDist <- read.csv(fileC) %>% mutate(flag = "current")
   
   #Load new data
-  fileN = paste(newDir, "/batchin_", yr, "/base_ntwk.txt", sep = "")
+  fileN = paste(newDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
   n1 <- readBaseNtwk(fileN)
   nNodes <- fmtNodes(n1) %>% mutate(flag = "new")
   nLinks <- fmtLinks(n1) %>% mutate(flag = "new")
   
-  fileN = paste(newDir, "/batchin_", yr, "/DomesticNetwork.csv", sep = "")
+  fileN = paste(newDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
   nDist <- read.csv(fileN) %>% mutate(flag = "new")
   
   #COMPARE####
@@ -199,7 +216,6 @@ t3 <- loopDistance%>%
 add_chTIPID <- rbind(t1, t2, t3) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
-  mutate(TIPID = as.numeric(TIPID)) %>%
   distinct() %>%
   left_join(confIDs, by = "TIPID") %>%
   filter(is.na(flag))
@@ -235,13 +251,12 @@ t3 <- loopDistance%>%
 rem_chTIPID <- rbind(t1, t2, t3) %>%
   left_join(in_MHN_hwyproj, by = "TIPID") %>%
   select(TIPID:RSP_ID) %>%
-  mutate(TIPID = as.numeric(TIPID)) %>%
   distinct() %>%
   left_join(confIDs, by = "TIPID") %>%
   filter(is.na(flag))
 
 #Export####
-if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
+if(nrow(add_chTIPID) > 1 | nrow(rem_chTIPID) > 1){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
   write.xlsx(exportList, outFile)
