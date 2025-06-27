@@ -9,7 +9,11 @@ inBaseYr = as.numeric(args[3])
 inFirstYr = as.numeric(args[4])
 inLastYr = as.numeric(args[5])
 
+<<<<<<< Updated upstream
 inputDir = paste("../Input/MHN_", oldConf, ".gdb", sep="")    ### Current MHN
+=======
+inputDir = paste("../Input/MHN_", newConf, ".gdb", sep="")    ### Current MHN
+>>>>>>> Stashed changes
 outputDir = paste("../Output/MFN_updated_", newConf, ".gdb", sep="")   ### Current MFN
 outPath = "../Output"
 outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
@@ -171,7 +175,7 @@ for(yr in years){
   #Identify changes in links for all years
   updated_MHN_MESO <- tipIDS %>%
     left_join(changes_MHN, by = join_by(TIPID)) %>%
-    left_join(in_MHN_hwynet_arc, by = "ABB") %>%                                                             #add new attributes to base MESO
+    left_join(in_MHN_hwynet_arc, by = "ABB", relationship = "many-to-many") %>%                                                             #add new attributes to base MESO
     mutate(MESO = ifelse(MESO == 1, 1, NA)) %>%
     group_by(TIPID) %>%
     fill(MESO, .direction = "updown") %>%
@@ -281,7 +285,7 @@ for(yr in years){
   connectors <- temp_dist1 %>%
     filter(!(MHN_ID %in% duplicateNodes$MHN_ID)) %>%
     group_by(specialID) %>%
-    filter(distance == min(distance))%>%
+    slice(which.min(distance))%>%
     ungroup() %>%
     mutate(lineID = specialID,
            lineID2 = MHN_ID) %>%
@@ -369,6 +373,7 @@ for(yr in years){
     mutate(idcount = length(unique(NODE_ID)))%>%
     select(NODE_ID, POINT_X, POINT_Y) %>%
     mutate(xcoord = POINT_X, ycoord = POINT_Y) %>%
+    filter(!is.na(NODE_ID)) %>%
     st_as_sf(coords = c("xcoord", "ycoord"), crs = 26771)  %>%
     st_intersection(in_mesozoneGeo) %>%
     distinct() %>%

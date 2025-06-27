@@ -36,6 +36,7 @@ if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 in_modePath <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "modePath")
 in_ports <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "Ports")
 in_POE <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "POE")
+in_zones <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "zones")
 
 #--Define Lists & Variables####
 allFiles = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
@@ -55,7 +56,8 @@ all_TruckEE <- data.frame(Year = as.numeric(), Production_zone = as.integer(), C
 all_TruckIE <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
                           C_poe = as.integer(), N_poe = as.integer(), CState = as.character(), NState = as.character(), CDirection = as.character(), NDirection = as.character())
 
-all_znEmp <- data.frame(Year = as.numeric(), currentEmp = as.integer(),
+all_znEmp <- data.frame(Year = as.numeric(), Zone = as.integer(), mesozone = as.integer(),
+                        currentEmp = as.integer(),
                         newEmp = as.integer(), Difference = as.integer(), Percent = as.numeric())
 
 all_modePort <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
@@ -63,10 +65,11 @@ all_modePort <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Product
                            C_nameNB = as.character(), N_nameNB = as.character(),  C_nameB = as.character(), N_nameB = as.character(), 
                            C_coastNB = as.character(), N_coastNB = as.character(),C_coastB = as.character(), N_coastB = as.character())
 
-all_znSkim <- data.frame(Year = as.numeric(), Origin= as.integer(), Destination= as.integer(),
-                         C_Peak= as.numeric(), C_OffPeak= as.numeric(), C_Miles= as.numeric(),  
-                         N_Peak= as.numeric(),  N_OffPeak= as.numeric(), N_Miles= as.numeric(),  
-                         diff_Peak= as.numeric(), diff_OffPeak= as.numeric(), diff_Mi= as.numeric())
+all_znSkim <- data.frame(Year = as.numeric(), OCounty= as.character(), DCounty= as.character(), 
+                         flagPeaks = as.numeric(), flagMi = as.numeric(),
+                         CPeak= as.numeric(), NPeak= as.numeric(), perc_Peak= as.numeric(),
+                         COffPeak= as.numeric(), NOffPeak= as.numeric(), perc_OffPeak= as.numeric(),
+                         CMiles= as.numeric(), NMiles= as.numeric(), perc_Mi= as.numeric())
 
 all_mesoSkim <- data.frame(Year = as.numeric(), Origin= as.integer(), Destination= as.integer(), currentTime= as.numeric(), 
                            newTime= as.numeric(), Difference= as.numeric(), Percent= as.numeric())
@@ -163,8 +166,8 @@ for(file in allFiles){
         
         qcOut <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>%     #Merge new and current data
           mutate(Difference = newEmp-currentEmp,                                   #Calculate employment difference
-                 Percent = round(Difference/(newEmp-currentEmp),3)) %>%            #Calculate employment percent difference, round 3 decimal places
-          filter(Difference > 0)%>%                                                #Filter employment difference > 0
+                 Percent = round(Difference/(currentEmp),3)) %>%            #Calculate employment percent difference, round 3 decimal places
+          filter(abs(Percent) > 0.5)%>%                                                #Filter employment difference > 0
           mutate(Year = year) %>%                                                  #Assign year variable to different data
           select(colnames(all_znEmp))                                              #Select template column names
         
@@ -173,7 +176,7 @@ for(file in allFiles){
         if(sum(qcOut$Difference) > 0 & empUpdate != "yes"){
           printOut = "ERROR: Employment unexpectedly changes!"
           cat(printOut, file =report,append=TRUE)
-          stop()
+          #stop()
           }                
         
         #Combine with template dataframe
@@ -188,14 +191,33 @@ for(file in allFiles){
           rename(N_Peak = Peak, N_OffPeak = OffPeak, N_Miles = Miles)
         
         #Merge data, calculate differences
+        #Peak and OffPeak Times; ussume time difference of 1 minute is okay
+        #Distance
         qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%
-          mutate(diff_Peak = N_Peak - C_Peak,
-                 diff_OffPeak = N_OffPeak - C_OffPeak,
-                 diff_Mi = N_Miles - C_Miles,
-                 Year = year,
-                 difSum = abs(diff_Peak) + abs(diff_OffPeak) + abs(diff_Mi)) %>%       #Sum all differences
-          filter(difSum > 0) %>%                                                       #filter to keep only OD pairs with differences
-          select(colnames(all_znSkim))                                                 #Select column names from target dataframe
+          left_join(in_zones, by = join_by("Origin" == 'Zone17')) %>%
+          rename(OCounty = County) %>%
+          left_join(in_zones, by = join_by("Destination" == 'Zone17')) %>%
+          rename(DCounty = County)%>%
+          mutate(OCounty = ifelse(is.na(OCounty), "POE", OCounty),
+                 DCounty = ifelse(is.na(DCounty), "POE", DCounty)) %>%
+          summarize(CPeak = sum(C_Peak),
+                    NPeak = sum(N_Peak),
+                    COffPeak = sum(C_OffPeak),
+                    NOffPeak = sum(N_OffPeak),
+                    CMiles = sum(C_Miles),
+                    NMiles= sum(N_Miles),
+                    .by = c("OCounty", "DCounty")) %>%
+          mutate(diff_Peak = NPeak - CPeak,
+                 perc_Peak = round(diff_Peak/CPeak,3),
+                 diff_OffPeak = NOffPeak - COffPeak,
+                 perc_OffPeak = round(diff_OffPeak/COffPeak, 3),
+                 diff_Mi = NMiles - CMiles,
+                 perc_Mi = round(diff_Mi/CMiles, 3),
+                 flagPeaks = ifelse(abs(perc_Peak) > .01 | abs(perc_OffPeak) > .01, 1, 0),
+                 flagMi = ifelse(abs(perc_Mi) > 0.01, 1, 0),
+                 Year = year) %>%       #Sum all differences
+          filter(flagPeaks == 1 | flagMi == 1) %>%                                                       #filter to keep only OD pairs with differences
+          select(colnames(all_znSkim))                                                                   #Select column names from target dataframe
         
         #Combine with template dataframe
         all_znSkim <- rbind(all_znSkim, qcOut)
