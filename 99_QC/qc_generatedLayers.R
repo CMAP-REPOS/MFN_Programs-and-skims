@@ -102,11 +102,7 @@ for(year in years){
   in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) %>% filter(!is.na(INODE))
   in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
 
-<<<<<<< Updated upstream
-  in_old_links_cmap <- read_sf(dsn = oldconfMFN, layer =links, crs = 26771) 
-=======
   in_old_links_cmap <- read_sf(dsn = oldconfMFN, layer =links, crs = 26771) %>% filter(!is.na(INODE))
->>>>>>> Stashed changes
   in_old_nodes_cmap <- read_sf(dsn = oldconfMFN, layer =nodes, crs = 26771)
   
   #NODES
@@ -212,17 +208,12 @@ final_Nodes <- rbind(rem_Nodes, add_Nodes)
 exportList <- list(Links = final_Links, Nodes = final_Nodes)
 write.xlsx(exportList, outFile)
 
-<<<<<<< Updated upstream
-#Export####
-if(nrow(add_chTIPID) > 1 | nrow(rem_chTIPID) > 1){
-=======
 #Check for non-conformity related changes####
 filt_Links <- final_Links %>% filter(Flag != "conformity")
 filt_Nodes <- final_Nodes %>% filter(Flag != "conformity")
 
 TIPID_List <- list(unique(unique(final_Nodes$TIPID), unique(final_Links$TIPID))) 
 if(nrow(filt_Links) > 0 | nrow(filt_Nodes) > 0){
->>>>>>> Stashed changes
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   stop('REVIEW ../Output/QC/changedTIPIDs.xlsx')
 }else{

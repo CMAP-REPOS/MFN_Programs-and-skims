@@ -6,10 +6,6 @@ oldconf = as.character(args[1])
 inBaseYr = as.integer(args[2])
 inFirstYr = as.integer(args[3])
 inLastYr = as.integer(args[4])
-<<<<<<< Updated upstream
-MHN_Dir = as.character(args[5])
-=======
->>>>>>> Stashed changes
 i = inFirstYr
 while(i <= inLastYr){
   if(i == inFirstYr){
@@ -23,11 +19,7 @@ while(i <= inLastYr){
 
 oldconfMFN = paste("../Input/MFN_", oldconf, ".gdb", sep="")
 currentDir = paste("../Input/BatchinFiles_", oldconf, sep="")
-<<<<<<< Updated upstream
-
-=======
 MHN_Dir = paste("../Input/MHN_", oldconf, ".gdb", sep="")
->>>>>>> Stashed changes
 newDir = "../Output/BatchinFiles"
 outputDir = "../Output/QC"
 outFile = "../Output/QC/batchinTIPIDs.xlsx"

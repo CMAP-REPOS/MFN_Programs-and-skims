@@ -9,11 +9,7 @@ inBaseYr = as.numeric(args[3])
 inFirstYr = as.numeric(args[4])
 inLastYr = as.numeric(args[5])
 
-<<<<<<< Updated upstream
-inputDir = paste("../Input/MHN_", oldConf, ".gdb", sep="")    ### Current MHN
-=======
 inputDir = paste("../Input/MHN_", newConf, ".gdb", sep="")    ### Current MHN
->>>>>>> Stashed changes
 outputDir = paste("../Output/MFN_updated_", newConf, ".gdb", sep="")   ### Current MFN
 outPath = "../Output"
 outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
