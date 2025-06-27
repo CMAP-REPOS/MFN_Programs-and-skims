@@ -86,11 +86,7 @@ if not exist "..\Input" (mkdir "..\Input")
 if not exist "..\Input\Skim_Output_%oldconf%" (mkdir "..\Input\Skim_Output_%oldconf%")
 if not exist "..\Input\BatchinFiles_%oldconf%" (mkdir "..\Input\BatchinFiles_%oldconf%")
 if not exist "..\Input\MFN_%oldconf%.gdb" (mkdir "..\Input\MFN_%oldconf%.gdb")
-<<<<<<< Updated upstream
-if not exist "..\Input\MHN_%oldconf%.gdb" (mkdir "..\Input\MHN_%oldconf%.gdb")
-=======
 if not exist "..\Input\MHN_%newconf%.gdb" (mkdir "..\Input\MHN_%newconf%.gdb")
->>>>>>> Stashed changes
 if not exist "..\Output\MFN_updated_%newconf%.gdb" (mkdir "..\Output\MFN_updated_%newconf%.gdb")
 if not exist "..\Skim_New\Model_Setups" (mkdir "..\Skim_New\Model_Setups")
 if not exist "..\Output\BatchinFiles" (mkdir "..\Output\BatchinFiles")
@@ -101,11 +97,7 @@ xcopy "%mfnDir%\Skim_Output" "..\Input\Skim_Output_%oldconf%" /s
 xcopy "%mfnDir%\BatchinFiles" "..\Input\BatchinFiles_%oldconf%" /s
 copy "%mfnDir%\MFN_%oldconf%.gdb" "..\Input\MFN_%oldconf%.gdb"
 copy "%mfnDir%\MFN_%oldconf%.gdb" "..\Output\MFN_updated_%newconf%.gdb"
-<<<<<<< Updated upstream
-copy %mhnDir% "..\Input\MHN_%oldconf%.gdb"
-=======
 copy %mhnDir% "..\Input\MHN_%newconf%.gdb"
->>>>>>> Stashed changes
 copy "%procDir%\NetworkUpdate" "..\Input"
 @echo copied files
 
@@ -130,11 +122,7 @@ if %counter% EQU 2035 (set scen="scen400_yr%counter%")
 if %counter% EQU 2040 (set scen="scen500_yr%counter%")
 if %counter% EQU 2045 (set scen="scen500_yr2040")
 if %counter% EQU 2050 (set scen="scen700_yr%counter%")
-<<<<<<< Updated upstream
-@echo %tbmInputDir%\%scen%
-=======
 
->>>>>>> Stashed changes
 copy "%tbmInputDir%\%scen%" %sasInDIR%
 if %counter% GTR %baseYr% (set /A counter=counter+5)
 if %counter% EQU %baseYr% (set /A counter=%firstYr%)
@@ -155,11 +143,7 @@ rem RUN PREP SCRIPTS
 rem call python 2_ArcGIS_Processing\batch_domestic_scen_working.py %baseYr% %firstYr% %lastYr%
 %pypath% 2_ArcGIS_Processing\batch_domestic_scen_working.py %newconf% %baseYr% %firstYr% %lastYr%
 @ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
-<<<<<<< Updated upstream
-%rpath% 99_QC\qc_batchinFiles.R %oldconf% %baseYr% %firstYr% %lastYr% %mhnDir%
-=======
 %rpath% 99_QC\qc_batchinFiles.R %oldconf% %baseYr% %firstYr% %lastYr%
->>>>>>> Stashed changes
 
 REM ###################################################################################################################################################
 @Echo %date% %time% Copying MFN Batchin Data...  >> %~dp0/model_run_timestamp.txt
@@ -267,11 +251,6 @@ goto while3
 CD %~dp0
 @ECHO Working Directory = %~dp0
 @ECHO All skims complete
-<<<<<<< Updated upstream
-@ECHO %CD%
-pause
-=======
->>>>>>> Stashed changes
 REM ###################################################################################################################################################
 :run4
 CD %~dp0
