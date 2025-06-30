@@ -15,12 +15,26 @@ package.check <- lapply(
   }
 )
 #SET PARAMETERS & VARIABLES####
-oldDir = args[1]
-newDir = "../Output/MFN_temp.gdb"
-MHN_Dir = "../Input/MHN_temp.gdb"    ### Current MHN
+oldconf = args[1]
+newconf = args[2]
+inBaseYr = as.numeric(args[3])
+inFirstYr = as.numeric(args[4])
+inLastYr = as.numeric(args[5])
+MHN_Dir = paste("../Input/MHN_", oldconf, ".gdb", sep="")
+oldconfMFN = paste("../Input/MFN_", oldconf, ".gdb", sep="")
+newDir = paste("../Output/MFN_updated_", newconf, ".gdb", sep="")
 outFile = "../Output/QC/changedTIPIDs.xlsx"
 
-years = c(2022, 2030, 2040, 2050, 2060)
+i = inFirstYr
+while(i <= inLastYr){
+  if(i == inFirstYr){
+    years <- list(inBaseYr, inFirstYr)
+  }else{
+    years <-append(years, i)
+  }
+  i = i+5
+}
+
 layers = c("CMAP_Rail", "National_Rail", "National_Highway","Inland_Waterways", 
            "Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System", "CMAP_Rail_nodes", 
            "National_Rail_nodes", "National_Hwy_nodes", "Inland_Waterway_nodes", "Crude_Oil_System_nodes", 
@@ -65,7 +79,7 @@ print("QA/QC STATIC DATA")
 for(layer in layers){
   #Import Data
   in_new <- read_sf(dsn = newDir, layer =layer, crs = 26771, quiet = TRUE) 
-  in_old <- read_sf(dsn = oldDir, layer =layer, crs = 26771, quiet = TRUE)
+  in_old <- read_sf(dsn = oldconfMFN, layer =layer, crs = 26771, quiet = TRUE)
   
   resp = all.equal(in_new, in_old)
   if(resp != TRUE){stop()}
@@ -85,17 +99,11 @@ for(year in years){
   nodes = paste("CMAP_HWY_NODE_y", year, sep = "")
   
   #Import New Data
-  in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) 
+  in_new_links_cmap <- read_sf(dsn = newDir, layer =links, crs = 26771) %>% filter(!is.na(INODE))
   in_new_nodes_cmap <- read_sf(dsn = newDir, layer =nodes, crs = 26771)
-  
-  #Import Old Data
-  if(year == 2022){
-    links = "CMAP_HWY_LINK_base"
-    nodes = "CMAP_HWY_NODE_base"
-  }
 
-  in_old_links_cmap <- read_sf(dsn = oldDir, layer =links, crs = 26771) 
-  in_old_nodes_cmap <- read_sf(dsn = oldDir, layer =nodes, crs = 26771)
+  in_old_links_cmap <- read_sf(dsn = oldconfMFN, layer =links, crs = 26771) %>% filter(!is.na(INODE))
+  in_old_nodes_cmap <- read_sf(dsn = oldconfMFN, layer =nodes, crs = 26771)
   
   #NODES
   resp = all.equal(in_old_nodes_cmap, in_new_nodes_cmap)
@@ -155,66 +163,62 @@ for(year in years){
 
 #QC With TIPIDs####
 #Added Nodes and Links####
-t1 <- loopNodes %>%
-  filter(dfFlag == "new") %>%
+add_Nodes <- loopNodes %>%
+  filter(dfFlag == "new")%>%
   rename(NODE = NODE_ID_T) %>%
-  select(NODE:POINT_Y) %>%
   distinct() %>%
-  left_join(allNodes, by = "NODE") %>%
-  select(TIPID) %>%
-  distinct()
+  left_join(allNodes, by = "NODE", relationship = "many-to-many") %>%
+  select(Year, TIPID, NODE, MESOZONE, POINT_X, POINT_Y) %>%
+  distinct() %>%
+  mutate(Flag = ifelse(is.na(TIPID), "not conformity", "conformity"),
+         Action = 'add')
 
-t2 <- loopLinks %>%
+add_Links <- loopLinks %>%
   filter(dfFlag == "new") %>%
   mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
-  select(linkID) %>%
-  distinct() %>%
-  left_join(projCode, by = c("linkID")) %>%
-  select(TIPID) %>%
-  unique()
-
-add_chTIPID <- rbind(t1, t2) %>%
-  left_join(in_MHN_hwyproj, by = "TIPID") %>%
-  select(TIPID:RSP_ID) %>%
-  #mutate(TIPID = as.numeric(TIPID)) %>%
-  distinct()%>%
-  left_join(confIDs, by = "TIPID") %>%
-  filter(is.na(flag))
+  left_join(projCode, by = c("linkID", 'INODE', 'JNODE')) %>%
+  select(Year, TIPID, linkID, INODE, JNODE, COMPLETION_YEAR) %>%
+  unique() %>%
+  mutate(Flag = ifelse(is.na(TIPID), "not conformity", "conformity"),
+         Action = 'add')
 
 #Removed Nodes and Links####
-t1 <- loopNodes %>%
+rem_Nodes <- loopNodes %>%
   filter(dfFlag == "old") %>%
   rename(NODE = NODE_ID_T) %>%
-  select(NODE:POINT_Y) %>%
   distinct() %>%
-  left_join(allNodes, by = "NODE") %>%
-  select(TIPID) %>%
-  distinct()
+  left_join(allNodes, by = "NODE", relationship = "many-to-many") %>%
+  select(Year, TIPID, NODE, MESOZONE, POINT_X, POINT_Y) %>%
+  distinct() %>%
+  mutate(Flag = ifelse(is.na(TIPID), "not conformity", "conformity"),
+         Action = 'removed')
 
-t2 <- loopLinks %>%
+rem_Links <- loopLinks %>%
   filter(dfFlag == "old") %>%
   mutate(linkID = paste(INODE, JNODE, sep = "-")) %>%
-  select(linkID) %>%
-  distinct() %>%
-  left_join(projCode, by = c("linkID")) %>%
-  select(TIPID) %>%
-  unique()
+  left_join(projCode, by = c("linkID", 'INODE', 'JNODE')) %>%
+  select(Year, TIPID, linkID, INODE, JNODE, COMPLETION_YEAR) %>%
+  unique() %>%
+  mutate(Flag = ifelse(is.na(TIPID), "not conformity", "conformity"),
+         Action = 'removed')
 
-rem_chTIPID <- rbind(t1, t2) %>%
-  left_join(in_MHN_hwyproj, by = "TIPID") %>%
-  select(TIPID:RSP_ID) %>%
-  #mutate(TIPID = as.numeric(TIPID)) %>%
-  distinct()%>%
-  left_join(confIDs, by = "TIPID") %>%
-  filter(is.na(flag))
+#Combine and Export####
+final_Links <- rbind(rem_Links, add_Links)
+final_Nodes <- rbind(rem_Nodes, add_Nodes)
+exportList <- list(Links = final_Links, Nodes = final_Nodes)
+write.xlsx(exportList, outFile)
 
-#Export####
-if(nrow(add_chTIPID) > 0 | nrow(rem_chTIPID) > 0){
+#Check for non-conformity related changes####
+filt_Links <- final_Links %>% filter(Flag != "conformity")
+filt_Nodes <- final_Nodes %>% filter(Flag != "conformity")
+
+TIPID_List <- list(unique(unique(final_Nodes$TIPID), unique(final_Links$TIPID))) 
+if(nrow(filt_Links) > 0 | nrow(filt_Nodes) > 0){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
-  exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
-  write.xlsx(exportList, outFile)
   stop('REVIEW ../Output/QC/changedTIPIDs.xlsx')
 }else{
   print("NETWORK CHANGES CONFIRMED TO BE ASSOCIATED WITH CONFORMITY UPDATES ONLY")
+  print("TIPID's Changed: ")
+  print(TIPID_List)
 }
 

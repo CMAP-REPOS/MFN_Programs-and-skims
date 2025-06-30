@@ -39,27 +39,33 @@ arcpy.OverwriteOutput = 1
 # ---------------------------------------------------------------
 # Read Script Arguments
 # ---------------------------------------------------------------
+inConf = str(sys.argv[1])
+inBaseYr = int(sys.argv[2])
+inFirstYr = int(sys.argv[3])
+inLastYr = int(sys.argv[4])
+
 programDir = os.path.dirname(__file__)
 mainDir = os.path.abspath(os.path.join(__file__, "../../../"))
-gdbDir = mainDir + "/Output/MFN_temp.gdb"
-outputPath_T = mainDir + "/Output/Batchin"
+gdbDir = mainDir + "/Output/MFN_updated_" + inConf + ".gdb"
+outputPath_T = mainDir + "/Output/BatchinFiles"
 
-years = "all"
-if years == 'all':
-    years = ['2022', '2030', '2040', '2050', '2060']
-else:
-    years = years.replace(" ", "")
-    years = years.split(",")
+i = inFirstYr
+while i <= inLastYr:
+    if i == inFirstYr:
+        years = [str(inBaseYr), str(inFirstYr)]
+    else:
+        years.append(str(i))
+    i=i+5
 arcpy.AddMessage(years)
 
 for yr in years:
 # ---------------------------------------------------------------
 # Local variables
 # ---------------------------------------------------------------
-    outputPath = outputPath_T + "\\batchin_" + yr
+    outputPath = outputPath_T + "\\scen_" + yr
     arcpy.AddMessage(outputPath)
     os.mkdir(outputPath)
-
+    
     arcpy.env.workspace = outputPath
     Temp = arcpy.CreateScratchName(prefix='Temp',data_type='Folder')
     os.mkdir(Temp)
