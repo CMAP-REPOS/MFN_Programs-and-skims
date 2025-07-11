@@ -22,11 +22,11 @@
 # ---------------------------------------------------------------
 # Import System Modules
 # ---------------------------------------------------------------
-import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, dbfread, shutil
+import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, shutil
 import pandas as pd
+import geopandas as gpd
 import numpy as np
 from arcpy import env
-from dbfread import DBF
 from datetime import datetime
 from pathlib import Path
 
@@ -45,7 +45,6 @@ mainDir = os.path.abspath(os.path.join(programDir, "../../"))
 gdbDir = os.path.join(mainDir + "/Output/MFN_updated_" + inConf + ".gdb")
 outFolder = os.path.join(mainDir + "/Output/BatchinFiles")
 tempPipePath = os.path.join(outFolder + "/Temp")
-
 
 # Delete and recreate ouput folder
 if os.path.exists(tempPipePath):
@@ -88,6 +87,7 @@ for x in [shapefiles_links,shapefiles]:
 # Generate Pipeline Batchin Files
 # ---------------------------------------------------------------
 i=0
+
 while i < 3:
     status = "   * Developing " + pipeDict['pOutput'][i] + " output"
     arcpy.AddMessage(status)
@@ -97,20 +97,15 @@ while i < 3:
     dateStr = str(datetime.now()) + '\n'
 
     # Read data
-    inNodes = DBF(pNodes)
-    inCentroids = DBF(pCentroids)
-    inLinks = DBF(pLinks)
+    inNodes = gpd.read_file(pNodes)
+    inCentroids = gpd.read_file(pCentroids)
+    inLinks = gpd.read_file(pLinks)
 
-    # Convert to pandas DF
-    nodes = pd.DataFrame(iter(inNodes))
-    centroids = pd.DataFrame(iter(inCentroids))
-    cosarc = pd.DataFrame(iter(inLinks))
-    
     # Select columns of interest only
-    nodes = nodes[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
-    centroids = centroids[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
-    cosarc = cosarc[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF"]]
-    
+    nodes = inNodes[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
+    centroids = inCentroids[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
+    cosarc = inLinks[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF"]]
+
     # Format Nodes
     allNodes = nodes.merge(centroids, how='outer', indicator=True)
     allNodes = allNodes.drop_duplicates(subset=['NODE_ID'])                                               #remove duplicates by node_id
@@ -133,6 +128,7 @@ while i < 3:
     cosarcR = cosarcR[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF"]]                       #move columns to match cosarc
     allArc = pd.concat([cosarc, cosarcR])                                                                 #bind referese links to cosarc
     allArc = allArc.round({'Miles': 2})                                                                   #round 2 decimal places
+    allArc = allArc.sort_values(by=['INODE', 'JNODE'])
 
     # QA/QC
     # Verify each link has a length (allArc, miles = 0) 
@@ -182,34 +178,58 @@ while i < 3:
         sys.exit(print(errorM))
 
     # Finalize columns
-    # Nodes
-    antiNodes['first'] = 'a'
-    antiNodes = antiNodes[['first', 'NODE_ID', "POINT_X", "POINT_Y", 'MESOZONE']]
-
     # Centroids
-    centroids['first'] = 'a*'
-    centroids = centroids[['first', 'NODE_ID', "POINT_X", "POINT_Y", 'MESOZONE']]
-    
+    centroids['POINT_X'] = centroids['POINT_X'].map(lambda x: f"{x:<13}")
+    centroids['POINT_X'] = centroids['POINT_X'].str.strip()
+    centroids['POINT_Y'] = centroids['POINT_Y'].map(lambda x: f"{x:<13}")
+    centroids['POINT_Y'] = centroids['POINT_Y'].str.strip()
+    centroids['NODE_ID'] = centroids['NODE_ID'].map(lambda x: f"{x:<13}")
+    centroids['NODE_ID'] = centroids['NODE_ID'].str.strip()
+
+    # Nodes
+    antiNodes['POINT_X'] = antiNodes['POINT_X'].map(lambda x: f"{x:<13}")
+    antiNodes['POINT_X'] = antiNodes['POINT_X'].str.strip()
+    antiNodes['POINT_Y'] = antiNodes['POINT_Y'].map(lambda x: f"{x:<13}")
+    antiNodes['POINT_Y'] = antiNodes['POINT_Y'].str.strip()
+    antiNodes['NODE_ID'] = antiNodes['NODE_ID'].map(lambda x: f"{x:<13}")
+    antiNodes['NODE_ID'] = antiNodes['NODE_ID'].str.strip()
+
     # Links
-    allArc['first'] = 'a'
     allArc['ul1'] = '0'
     allArc['ul2'] = '0'
     allArc['ul3'] = '0'
-    allArc = allArc[['first', "INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'ul1', 'ul2', 'ul3']]
 
     # Write to output txt
     outTitle = "c " + pipeDict['pMessage'][i] + " BATCHIN FILE \n"                       #file title
+
     with pOutput.open('w') as f:
         f.write(outTitle)                                                                #file title
         f.write(dateStr)                                                                 #date/time
         f.write('c node   x   y   UI1 \n')                                               #node column headers
         f.write('t nodes init \n')                                                       #node init line
-        f.write(centroids.to_string(header = False, index = False))                      #write centroids
-        f.write("\n")
-        f.write(antiNodes.to_string(header = False, index = False))                      #write nodes
-        f.write('\n c i   j   mi   modes   type   lanes   vdf   ul1   ul2   ul3 \n')     #link header
-        f.write('t links init \n')                                                       #link init line
-        f.write(allArc.to_string(header = False, index = False))                         #write arcs
+
+    for index, row in centroids.iterrows():
+            print(index)
+            outNodes = 'a*  ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
+            with open(pOutput, mode = 'a') as f:
+                f.write(outNodes)
+
+    for index, row in antiNodes.iterrows():
+            print(index)
+            outNodes = 'a   ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
+            with open(pOutput, mode = 'a') as f:
+                 f.write(outNodes)
+    c=1
+    for index, row in allArc.iterrows():
+        print(index)
+        if(c == 1):
+            with open(pOutput, mode = 'a') as f:
+                 f.write('c i   j   mi   modes   type   lanes   vdf   ul1   ul2   ul3 \n') 
+                 f.write('t links init \n')
+                 c=2
+        outLinks = 'a   ' + str(row['INODE']) + "   " + str(row['JNODE']) + "   " + str(row['Miles']) + "   "  + str(row['Modes']) + "   "+ str(row['Type'])+ "   " + str(row['LANES']) + "   " + str(row['VDF']) + "   " + str(row['ul1']) + "   " + str(row['ul2']) + "   " + str(row['ul3']) + "\n"
+        with open(pOutput, mode = 'a') as f:
+             f.write(outLinks)
 
     #increase increment
     i=i+1
