@@ -208,7 +208,6 @@ outFiles.append("export_temp_Inland_Waterways.csv")
 # ---------------------------------------------------------------
 # Generate Highway Batchin Files
 # ---------------------------------------------------------------
-years=['2025']
 for yr in years:
     arcpy.AddMessage("---> Generating Batchin Files for: " + yr)
     
@@ -225,7 +224,7 @@ for yr in years:
     pLinkCMAP = tempHWYPath + "/temp_" + hwyLinks + ".dbf"
     pOutNTWK = Path(outPath_scen + "/base_ntwk.txt")
     dateStr = str(datetime.now()) + '\n'
-    print('ln228')
+
     #Fix type if needed
     arcpy.env.workspace = gdbDir
     desc = arcpy.Describe(hwyNodes)
@@ -244,7 +243,7 @@ for yr in years:
         arcpy.management.AddField(x, "origLen", "DOUBLE")
         arcpy.management.CalculateField(x, 'origLen', "!shape.length!", "PYTHON")
         arcpy.conversion.ExportFeatures(x, tempHWYPath + "\\temp_{}.shp".format(x))
-    print('ln247')
+
     # Read and Format Highway Data
     inLinkCMAP = gpd.read_file(pLinkCMAP)
     inNodeCMAP = gpd.read_file(pNodeCMAP)
@@ -264,14 +263,14 @@ for yr in years:
     nodes[['POINT_X', 'POINT_Y']] = nodes[['POINT_X', 'POINT_Y']].astype('str')
     nodes = nodes[(nodes._merge=='left_only')].drop('_merge', axis=1)                      #antijoin with lognodes (remove lognodes)
     nodes = nodes[(nodes._merge2=='left_only')].drop('_merge2', axis=1)                    #antijoin with centroids (remove centroids)
-    print('ln267')
+
     # Create Reverse CMAP Highway Arcs
     rev_hwyarc1 = hwyarc1.set_axis(["JNODE", "INODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS'], axis = 1)         #Flip Direction
     rev_hwyarc1 = rev_hwyarc1[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS']]   
     for idx, row in rev_hwyarc1.iterrows():               #switch lanes
         if (row.DIRECTIONS == 3):
             rev_hwyarc1.at[idx,'LANES'] = rev_hwyarc1.at[idx,'LANES2']
-    print('ln274')
+
     hwyarc1 = hwyarc1.drop(columns = ['LANES2', 'DIRECTIONS'])
     rev_hwyarc1 = rev_hwyarc1.drop(columns = ['LANES2', 'DIRECTIONS'])
 
@@ -280,7 +279,9 @@ for yr in years:
                           hwyarc1, rev_hwyarc1, hwyarc2, rev_hwyarc2, 
                           waterarc, rev_waterarc])
     allLinks = allLinks.sort_values(by=['INODE', 'JNODE'])                       #sort by inode and jnode
-    print("ln 283")
+    allLinks = allLinks.round({'Miles': 2})                                                                   #round 2 decimal places
+    allLinks[["INODE", "JNODE", "Type", "LANES", "VDF"]] = allLinks[["INODE", "JNODE", "Type", "LANES", "VDF"]].astype(int)
+
     # QA/QC
     # Verify each link has a length (allLinks, miles = 0) 
     errorM = "CRUDE OIL SYSTEM NETWORK LINKS WITHOUT A CODED LENGTH"
@@ -327,7 +328,7 @@ for yr in years:
     check=((centroids["NODE_ID"]).is_unique)
     if(check == 'False'): 
         sys.exit(print(errorM))
-    print('ln330')
+  
     # Create Temporary clipped highway layer for domestic distance file
     arcpy.env.workspace = tempHWYPath
 
@@ -335,7 +336,7 @@ for yr in years:
     arcpy.AddMessage("---> Clipping highway network")
     arcpy.analysis.Clip(tempHWY + ".shp", "temp_conus_ak.shp", "clip{}".format(tempHWY))
     list_get.append("clip{}".format(tempHWY))
-    print('ln338')
+    
     arcpy.AddMessage("---> Adding new fields to highway network")
     arcpy.management.AddField(tempHWY + ".shp", "newlen", "DOUBLE")
     arcpy.management.CalculateField(tempHWY + ".shp", 'newlen', "!shape.length!", "PYTHON")
@@ -362,7 +363,7 @@ for yr in years:
         except:
             df = df[['inode','jnode','miles','ratio']]
         dflist.append(df)
-    print('ln365')
+    
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
@@ -371,7 +372,7 @@ for yr in years:
 
     # Remove highway layer to the domestic network csv export list (so next loop doesn't include the data)
     outFiles.remove("export_{}.csv".format(tempHWY))
-    print('ln374')
+    
     # Final formatting for output base_ntwk.txt
     nodes = nodes[['NODE_ID', "POINT_X", "POINT_Y", 'MESOZONE']]
     nodes['POINT_X'] = nodes['POINT_X'].map(lambda x: f"{x:<13}")
@@ -394,26 +395,27 @@ for yr in years:
     allLinks['ul3'] = '0'
     allLinks = allLinks[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'ul1', 'ul2', 'ul3']]
     allLinks = allLinks.sort_values(by=['INODE', 'JNODE'])
-    print('ln397')
+    
     yearM = "c YEAR = " + yr + "\n"
     # OUTPUT BASE_NTWK.TXT
     with pOutNTWK.open('w') as f:
             f.write("c MESO FREIGHT NETWORK BATCHIN FILE \n")                        #file title
             f.write(yearM)                                                             #year 
             f.write(dateStr)                                                             #date/time
-    print('ln404')
+            f.write('t nodes init \n')
+  
     for index, row in centroids.iterrows():
             print(index)
             outNodes = 'a*  ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutNTWK, mode = 'a') as f:
                 f.write(outNodes)
-    print('ln410')
+   
     for index, row in nodes.iterrows():
             print(index)
             outNodes = 'a   ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutNTWK, mode = 'a') as f:
                  f.write(outNodes)
-    print('ln416')
+ 
     c=1
     for index, row in allLinks.iterrows():
         print(index)
