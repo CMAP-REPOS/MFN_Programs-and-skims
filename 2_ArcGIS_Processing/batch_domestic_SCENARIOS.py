@@ -223,7 +223,8 @@ for yr in years:
     pNodeCMAP = tempHWYPath + "/temp_" + hwyNodes + ".dbf"
     pLinkCMAP = tempHWYPath + "/temp_" + hwyLinks + ".dbf"
     pOutNTWK = Path(outPath_scen + "/base_ntwk.txt")
-    dateStr = str(datetime.now()) + '\n'
+    dateStr = 'c ' + str(datetime.now()) + '\n'
+    yearM = "c YEAR = " + yr + "\n"
 
     #Fix type if needed
     arcpy.env.workspace = gdbDir
@@ -265,10 +266,11 @@ for yr in years:
     nodes = nodes[(nodes._merge2=='left_only')].drop('_merge2', axis=1)                    #antijoin with centroids (remove centroids)
 
     # Create Reverse CMAP Highway Arcs
-    rev_hwyarc1 = hwyarc1.set_axis(["JNODE", "INODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS'], axis = 1)         #Flip Direction
+    rev_hwyarc1 = hwyarc1[hwyarc1['DIRECTIONS'] != '1']
+    rev_hwyarc1 = rev_hwyarc1.set_axis(["JNODE", "INODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS'], axis = 1)         #Flip Direction
     rev_hwyarc1 = rev_hwyarc1[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS']]   
     for idx, row in rev_hwyarc1.iterrows():               #switch lanes
-        if (row.DIRECTIONS == 3):
+        if (row.DIRECTIONS == '3'):
             rev_hwyarc1.at[idx,'LANES'] = rev_hwyarc1.at[idx,'LANES2']
 
     hwyarc1 = hwyarc1.drop(columns = ['LANES2', 'DIRECTIONS'])
@@ -377,31 +379,43 @@ for yr in years:
     nodes = nodes[['NODE_ID', "POINT_X", "POINT_Y", 'MESOZONE']]
     nodes['POINT_X'] = nodes['POINT_X'].map(lambda x: f"{x:<13}")
     nodes['POINT_X'] = nodes['POINT_X'].str.strip()
+    nodes['POINT_X'] = nodes['POINT_X'].str.rstrip('0')
+    nodes['POINT_X'] = nodes['POINT_X'].str.rstrip('.')
     nodes['POINT_Y'] = nodes['POINT_Y'].map(lambda x: f"{x:<13}")
     nodes['POINT_Y'] = nodes['POINT_Y'].str.strip()
+    nodes['POINT_Y'] = nodes['POINT_Y'].str.rstrip('0')
+    nodes['POINT_Y'] = nodes['POINT_Y'].str.rstrip('.')
     nodes['NODE_ID'] = nodes['NODE_ID'].map(lambda x: f"{x:<13}")
     nodes['NODE_ID'] = nodes['NODE_ID'].str.strip()
 
     centroids = centroids[['NODE_ID', "POINT_X", "POINT_Y", 'MESOZONE']]
     centroids['POINT_X'] = centroids['POINT_X'].map(lambda x: f"{x:<13}")
     centroids['POINT_X'] = centroids['POINT_X'].str.strip()
+    centroids['POINT_X'] = centroids['POINT_X'].str.rstrip('0')
+    centroids['POINT_X'] = centroids['POINT_X'].str.rstrip('.')
     centroids['POINT_Y'] = centroids['POINT_Y'].map(lambda x: f"{x:<13}")
     centroids['POINT_Y'] = centroids['POINT_Y'].str.strip()
+    centroids['POINT_Y'] = centroids['POINT_Y'].str.rstrip('0')
+    centroids['POINT_Y'] = centroids['POINT_Y'].str.rstrip('.')
     centroids['NODE_ID'] = centroids['NODE_ID'].map(lambda x: f"{x:<13}")
     centroids['NODE_ID'] = centroids['NODE_ID'].str.strip()
 
     allLinks['ul1'] = '0'
     allLinks['ul2'] = '0'
     allLinks['ul3'] = '0'
+    allLinks['Miles'] = allLinks['Miles'].map(lambda x: f"{x:<7}")
+    allLinks['Miles'] = allLinks['Miles'].str.replace('.0 ', ' ')
+    allLinks['Miles'] = allLinks['Miles'].str.replace('. ', ' ')
+    allLinks['Miles'] = allLinks['Miles'].str.strip()
     allLinks = allLinks[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'ul1', 'ul2', 'ul3']]
     allLinks = allLinks.sort_values(by=['INODE', 'JNODE'])
     
-    yearM = "c YEAR = " + yr + "\n"
     # OUTPUT BASE_NTWK.TXT
     with pOutNTWK.open('w') as f:
             f.write("c MESO FREIGHT NETWORK BATCHIN FILE \n")                        #file title
             f.write(yearM)                                                             #year 
             f.write(dateStr)                                                             #date/time
+            f.write('c node   x   y   UI1 \n')                                               #node column headers
             f.write('t nodes init \n')
   
     for index, row in centroids.iterrows():

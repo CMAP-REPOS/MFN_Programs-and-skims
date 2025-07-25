@@ -94,7 +94,7 @@ while i < 3:
     pNodes = tempPipePath + pipeDict['pNodes'][i]
     pLinks = tempPipePath + pipeDict['pLinks'][i]
     pOutput = Path(outFolder + pipeDict['pOutput'][i])
-    dateStr = str(datetime.now()) + '\n'
+    dateStr = 'c' + str(datetime.now()) + '\n'
 
     # Read data
     inNodes = gpd.read_file(pNodes)
@@ -181,16 +181,20 @@ while i < 3:
     # Centroids
     centroids['POINT_X'] = centroids['POINT_X'].map(lambda x: f"{x:<13}")
     centroids['POINT_X'] = centroids['POINT_X'].str.strip()
+    centroids['POINT_X'] = centroids['POINT_X'].str.rstrip('0')
     centroids['POINT_Y'] = centroids['POINT_Y'].map(lambda x: f"{x:<13}")
     centroids['POINT_Y'] = centroids['POINT_Y'].str.strip()
+    centroids['POINT_Y'] = centroids['POINT_Y'].str.rstrip('0')
     centroids['NODE_ID'] = centroids['NODE_ID'].map(lambda x: f"{x:<13}")
     centroids['NODE_ID'] = centroids['NODE_ID'].str.strip()
 
     # Nodes
     antiNodes['POINT_X'] = antiNodes['POINT_X'].map(lambda x: f"{x:<13}")
     antiNodes['POINT_X'] = antiNodes['POINT_X'].str.strip()
+    antiNodes['POINT_X'] = antiNodes['POINT_X'].str.rstrip('0')
     antiNodes['POINT_Y'] = antiNodes['POINT_Y'].map(lambda x: f"{x:<13}")
     antiNodes['POINT_Y'] = antiNodes['POINT_Y'].str.strip()
+    antiNodes['POINT_Y'] = antiNodes['POINT_Y'].str.rstrip('0')
     antiNodes['NODE_ID'] = antiNodes['NODE_ID'].map(lambda x: f"{x:<13}")
     antiNodes['NODE_ID'] = antiNodes['NODE_ID'].str.strip()
 
@@ -198,6 +202,11 @@ while i < 3:
     allArc['ul1'] = '0'
     allArc['ul2'] = '0'
     allArc['ul3'] = '0'
+    allArc['Miles'] = allArc['Miles'].map(lambda x: f"{x:<7}")
+    allArc['Miles'] = allArc['Miles'].str.replace('.0 ', ' ')
+    allArc['Miles'] = allArc['Miles'].str.replace('. ', ' ')
+    allArc['Miles'] = allArc['Miles'].str.strip()
+    
 
     # Write to output txt
     outTitle = "c " + pipeDict['pMessage'][i] + " BATCHIN FILE \n"                       #file title
@@ -239,6 +248,9 @@ while i < 3:
 # ---------------------------------------------------------------
 arcpy.env.workspace = tempPipePath
 tempfiles_pipe = ["temp_{}".format(x) for x in shapefiles_links]
+
+# Remove waterways
+tempfiles_pipe.remove("temp_{}".format('Inland_Waterways'))
 
 arcpy.AddMessage("---> Clipping Pipeline Domestic Network")
 pipe_list_get = []

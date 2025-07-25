@@ -146,6 +146,9 @@ combineData.sort_values(by=['layover'], ascending=False)
 # Create trav_time by rounding t_time to 0.01 decimal places and formatting 
 combineData['T_TIME'] = combineData['T_TIME'].round(decimals=2)
 combineData['trav_time'] = combineData['T_TIME'].map(lambda x: f"{x:<5}")
+combineData['trav_time'] = combineData['trav_time'].str.replace('.0 ', ' ')
+combineData['trav_time'] = combineData['trav_time'].str.replace('. ', ' ')
+combineData['trav_time'] = combineData['trav_time'].map(lambda x: f"{x:<5}")
 combineData['name'] = "'" + combineData['DESC_'].str.strip() + "'"
 
 # Force Speed to string with 0 decimal places
