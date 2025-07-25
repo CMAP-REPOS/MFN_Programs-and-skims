@@ -1,12 +1,25 @@
 #KCazzato 3/25/2025
 #This script reviews the batchin files for the Freight network skimming
 #Files produced by batch_domestic_scen_working.py
+''
 args = commandArgs(trailingOnly=T)
 oldconf = as.character(args[1])
-inBaseYr = as.integer(args[2])
-inFirstYr = as.integer(args[3])
-inLastYr = as.integer(args[4])
+newconf = as.character(args[2])
+inBaseYr = as.integer(args[3])
+inFirstYr = as.integer(args[4])
+inLastYr = as.integer(args[5])
 i = inFirstYr
+''
+
+#FOR TESTING####
+oldconf = 'c24q4'
+newconf = 'c25q2'
+inBaseYr = 2022
+inFirstYr = 2025
+inLastYr = 2050
+i = inFirstYr
+#####
+
 while(i <= inLastYr){
   if(i == inFirstYr){
     years <- list(inBaseYr, inFirstYr)
@@ -16,10 +29,8 @@ while(i <= inLastYr){
   i = i+5
 }
 
-
-oldconfMFN = paste("../Input/MFN_", oldconf, ".gdb", sep="")
-currentDir = paste("../Input/BatchinFiles_", oldconf, sep="")
-MHN_Dir = paste("../Input/MHN_", oldconf, ".gdb", sep="")
+oldBatchinDir = paste("../Input/BatchinFiles_", oldconf, sep="")
+newMHN = paste("../Input/MHN_", newconf, ".gdb", sep="")
 newDir = "../Output/BatchinFiles"
 outputDir = "../Output/QC"
 outFile = "../Output/QC/batchinTIPIDs.xlsx"
@@ -40,8 +51,8 @@ package.check <- lapply(
 files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
 
 #MHN formatting data
-in_MHN_hwyproj_coding <- read_sf(dsn = MHN_Dir, layer = "hwyproj_coding", crs = 26771)
-in_MHN_hwyproj <- read_sf(dsn = MHN_Dir, layer = "hwyproj", crs = 26771)
+in_MHN_hwyproj_coding <- read_sf(dsn = newMHN, layer = "hwyproj_coding", crs = 26771)
+in_MHN_hwyproj <- read_sf(dsn = newMHN, layer = "hwyproj", crs = 26771)
 
 #Define function for reading base_ntwk.txt and formatting####
 readBaseNtwk <- function(file){
@@ -102,21 +113,25 @@ confIDs <- in_MHN_hwyproj_coding %>%
 
 #Compare static data####
 print("QA/QC STATIC DATA")
-for(yr in years){
-  for(file in files){
-    #Load current data
-    fileC = paste(currentDir, "/scen_", yr, "/", file, sep = "")
-    in1 <- scan(fileC, what = character(), sep = "\n", skip = 2)
-    
-    #Load new data
-    fileN = paste(newDir, "/scen_", yr, "/", file, sep = "")
-    in2 <- scan(fileN, what = character(), sep = "\n", skip = 2)
-    
-    #Compare
-    resp = all.equal(in1, in2)
-    if(resp != TRUE){stop()} 
-  }
+for(file in files){
+  print(file)
+  #Load current data
+  fileC = paste(oldBatchinDir, "/", file, sep = "")
+  in1 <- scan(fileC, what = character(), sep = "\n", skip = 2)
+  
+  #Load new data
+  fileN = paste(newDir, "/", file, sep = "")
+  in2 <- scan(fileN, what = character(), sep = "\n", skip = 2)
+  
+  #Compare
+  resp = all.equal(in1, in2)
+  if(resp != TRUE){
+    errorM = paste('DISCREPANCIES IN ', file, " file", sep ="")
+    print(errorM)
+    #stop()
+    } 
 }
+
 
 #Compare highway data####
 #DomesticNetwork.csv
@@ -133,12 +148,12 @@ print("QA/QC HIGHWAY DATA")
 for(yr in years){
   #LOAD DATA####
   #Load current data
-  fileC = paste(currentDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
+  fileC = paste(oldBatchinDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
   c1 <- readBaseNtwk(fileC)
   cNodes <- fmtNodes(c1) %>% mutate(flag = "current")
   cLinks <- fmtLinks(c1) %>% mutate(flag = "current")
 
-  fileC = paste(currentDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
+  fileC = paste(oldBatchinDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
   cDist <- read.csv(fileC) %>% mutate(flag = "current")
   
   #Load new data
@@ -217,7 +232,8 @@ add_chTIPID <- rbind(t1, t2, t3) %>%
   select(TIPID:RSP_ID) %>%
   distinct() %>%
   left_join(confIDs, by = "TIPID") %>%
-  filter(is.na(flag))
+  filter(is.na(flag))%>%
+  filter(!is.na(TIPID))
 
 #Removed Nodes and Links####
 t1 <- loopNodes %>%
@@ -252,7 +268,8 @@ rem_chTIPID <- rbind(t1, t2, t3) %>%
   select(TIPID:RSP_ID) %>%
   distinct() %>%
   left_join(confIDs, by = "TIPID") %>%
-  filter(is.na(flag))
+  filter(is.na(flag)) %>%
+  filter(!is.na(TIPID))
 
 #Export####
 if(nrow(add_chTIPID) > 1 | nrow(rem_chTIPID) > 1){

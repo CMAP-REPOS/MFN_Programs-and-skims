@@ -26,7 +26,7 @@ rem FIND PYTHON Installation
 rem call %~dp0Meso_Freight_Skim_Setup_c##q##_YYYY\Scripts\manage\env\activate_env.cmd MFN_env
 set infile=pathPY.txt
 if exist %infile% (del %infile% /Q)
-dir "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe" /s /b >> %infile% 2>nul
+dir "C:\Users\kcazzato\AppData\Local\ESRI\conda\envs\arcgispro-py3-MFN\python.exe" /s /b >> %infile% 2>nul
 set /p path2=<%infile%
 set pypath=%paren%%path2%%paren%
 echo pypath = %pypath%
@@ -34,7 +34,6 @@ CD %~dp0
 
 REM ###################################################################################################################################################
 rem HEADER INFO
-
 @echo SELECT RUN MODE
 @echo Mode 1: Run all (runs setup, MFN update, skims, and skim QC)
 @echo Mode 2: Skip setup (only runs MFN update, skims, and skim QC)
@@ -131,20 +130,28 @@ goto while
 @echo created skim folders and copied Data
 
 REM ###################################################################################################################################################
+rem RUN PREP SCRIPTS
 :run2
 CD %~dp0
 @Echo %date% %time% Updating MFN and Generating Batchin Files...  >> %~dp0/model_run_timestamp.txt
-rem RUN PREP SCRIPTS
-@ECHO Running process_futureLinks.R >> %~dp0/model_run_timestamp.txt
-%rpath% 1_PreProcessing\process_futureLinks.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
-@ECHO Running qc_generatedLayers.R  >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_generatedLayers.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
-@ECHO Running batch_domestic_scen_working.py 
-rem call python 2_ArcGIS_Processing\batch_domestic_scen_working.py %baseYr% %firstYr% %lastYr%
-%pypath% 2_ArcGIS_Processing\batch_domestic_scen_working.py %newconf% %baseYr% %firstYr% %lastYr%
-@ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_batchinFiles.R %oldconf% %baseYr% %firstYr% %lastYr%
 
+rem @ECHO Running process_futureLinks.R >> %~dp0/model_run_timestamp.txt
+rem %rpath% 1_PreProcessing\process_futureLinks.R %newconf% %baseYr% %firstYr% %lastYr%
+rem @ECHO Running qc_generatedLayers.R  >> %~dp0/model_run_timestamp.txt
+rem %rpath% 99_QC\qc_generatedLayers.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
+
+rem @ECHO Running batch_domestic_PIPELINE.py 
+rem %pypath% 2_ArcGIS_Processing\batch_domestic_PIPELINE.py %newconf%
+
+rem @ECHO Running batch_domestic_SCENARIOS.py 
+rem %pypath% 2_ArcGIS_Processing\batch_domestic_SCENARIOS.py %newconf% %baseYr% %firstYr% %lastYr%
+
+rem @ECHO Running batch_domestic_ITINERARIES.py 
+rem %pypath% 2_ArcGIS_Processing\batch_domestic_ITINERARIES.py %newconf%
+
+@ECHO Running qc_batchinFiles.R  >> %~dp0/model_run_timestamp.txt
+%rpath% 99_QC\qc_batchinFiles.R %oldconf% %newconf% %baseYr% %firstYr% %lastYr%
+pause
 REM ###################################################################################################################################################
 @Echo %date% %time% Copying MFN Batchin Data...  >> %~dp0/model_run_timestamp.txt
 rem COPY BATCHIN DATA TO APPROPRIATE FOLDER
@@ -179,6 +186,8 @@ if %counter% GTR %lastYr% (set /A counter=%baseYr%)
 if %scen% GTR 200 (goto :loopend3) 
 set nameMod=Meso_Freight_Skim_Setup_%newconf%_%counter%
 CD ..\Skim_New\Model_Setups\%nameMod%\Database
+@echo set cd to model database folder %CD%
+pause
 @echo %date% %time% %nameMod% for scenario %scen%...  >> %~dp0/model_run_timestamp.txt
 if "%counter%"=="2022" (
 	set /A flag143=0
@@ -198,6 +207,8 @@ if "%scen%"=="100" (
 REM -- Get name of .emp file --
 set infile=empfile.txt
 cd ..
+@echo move to model folder %CD%
+pause
 if exist %infile% (del %infile% /Q)
 dir "*.emp" /b >> %infile% 2>nul
 set /p file1=<%infile%
