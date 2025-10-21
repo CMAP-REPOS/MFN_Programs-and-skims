@@ -1,5 +1,6 @@
 #################################################################################
 # batch_domestic_PIPELINE.py                                                    #
+# kcazzato 10/21/2025 updates - added to MFN toolbox                            #
 # kcazzato 07/2/2025 updates                                                    #
 # ----- Removed SAS processsing                                                 #
 # ----- Separated pipeline and highway/rail scenarios processing                #
@@ -10,7 +11,20 @@
 #    This program creates Emme batchin files from the                       	#
 #    Meso Freight Network for the Pipelie Networks.                     	    # 
 #    The following files are created:                                           #
-#    Output/BathinFiles folder:                                 	            #
+#    System Inputs:                                             	            #
+#       - MFN GDB                                                               #
+#       - Output Folder Path                                                    #
+#    Data Inputs:                                                 	            #
+#       - Crude_Oil_System                                                      #
+#       - NEC_NG_19_System                                                      #
+#       - Prod_17_18_System                                                     #
+#       - Inland_Waterways                                                      #
+#       - Crude_Oil_System_nodes                                                #
+#       - NEC_NG_19_nodes                                                       #
+#       - Prod_17_18_nodes                                                      #
+#       - Meso_Ext_Int_Centroids                                                #
+#       - conus_ak                                                              #
+#    Output:                                 	                                #
 #         - cos_ntwk.txt (all crude oil system links, nodes, and centroids) 	#
 #         - nec_19_ntwk.txt (all crude oil system links, nodes, and centroids)  # 	   
 #         - p1718_ntwk.txt (all crude oil system links, nodes, and centroids)   #
@@ -24,7 +38,6 @@
 # ---------------------------------------------------------------
 import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, shutil
 import pandas as pd
-import geopandas as gpd
 import numpy as np
 from arcpy import env
 from datetime import datetime
@@ -35,27 +48,27 @@ arcpy.OverwriteOutput = 1
 # ---------------------------------------------------------------
 # Read Script Arguments
 # ---------------------------------------------------------------
-#inConf = str(sys.argv[1])
-#programDir = os.path.dirname(__file__)
-#mainDir = os.path.abspath(os.path.join(__file__, "../../../"))
+###
+gdbDir = arcpy.GetParameterAsText(0)
+outFolder = arcpy.GetParameterAsText(1)
 
-inConf = "c25q2"
-programDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY26/MFN/Translate_SAS/1_create_emme_batchin/Scripts/2_ArcGIS_Processing"
-mainDir = os.path.abspath(os.path.join(programDir, "../../"))
-gdbDir = os.path.join(mainDir + "/Output/MFN_updated_" + inConf + ".gdb")
-outFolder = os.path.join(mainDir + "/Output/BatchinFiles")
 tempPipePath = os.path.join(outFolder + "/Temp")
 
-# Delete and recreate ouput folder
+# Create output folder if it doesn't exist
+if not os.path.exists(outFolder):
+    os.mkdir(outFolder)
+    arcpy.AddMessage("---> Output Directory created: " + outFolder)
+
+# Delete and recreate temporary folder
 if os.path.exists(tempPipePath):
     shutil.rmtree(tempPipePath)
-if os.path.exists(outFolder):
-    shutil.rmtree(outFolder)
-os.mkdir(outFolder)
-arcpy.AddMessage("---> Directory created: " + outFolder)
 os.mkdir(tempPipePath)
 arcpy.AddMessage("---> Directory created: " + tempPipePath)
 
+# Define function for reading tables as pandas df
+def dbf_to_df(table_path):
+    fields = [f.name for f in arcpy.ListFields(table_path) if f.type not in ("Geometry", "Blob", "Raster")]
+    return pd.DataFrame(arcpy.da.TableToNumPyArray(table_path, fields))
 # ---------------------------------------------------------------
 # Prepare Data for Pipeline File Generation
 # ---------------------------------------------------------------
@@ -97,9 +110,9 @@ while i < 3:
     dateStr = 'c' + str(datetime.now()) + '\n'
 
     # Read data
-    inNodes = gpd.read_file(pNodes)
-    inCentroids = gpd.read_file(pCentroids)
-    inLinks = gpd.read_file(pLinks)
+    inNodes = dbf_to_df(pNodes)
+    inCentroids = dbf_to_df(pCentroids)
+    inLinks = dbf_to_df(pLinks)
 
     # Select columns of interest only
     nodes = inNodes[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
@@ -135,47 +148,47 @@ while i < 3:
     errorM = pipeDict['pMessage'][i] + " LINKS WITHOUT A CODED LENGTH"
     check = (allArc['Miles'] == "0").any()
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each link has a mode (allArc, mode is NA) 
     errorM = pipeDict['pMessage'][i] + " LINKS WITHOUT A CODED MODE"
     check = (allArc['Modes'].isnull()).any()
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each node has coordinates (antiNodes, point_x='.' Or point_y='.') 
     errorM = pipeDict['pMessage'][i] + " NODES WITH NO X COORDINATES"
     check=(antiNodes['POINT_X'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     errorM = pipeDict['pMessage'][i] + " NODES WITH NO Y COORDINATES"
     check=(antiNodes['POINT_Y'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each centroid has coordinates (centroids, point_x='.' Or point_y='.' 
     errorM = pipeDict['pMessage'][i] + " CENTROIDS WITH NO X COORDINATES"
     check=(centroids['POINT_X'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
     
     errorM = pipeDict['pMessage'][i] + " CENTROIDS WITH NO Y COORDINATES"
     check=(centroids['POINT_Y'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each node has a unique number (antiNodes, check count node_id not>1) 
     errorM = pipeDict['pMessage'][i] + " NODES WITH DUPLICATE NUMBERS"
     check=(antiNodes["NODE_ID"].is_unique)
     if(check == 'False'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each centroid has a unique number (centroids, check count node_id not>1) 
     errorM = pipeDict['pMessage'][i] + " CENTROIDS WITH DUPLICATE NUMBERS"
     check=((centroids["NODE_ID"]).is_unique)
     if(check == 'False'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Finalize columns
     # Centroids
@@ -218,19 +231,16 @@ while i < 3:
         f.write('t nodes init \n')                                                       #node init line
 
     for index, row in centroids.iterrows():
-            print(index)
             outNodes = 'a*  ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutput, mode = 'a') as f:
                 f.write(outNodes)
 
     for index, row in antiNodes.iterrows():
-            print(index)
             outNodes = 'a   ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutput, mode = 'a') as f:
                  f.write(outNodes)
     c=1
     for index, row in allArc.iterrows():
-        print(index)
         if(c == 1):
             with open(pOutput, mode = 'a') as f:
                  f.write('c i   j   mi   modes   type   lanes   vdf   ul1   ul2   ul3 \n') 
@@ -298,9 +308,9 @@ toclean = [f for f in os.listdir(tempPipePath)]
 for f in toclean:
     try:
         os.remove(os.path.join(tempPipePath, f))
+        os.remove(tempPipePath)
     except RuntimeError:
         arcpy.management.Delete(os.path.join(tempPipePath, f))
     except WindowsError:
-        print("WindowsError (probably access denied) for {}".format(f))
+        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(f))
         continue
-

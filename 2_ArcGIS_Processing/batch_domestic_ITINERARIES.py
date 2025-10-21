@@ -1,4 +1,6 @@
-# batch_domestic_SCENARIOS.py                                                   #
+#################################################################################
+# batch_domestic_ITINERARIES.py                                                 #
+# kcazzato 10/21/2025 updates - added to MFN toolbox                            #
 # kcazzato 07/2/2025 updates                                                    #
 # ----- Removed SAS processsing                                                 #
 # ----- Separated pipeline and highway/rail scenarios processing                #
@@ -7,9 +9,17 @@
 # original batchin script by nrf    	       	                                #
 #                                                                           	# 
 #    This program creates Emme batchin files from the                       	#
-#    Meso Freight Network for the Rail and Highway Network.                	    # 
-#    The following files are created:                                           #
-#    Output/BathinFiles folder:                                 	            #
+#    Meso Freight Network for the Rail Itineraries.                     	    # 
+#                                                                           	# 
+#    System Inputs:                                             	            #
+#       - MFN GDB                                                               #
+#       - Output Folder Path                                                    #
+#    Data Inputs:                                                 	            #
+#       - CMAP_Rail_Routes.dbf                                                  #
+#       - National_Rail_Routes.dbf                                              #
+#       - CMAP_Rail_Itinerary                                                   #
+#       - National_Rail_Itinerary                                               #
+#    Output:                                                    	            #
 #         - lines.in    (rail headers and itineraries)         		            #
 #                                                                           	#
 #################################################################################
@@ -17,9 +27,8 @@
 # ---------------------------------------------------------------
 # Import System Modules
 # ---------------------------------------------------------------
-import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, shutil
+import sys, os, arcpy,  shutil
 import pandas as pd
-import geopandas as gpd
 import numpy as np
 from arcpy import env
 from datetime import datetime
@@ -29,20 +38,25 @@ arcpy.OverwriteOutput = 1
 # ---------------------------------------------------------------
 # Read Script Arguments and Set Paths
 # ---------------------------------------------------------------
-#for testing
-inConf = "c25q2"
-programDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY26/MFN/Translate_SAS/1_create_emme_batchin/Scripts/2_ArcGIS_Processing"
-mainDir = os.path.abspath(os.path.join(programDir, "../../"))
-
 ###
-#inConf = str(sys.argv[1])
-dateStr = str(datetime.now()) + '\n'
-#programDir = os.path.dirname(__file__)
-#mainDir = os.path.abspath(os.path.join(__file__, "../../../"))
-gdbDir = os.path.join(mainDir + "/Output/MFN_updated_" + inConf + ".gdb")
-outFolder = os.path.join(mainDir + "/Output/BatchinFiles")
-tempPath = os.path.join(outFolder + "/Temp")
-pOutLines = Path(outFolder + "/lines.in")
+gdbDir = arcpy.GetParameterAsText(0)           # MFN GDB                 
+outFolder = arcpy.GetParameterAsText(1)        # Output folder
+
+tempPath = os.path.join(outFolder + "/Temp")   # Temporary folder for data processing
+pOutLines = Path(outFolder + "/lines.in")      # Output file 
+
+dateStr = str(datetime.now()) + '\n'           # Timestamp for output files
+
+# Paths for non-scenario specific layers
+pRailRouteCMAP = tempPath + "/temp_CMAP_Rail_Routes.dbf"
+pRailRouteNat = tempPath + "/temp_National_Rail_Routes.dbf"
+pItinCMAP = tempPath + "/temp_railitin1.dbf"
+pItinNat = tempPath + "/temp_railitin2.dbf"
+
+# Create output folder if it doesn't exist
+if not os.path.exists(outFolder):
+    os.mkdir(outFolder)
+    arcpy.AddMessage("---> Output Directory created: " + outFolder)
 
 # Delete and recreate temporary folder
 if os.path.exists(tempPath):
@@ -50,11 +64,10 @@ if os.path.exists(tempPath):
 os.mkdir(tempPath)
 arcpy.AddMessage("---> Directory created: " + tempPath)
 
-# Paths for non-scenario specific layers
-pRailRouteCMAP = tempPath + "/temp_CMAP_Rail_Routes.dbf"
-pRailRouteNat = tempPath + "/temp_National_Rail_Routes.dbf"
-pItinCMAP = tempPath + "/temp_railitin1.dbf"
-pItinNat = tempPath + "/temp_railitin2.dbf"
+# Define function for reading tables as pandas df
+def dbf_to_df(table_path):
+    fields = [f.name for f in arcpy.ListFields(table_path) if f.type not in ("Geometry", "Blob", "Raster")]
+    return pd.DataFrame(arcpy.da.TableToNumPyArray(table_path, fields))
 
 # ---------------------------------------------------------------
 # Prepare Data for File Generation
@@ -64,6 +77,7 @@ arcpy.env.workspace = gdbDir
 
 # Define Lists, Dictionaries, and Paths
 rail_itineraries = [gdbDir + "\\CMAP_Rail_Itinerary", gdbDir + "\\National_Rail_Itinerary"]
+
 # Create temporary copies
 for y in ["CMAP_Rail_Routes", "National_Rail_Routes"]:
     arcpy.management.SelectLayerByAttribute(y, "CLEAR_SELECTION")
@@ -77,10 +91,10 @@ arcpy.analysis.TableSelect(rail_itineraries[0], temp_itin_dbfs[0], "\"OBJECTID\"
 arcpy.analysis.TableSelect(rail_itineraries[1], temp_itin_dbfs[1], "\"OBJECTID\" >= 1") 
 
 # Read temporary data
-inRailRouteCMAP = gpd.read_file(pRailRouteCMAP)
-inRailRouteNat = gpd.read_file(pRailRouteNat)
-inItinCMAP = gpd.read_file(pItinCMAP)
-inItinNat = gpd.read_file(pItinNat)
+inRailRouteCMAP= dbf_to_df(pRailRouteCMAP)
+inRailRouteNat= dbf_to_df(pRailRouteNat)
+inItinCMAP= dbf_to_df(pItinCMAP)
+inItinNat= dbf_to_df(pItinNat)
 
 # Select columns of interest only
 railroute1 = inRailRouteCMAP[['DESC_', 'REV_DESC', 'START_NODE', 'END_NODE', 'Mode', 'VEHICLE', 'TOT_DIST', 'TOT_T_TIME', 'Speed', 'Headway']]
@@ -110,14 +124,13 @@ itins = itins.sort_values(by=['DESC_', 'SEG_ORDER'])                            
 # ---------------------------------------------------------------
 # Report Routes Without an Itinerary
 checkDF = itins.merge(routes, how='outer', indicator=True, on = "DESC_")      #combine itineraries and routes 
-print("merged checkDF")
 checkDF = checkDF[(checkDF._merge!='both')].drop('_merge', axis=1)      #keep rows in routes only
 checkDF = checkDF.sort_values(by=['DESC_'])                                   #sort by DESC_                       
 
-errorM = "RAIL ROUTES WITHOUT ITINERARIES"
 check=checkDF.shape[0]
 if(check != 0): 
-    sys.exit(print(errorM + "\n" + checkDF))
+    errorM = "RAIL ROUTES WITHOUT ITINERARIES" + "\n" + checkDF
+    sys.exit(arcpy.AddMessage(errorM))
 
 # Report Itinerary Gaps
 checkDF = itins.sort_values(by=['DESC_', 'SEG_ORDER'])
@@ -126,8 +139,8 @@ checkDF['lagLN'] = checkDF['DESC_'].shift(1)
 
 for index, row in checkDF.iterrows():
     if (row['DESC_'] == row['lagLN']) & (row['INODE'] != row['lagJ']):
-        errorM = 'GAP IN ITINERARY:' + row['lagJ'] + " IS JNODE OF PREVIOUS SEGMENT"
-        sys.exit(print(errorM + "\n" + row))
+        errorM = 'GAP IN ITINERARY:' + row['lagJ'] + " IS JNODE OF PREVIOUS SEGMENT" + "\n" + checkDF
+        sys.exit(arcpy.AddMessage(errorM))
 
 # ---------------------------------------------------------------
 # Combine Route and Itinerary Data for Export
@@ -174,7 +187,6 @@ with pOutLines.open('w') as f:
 combineData['maxSEG'] = combineData.groupby('DESC_')['SEG_ORDER'].transform('max')
 
 for index, row in combineData.iterrows():
-    print(index)
     firstDESC = "a " + row['name'] + "   " + row['Mode'] + "   " + str(row['VEHICLE']) + "   " + str(row['Headway']) + "   " + str(row['Speed']) + "   " + row['DESC_'] + "  \n"
     pathln = "  path=no \n"
     yesLayover = "    dwt=0.01" + "   " + str(row['INODE']) + "   ttf=10   us1=" + str(row['trav_time']) + "  us2=0" + "\n               " + str(row['JNODE'] )+ "   lay="  + str(row['layover']) + "\n"
@@ -197,14 +209,14 @@ for index, row in combineData.iterrows():
 # ---------------------------------------------------------------
 # Cleanup final non-scenario specific temporary files
 # ---------------------------------------------------------------
-#fix this to work with new file structure
 arcpy.AddMessage("---> Removing Temporary Files")
 toclean = [f for f in os.listdir(tempPath)]
 for f in toclean:
     try:
         os.remove(os.path.join(tempPath, f))
+        os.remove(tempPath)
     except RuntimeError:
         arcpy.management.Delete(os.path.join(tempPath, f))
     except WindowsError:
-        print("WindowsError (probably access denied) for {}".format(f))
+        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(f))
         continue

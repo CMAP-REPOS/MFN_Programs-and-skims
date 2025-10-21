@@ -1,4 +1,5 @@
 # batch_domestic_SCENARIOS.py                                                   #
+# kcazzato 10/21/2025 updates - added to MFN toolbox                            #
 # kcazzato 07/2/2025 updates                                                    #
 # ----- Removed SAS processsing                                                 #
 # ----- Separated pipeline and highway/rail scenarios processing                #
@@ -21,57 +22,25 @@
 # ---------------------------------------------------------------
 # Import System Modules
 # ---------------------------------------------------------------
-import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, shutil
+import sys, string, os, arcpy, subprocess, time, platform, fileinput, csv, shutil, re
 import pandas as pd
 import numpy as np
 from arcpy import env
 from datetime import datetime
 from pathlib import Path
-import geopandas as gpd
 arcpy.OverwriteOutput = 1
 
 # ---------------------------------------------------------------
 # Read Script Arguments and Set Paths
 # ---------------------------------------------------------------
-#for testing
-inConf = "c25q2"
-inBaseYr = 2022
-inFirstYr = 2025
-inLastYr = 2050
-
-programDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY26/MFN/Translate_SAS/1_create_emme_batchin/Scripts/2_ArcGIS_Processing"
-mainDir = os.path.abspath(os.path.join(programDir, "../../"))
-
 ###
-#inConf = str(sys.argv[1])
-#inBaseYr = int(sys.argv[2])
-#inFirstYr = int(sys.argv[3])
-#inLastYr = int(sys.argv[4])
+gdbDir = arcpy.GetParameterAsText(0)
+outFolder = arcpy.GetParameterAsText(1)
 
-dateStr = str(datetime.now()) + '\n'
-
-#programDir = os.path.dirname(__file__)
-#mainDir = os.path.abspath(os.path.join(__file__, "../../../"))
-gdbDir = os.path.join(mainDir + "/Output/MFN_updated_" + inConf + ".gdb")
-outFolder = os.path.join(mainDir + "/Output/BatchinFiles")
+tempPipePath = os.path.join(outFolder + "/Temp")
 tempHWYPath = os.path.join(outFolder + "/Temp")
 
-# Delete and recreate temporary folder
-if os.path.exists(tempHWYPath):
-    shutil.rmtree(tempHWYPath)
-os.mkdir(tempHWYPath)
-arcpy.AddMessage("---> Directory created: " + tempHWYPath)
-
-# Create list of years         
-i = inFirstYr
-while i <= inLastYr:
-    if i == inFirstYr:
-        years = [str(inBaseYr), str(inFirstYr)]
-    else:
-        years.append(str(i))
-    i=i+5
-arcpy.AddMessage("Scenario Years: ")
-arcpy.AddMessage(years)
+dateStr = str(datetime.now()) + '\n'
 
 # Paths for non-scenario specific layers
 pNodeRailCMAP = tempHWYPath + "/temp_CMAP_Rail_nodes.dbf"
@@ -84,6 +53,22 @@ pLinkRailCMAP = tempHWYPath + "/temp_CMAP_Rail.dbf"
 pLinkRailNat = tempHWYPath + "/temp_National_Rail.dbf"
 pLinkNat = tempHWYPath + "/temp_National_Highway.dbf"
 pLinkWater = tempHWYPath + "/temp_Inland_Waterways.dbf"
+
+# Create output folder if it doesn't exist
+if not os.path.exists(outFolder):
+    os.mkdir(outFolder)
+    arcpy.AddMessage("---> Output Directory created: " + outFolder)
+
+# Delete and recreate temporary folder
+if os.path.exists(tempHWYPath):
+    shutil.rmtree(tempHWYPath)
+os.mkdir(tempHWYPath)
+arcpy.AddMessage("---> Directory created: " + tempHWYPath)
+
+# Define function for reading tables as pandas df
+def dbf_to_df(table_path):
+    fields = [f.name for f in arcpy.ListFields(table_path) if f.type not in ("Geometry", "Blob", "Raster")]
+    return pd.DataFrame(arcpy.da.TableToNumPyArray(table_path, fields))
 
 # ---------------------------------------------------------------
 # Create Temporary Layers for Domestic Network File
@@ -108,16 +93,16 @@ for x in [shapefiles_links,shapefiles_nodes,shapefiles_geo]:
 # Read Static Temporary Data as Pandas DF
 # ---------------------------------------------------------------
 # Read non-scenario specific data
-inNodeRailCMAP = gpd.read_file(pNodeRailCMAP)
-inNodeRailNat = gpd.read_file(pNodeRailNat)
-inNodeNat = gpd.read_file(pNodeNat)
-inNodeWater = gpd.read_file(pNodeWater)
-inLognode = gpd.read_file(pNodeLog)
-inNodeCent = gpd.read_file(pNodeCent)
-inLinkRailCMAP = gpd.read_file(pLinkRailCMAP)
-inLinkRailNat = gpd.read_file(pLinkRailNat)
-inLinkNat = gpd.read_file(pLinkNat)
-inLinkWater = gpd.read_file(pLinkWater)
+inNodeRailCMAP = dbf_to_df(pNodeRailCMAP)
+inNodeRailNat = dbf_to_df(pNodeRailNat)
+inNodeNat = dbf_to_df(pNodeNat)
+inNodeWater = dbf_to_df(pNodeWater)
+inLognode = dbf_to_df(pNodeLog)
+inNodeCent = dbf_to_df(pNodeCent)
+inLinkRailCMAP = dbf_to_df(pLinkRailCMAP)
+inLinkRailNat = dbf_to_df(pLinkRailNat)
+inLinkNat = dbf_to_df(pLinkNat)
+inLinkWater = dbf_to_df(pLinkWater)
 
 # Select columns of interest only
 railarc1 = inLinkRailCMAP[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF"]]
@@ -208,33 +193,41 @@ outFiles.append("export_temp_Inland_Waterways.csv")
 # ---------------------------------------------------------------
 # Generate Highway Batchin Files
 # ---------------------------------------------------------------
+# Create list of years     
+arcpy.env.workspace = gdbDir
+matching_fcs = arcpy.ListFeatureClasses("final_links_*") or []
+
+# Look in all feature datasets
+datasets = arcpy.ListDatasets(feature_type='feature') or []
+
+for ds in datasets:
+    arcpy.env.workspace = os.path.join(gdbDir, ds)
+    fcs = arcpy.ListFeatureClasses("final_links_*") or []
+    matching_fcs.extend([f"{ds}\\{fc}" for fc in fcs])  # preserve dataset name in path
+
+years =  [re.findall(r'\d+', s) for s in matching_fcs]
+years = [item[0] for item in years]
+arcpy.AddMessage("Scenario Years: ")
+arcpy.AddMessage(years)
+
 for yr in years:
     arcpy.AddMessage("---> Generating Batchin Files for: " + yr)
     
     # Create output and temporary folder if it does not exist
     outPath_scen = outFolder + "\\scen_" + yr
-    if not os.path.exists(outPath_scen):
-        os.mkdir(outPath_scen)
-        arcpy.AddMessage("---> Directory created: " + outPath_scen)
+    if os.path.exists(outPath_scen):
+        shutil.rmtree(outPath_scen)
+    os.mkdir(outPath_scen)
+    arcpy.AddMessage("---> Directory created: " + outPath_scen)
 
     # Define Paths and Variables
-    hwyLinks = "CMAP_HWY_LINK_y" + yr
-    hwyNodes = "CMAP_HWY_NODE_y" + yr
+    hwyLinks = "final_links_" + yr
+    hwyNodes = "final_nodes_" + yr
     pNodeCMAP = tempHWYPath + "/temp_" + hwyNodes + ".dbf"
     pLinkCMAP = tempHWYPath + "/temp_" + hwyLinks + ".dbf"
     pOutNTWK = Path(outPath_scen + "/base_ntwk.txt")
     dateStr = 'c ' + str(datetime.now()) + '\n'
     yearM = "c YEAR = " + yr + "\n"
-
-    #Fix type if needed
-    arcpy.env.workspace = gdbDir
-    desc = arcpy.Describe(hwyNodes)
-    fields = desc.fields
-    if "NODE_ID" in fields:
-        print("node_id exists")
-    else:
-        arcpy.management.AddField(hwyNodes, 'NODE_ID', 'LONG')
-        arcpy.management.CalculateField(hwyNodes, 'NODE_ID', "!NODE_ID_T!", "PYTHON3")
 
     # Create Temporary Copies of HWY network
     arcpy.env.workspace = gdbDir
@@ -246,11 +239,13 @@ for yr in years:
         arcpy.conversion.ExportFeatures(x, tempHWYPath + "\\temp_{}.shp".format(x))
 
     # Read and Format Highway Data
-    inLinkCMAP = gpd.read_file(pLinkCMAP)
-    inNodeCMAP = gpd.read_file(pNodeCMAP)
+    inLinkCMAP = dbf_to_df(pLinkCMAP)
+    inNodeCMAP = dbf_to_df(pNodeCMAP)
 
-    hwynode1 = inNodeCMAP[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
-    hwyarc1 = inLinkCMAP[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS']]
+    hwynode1 = inNodeCMAP[["NODE", "POINT_X", "POINT_Y", "MESOZONE"]]
+    hwynode1 = hwynode1.rename(columns={'NODE': 'NODE_ID'})
+    hwyarc1 = inLinkCMAP[["INODE", "JNODE", "MILES", "MODES", "TYPE", "LANES1", "VDF", 'LANES2', 'DIRECTIONS']]
+    hwyarc1 = hwyarc1.rename(columns={'MILES': 'Miles', 'MODES': 'Modes', 'TYPE': 'Type', 'LANES1':'LANES'})
 
     # Combine HWY Nodes with other nodes
     nodes = pd.concat([railnode1, railnode2, hwynode1, hwynode2, waternode])               #combine all network nodes
@@ -289,47 +284,47 @@ for yr in years:
     errorM = "CRUDE OIL SYSTEM NETWORK LINKS WITHOUT A CODED LENGTH"
     check = (allLinks['Miles'] == "0").any()
     if(check == 'True'): 
-        print(sys.exit(print(errorM)))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each link has a mode (allLinks, mode is NA) 
     errorM = "CRUDE OIL SYSTEM NETWORK LINKS WITHOUT A CODED MODE"
     check = (allLinks['Modes'].isnull()).any()
     if(check == 'True'): 
-        print(sys.exit(print(errorM)))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each node has coordinates (nodes, point_x='.' Or point_y='.') 
     errorM = "CRUDE OIL SYSTEM NETWORK NODES WITH NO X COORDINATES"
     check=(nodes['POINT_X'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     errorM = "CRUDE OIL SYSTEM NETWORK NODES WITH NO Y COORDINATES"
     check=(nodes['POINT_Y'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each centroid has coordinates (centroids, point_x='.' Or point_y='.' 
     errorM = "MESO FREIGHT NETWORK CENTROIDS WITH NO X COORDINATES"
     check=(centroids['POINT_X'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
     
     errorM = "MESO FREIGHT NETWORK CENTROIDS WITH NO Y COORDINATES"
     check=(centroids['POINT_Y'].isnull()).any() 
     if(check == 'True'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each node has a unique number (nodes, check count node_id not>1) 
     errorM = "CRUDE OIL SYSTEM NETWORK NODES WITH DUPLICATE NUMBERS"
     check=(nodes["NODE_ID"].is_unique)
     if(check == 'False'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
 
     # Verify each centroid has a unique number (centroids, check count node_id not>1) 
     errorM = "MESO FREIGHT NETWORK CENTROIDS WITH DUPLICATE NUMBERS"
     check=((centroids["NODE_ID"]).is_unique)
     if(check == 'False'): 
-        sys.exit(print(errorM))
+        sys.exit(arcpy.AddMessage(errorM))
   
     # Create Temporary clipped highway layer for domestic distance file
     arcpy.env.workspace = tempHWYPath
@@ -363,7 +358,7 @@ for yr in years:
         try:
             df = df[['INODE','JNODE','Miles','ratio']]
         except:
-            df = df[['inode','jnode','miles','ratio']]
+            df = df[['INODE','JNODE','MILES','ratio']]
         dflist.append(df)
     
     df = pd.concat([x for x in dflist])
@@ -419,20 +414,17 @@ for yr in years:
             f.write('t nodes init \n')
   
     for index, row in centroids.iterrows():
-            print(index)
             outNodes = 'a*  ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutNTWK, mode = 'a') as f:
                 f.write(outNodes)
    
     for index, row in nodes.iterrows():
-            print(index)
             outNodes = 'a   ' + (row['NODE_ID']) + "   " + (row['POINT_X']) + "   " + (row['POINT_Y']) + "   " + str(row['MESOZONE']) + "\n"
             with open(pOutNTWK, mode = 'a') as f:
                  f.write(outNodes)
  
     c=1
     for index, row in allLinks.iterrows():
-        print(index)
         if(c == 1):
             with open(pOutNTWK, mode = 'a') as f:
                  f.write('c i   j   mi   modes   type   lanes   vdf   ul1   ul2   ul3 \n') 
@@ -441,8 +433,9 @@ for yr in years:
         outLinks = 'a   ' + str(row['INODE']) + "   " + str(row['JNODE']) + "   " + str(row['Miles']) + "   "  + str(row['Modes']) + "   "+ str(row['Type'])+ "   " + str(row['LANES']) + "   " + str(row['VDF']) + "   " + str(row['ul1']) + "   " + str(row['ul2']) + "   " + str(row['ul3']) + "\n"
         with open(pOutNTWK, mode = 'a') as f:
              f.write(outLinks)
-    print("end year")
-    print(yr)
+    arcpy.AddMessage("end year:")
+    arcpy.AddMessage(yr)
+    arcpy.AddMessage("________________________________________________________________________")
 
 # ---------------------------------------------------------------
 # Cleanup final temporary files
@@ -453,9 +446,10 @@ toclean = [f for f in os.listdir(tempHWYPath)]
 for f in toclean:
     try:
         os.remove(os.path.join(tempHWYPath, f))
+        os.remove(tempHWYPath)
     except RuntimeError:
         arcpy.management.Delete(os.path.join(tempHWYPath, f))
     except WindowsError:
-        print("WindowsError (probably access denied) for {}".format(f))
+        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(f))
         continue
 
