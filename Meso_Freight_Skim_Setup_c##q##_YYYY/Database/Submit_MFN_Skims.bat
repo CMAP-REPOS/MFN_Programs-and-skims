@@ -91,24 +91,23 @@ REM ======================================================================
 
 call %~dp0..\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
 
-call python post_processing\Step1_Create_GCD_file.ipynb
+call python post_processing\Step1_Create_GCD_file.ipynb %choiceYR%
 
-call python post_processing\Step2_1_formatSkims.ipynb
+call python post_processing\Step2_1_formatSkims.ipynb %choiceYR% %flag140%
 
-call python post_processing\Step2_2_format_O-L-D.ipynb
+call python post_processing\Step2_2_format_O-L-D.ipynb %choiceYR% 
 
-call python post_processing\Step2_3_format_Airport_Trips.ipynb
+call python post_processing\Step2_3_format_Airport_Trips.ipynb %choiceYR% 
 
-call python post_processing\Step2_4_format_waterport_trips.ipynb
+call python post_processing\Step2_4_format_waterport_trips.ipynb %choiceYR% 
 
-call python post_processing\Step2_5_finalize_skims.ipynb
+call python post_processing\Step2_5_finalize_skims.ipynb %choiceYR% %flag140% %flag143% 
 
+call python post_processing\Step3_1_Verify_Costs_Times.ipynb %choiceYR% %flag140% %flag143% 
 
-call python post_processing\Step3_1_Verify_Costs_Times.ipynb
+call python post_processing\Step3_2_port_summary.ipynb %choiceYR% %flag140% %flag143% 
 
-call python post_processing\Step3_2_port_summary.ipynb
-
-call python post_processing\Step4_create_zonal_truck_tour_files.ipynb
+call python post_processing\Step4_create_zonal_truck_tour_files.ipynb %choiceYR%
 
 
 
