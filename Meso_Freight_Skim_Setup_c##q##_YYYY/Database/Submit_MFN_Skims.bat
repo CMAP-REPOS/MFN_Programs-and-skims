@@ -86,44 +86,40 @@ rem verify rail service
 
 REM ======================================================================
 @echo
-@echo RUNNING sas batch processing
+@echo RUNNING Post-Processing Procedures
 @echo
 
+call %~dp0..\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
+
+call python post_processing\Step1_Create_GCD_file.ipynb
+
+call python post_processing\Step2_1_formatSkims.ipynb
+
+call python post_processing\Step2_2_format_O-L-D.ipynb
+
+call python post_processing\Step2_3_format_Airport_Trips.ipynb
+
+call python post_processing\Step2_4_format_waterport_trips.ipynb
+
+call python post_processing\Step2_5_finalize_skims.ipynb
+
+
+call python post_processing\Step3_1_Verify_Costs_Times.ipynb
+
+call python post_processing\Step3_2_port_summary.ipynb
+
+call python post_processing\Step4_create_zonal_truck_tour_files.ipynb
+
+
+
+
+
+
+
+
+
 REM ======================================================================
-set /A counter=1
 REM ======================================================================
-cd SAS
-:while
-if %counter% GTR 5 (goto loopend)
-
-if %counter% EQU 1 (set script=Step1_Create_GCD_file)
-if %counter% EQU 2 (set script=Step2_Create_ModePath_Skim_file)
-if %counter% EQU 3 (set script=Step3_Verify_Costs_Times)
-if %counter% EQU 4 (set script=Step4_Create_Zonal_Truck_Tour_files)
-if %counter% EQU 5 (set script=Step5_determine_pipeline_costs.R)
-
-if exist %script%.lst (del %script%.lst /Q)
-if exist Step3_Verify_Costs_Times.lst (del Step3_Verify_Costs_Times.lst /Q)
-@ECHO.
-@ECHO   - Running Script %counter%.
-if %counter% EQU 1 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR%")
-if %counter% EQU 2 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag140% %flag143% %choiceYR%")
-if %counter% EQU 3 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag143%")
-if %counter% EQU 4 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR% %conf2%")
-if %counter% EQU 5 (%rpath% %script% %scenario% %choiceYr%)
-@ECHO.
-@echo ran step %counter%
-
-if %ERRORLEVEL% GTR 1 (goto saserr)
-if exist Step3_Verify_Costs_Times.lst (goto mode_err)
-@ECHO   - Script %counter% (%script%) completed successfully.
-
-set /A counter=counter+1
-goto while
-REM ======================================================================
-goto end
-
-
 :CheckEmpty2
 if %~z1 == 0 (goto badR)
 goto Rpass
