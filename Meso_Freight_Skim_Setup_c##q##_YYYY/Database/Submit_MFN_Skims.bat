@@ -10,36 +10,35 @@ rem ============================================================================
 rem =========================================================================================
 REM USER INPUT
 @echo Enter year to run skims: 
-set /p choiceYR=%1
+set /p choiceYR=
 
 @echo Enter 100 to run model WITHOUT logistics node 140 connected
 @echo Enter 200 to run model WITH logistics node 140 connected
-set /p choice=%1
+set /p choice=
 
 @echo Run analyze_mode_access ('y' or 'no'; note, this will take at least an hour)
 set /p flagAccess="[RUN analyze_mode_access? (y/n)] "
 
 if "%choiceYR%"=="2022" (
-	set /A flag143=0
+	set /a flag143=0
 	goto proceed143)
 if NOT "%choiceYR%" == "2022" (
-	set /A flag143=1
+	set /a flag143=1
 	goto proceed143)
 :proceed143
 
-set choice=%2
+
 if "%choice%"=="200" (
-	set /A scenario=200
-	set /A flag140=1
+	set /a scenario=200
+	set /a flag140=1
 	goto proceed140)
 
 if "%choice%"=="100" (
-	set /A scenario=100
-	set /A flag140=0
+	set /a scenario=100
+	set /a flag140=0
 	goto proceed140)
-
 :proceed140
-pause
+
 @echo Model run year: %choiceYR%
 @echo Model run scenario: %scenario%
 @echo Model Node 140 Flag: %flag140%
@@ -49,6 +48,7 @@ pause
 rem =========================================================================================
 rem Activate Emme Python env
 call %~dp0..\Scripts\manage\env\activate_env.cmd emme
+pause
 
 REM -- Get name of .emp file --
 cd %~dp0
@@ -73,6 +73,7 @@ cd Database
 set /a scenMax = 212
 @Echo RUNNING 1_remove_old_scenarios
 call python macros\1_remove_old_scenarios.py %scenario% %scenMax%
+pause
 @Echo RUNNING 2_build_network
 call emme -ng 000 -m macros\2_build_network.mac %scenario% %flag140% %flag143% 
 @Echo RUNNING 3_run_skims

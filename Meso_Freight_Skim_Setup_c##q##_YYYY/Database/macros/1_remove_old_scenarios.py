@@ -9,10 +9,10 @@ import pandas as pd
     
 def main():
     # Define the path to the Emme project (.emp file)
-    empFl = sys.argv[1]
+    empFl = 'MesoFreightNetwork.emp'
     directory = os.getcwd().replace('\\Database','')
     empFile = os.path.join(directory,empFl)
-
+    print(empFile)
     # start a dedicated instance of Emme Desktop connected to the specified project
     desktop = _app.start_dedicated(
         visible=True,
@@ -53,7 +53,7 @@ def main():
 
     # Delete Scenarios
     scen = 2
-    while scen < 212:
+    while scen < 213:
         try:
             delScen = emmebank.scenario(scen)
             delete_scenario(scenario=delScen)
