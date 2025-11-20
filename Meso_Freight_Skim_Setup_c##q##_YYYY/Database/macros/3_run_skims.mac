@@ -33,14 +33,14 @@
 ~#  - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ~#    Must provide 3-digit scenario and logistics node 140 inclusion flag when submitting macro. 
 ~#          %1% = 3-digit scenario
-~#          %2% = include logistics node 140? 0: no (input file to delete 140 connectors), 1: yes
+~#              = include logistics node 140? scenario = 100: no (input file to delete 140 connectors), scenario=200: yes
 ~# 	(e.g. "~<macros\3_run_skims.mac 100 0")
 ~#
 ~#  ************************************************************************************************
 ~# =================================================================================================
 ~#
 ~z=%0%
-~+;~?!z=2;~$>error
+~+;~?!z=1;~$>error
 ~#
 ~+;s=%1%;~?e;~$>bad_scen
 ~/ Scenario number argument is valid.
@@ -93,6 +93,12 @@ batchin=input_data\matrix.in
 ~#
 ~# ## -- Domestic distance Skims - MF41 -- ##
 ~+|5.11|1|~?q=2|2|3|T|5|mf29||||6|@domestic|+||mf41|n|1||||
+~+|5.21|2
+~#
+~#
+~#  ### Extras below to look at path variability 
+~#   --- Modified 10-03-2016 to store Truck linehaul dist in mf33 ---
+~+|5.11|1|~?q=2|2|3|T|5|mf29||||6|@lhdist|+||mf33|n|1||||
 ~+|5.21|2
 ~#
 ~# KC removed 1/7/25 Extras below to look at path variability 
@@ -225,9 +231,9 @@ len               / Additional auxiliary transit attribute
 batchin=input_data\mo80.txt
 ~+;3.11;2
 ~#
-~y=%2%
+~y=%1%
 ~t2=151,399
-~+;~?!y=0;~$>run_LogNode140
+~+;~?!y=100;~$>run_LogNode140
 ~# ## -- OPTION 1: Triple-Indexing excluding LogNode 140 -- ##
 3.23
 1             ~/ compute triple-index operation
@@ -314,11 +320,6 @@ batchout=%t1%\%1%\CCdist.txt
 ~+|batchout=%t1%/%1%/mf65.in||3.14|3|mf65|mf65|0,9999999,in|n|n|n|q
 ~+|batchout=%t1%/%1%/mf66.in||3.14|3|mf66|mf66|0,9999999,in|n|n|n|q
 ~+|batchout=%t1%/%1%/mf80.in||3.14|3|mf80|mf80|0,9999999,in|n|n|y|%t2%| |%t2%| |q
-~#
-~#  ============================================================================
-~# ## -- Run SAS program to verify no connector-to-connecttor paths are being used -- ##
-~!"C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" macros/verify_rail_service -sysparm %1%
-~!if exist verify_rail_service.log (del verify_rail_service.log /Q)
 ~#
 ~#  ============================================================================
 ~#
