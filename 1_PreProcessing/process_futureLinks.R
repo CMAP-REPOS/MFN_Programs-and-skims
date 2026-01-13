@@ -1,25 +1,11 @@
 #KCC
 #script to read MHN future network coding and produce future MFN networks
+MHN_conf = 'c25q2'
+reference_conf = 'c24q4'
+years = c(2022, 2025, 2030, 2035, 2040, 2045, 2050, 2060)
 
-#--SET KEY PARAMETERS--####
-args = commandArgs(trailingOnly=T)
-oldConf = as.character(args[1])
-newConf = as.character(args[2])
-inBaseYr = as.numeric(args[3])
-inFirstYr = as.numeric(args[4])
-inLastYr = as.numeric(args[5])
-
-inputDir = paste("../Input/MHN_", newConf, ".gdb", sep="")    ### Current MHN
-outputDir = paste("../Output/MFN_updated_", newConf, ".gdb", sep="")   ### Current MFN
-outPath = "../Output"
-outFile <- file(paste(outPath, "/QC/specialNodes.txt", sep = ""))
-outDir1 = "../Output/QC/"
-outDir2 = "../Output/Lognodes/"
-dir.create(outDir1)
-dir.create(outDir2)
-
-#--SETUP--
-packages <- c("tidyverse", "scales", "openxlsx", "sf", "sfheaders", "sp", "geosphere")
+#--SETUP--####
+packages <- c("tidyverse", "scales", "openxlsx", "sf", "sfheaders", "sp", "geosphere", 'rstudioapi')
 package.check <- lapply(
   packages,
   FUN = function(x) {
@@ -30,11 +16,20 @@ package.check <- lapply(
   }
 )
 
-#if (!require("arcgisbinding", character.only = TRUE)) {
-#  install.packages("arcgisbinding", repos="https://r.esri.com", type="win.binary")
-#  library("arcgisbinding", character.only = TRUE)
-#  arc.check_product()
-#}
+cwdir=dirname(getActiveDocumentContext()$path)
+
+#--SET KEY PARAMETERS--####
+MFN_output_dir = paste(cwdir, '/Output/MFN_', MHN_conf,'.gdb',sep='')
+QC_out_dir = paste(cwdir, '/Output/QC',sep='') 
+dir.create(paste(cwdir, '/Output',sep=''))
+dir.create(MFN_output_dir)
+dir.create(QC_out_dir)
+spatial_ref = 26771
+
+MFN_reference_dir = paste('V:/Secure/Master_Freight/Archive/', reference_conf, '/MFN_', reference_conf, '.gdb',sep="")
+MHN_gdb_dir = paste('V:/Secure/Master_Highway/archive/gdb/conformity/mhn_', MHN_conf, '.gdb', sep="")
+
+out_QC_file <- paste(QC_out_dir, "/specialNodes.txt", sep = "")
 
 #--DEFINE NODES for QC
 qc_centroidsCMAP <- data.frame(NODE_ID = c(1:132))                   ### 1-132 CMAP Centroids
@@ -44,23 +39,23 @@ qc_poe <- data.frame(NODE_ID = c(3634, 3636, 3639, 3640, 3641, 3642, 3643, 3644,
 
 #--READ DATA--####
 #MHN formatting data
-in_MHN_hwyproj_coding <- read_sf(dsn = inputDir, layer = "hwyproj_coding", crs = 26771)
-in_MHN_hwynet_arc <- read_sf(dsn = inputDir, layer = "hwynet_arc", crs = 26771)
-in_MHN_hwyproj <- read_sf(dsn = inputDir, layer = "hwyproj", crs = 26771)
-in_MHN_hwynodes <- read_sf(dsn = inputDir, layer = "hwynet_node", crs = 26771) %>%
+in_MHN_hwyproj_coding <- read_sf(dsn = MHN_gdb_dir, layer = "hwyproj_coding", crs = 26771)
+in_MHN_hwynet_arc <- read_sf(dsn = MHN_gdb_dir, layer = "hwynet_arc", crs = 26771)
+in_MHN_hwyproj <- read_sf(dsn = MHN_gdb_dir, layer = "hwyproj", crs = 26771)
+in_MHN_hwynodes <- read_sf(dsn = MHN_gdb_dir, layer = "hwynet_node", crs = 26771) %>%
   rename(node = NODE, X = POINT_X, Y = POINT_Y) %>%
   select(node, X, Y) %>%
   mutate(NODE_ID = as.numeric(node))
 
 #MFN formatting data
-in_logisticNodes <- read_sf(dsn = outputDir, layer ="Meso_Logistic_Nodes", crs = 26771) %>% select(MESOZONE, POINT_X, POINT_Y, NODE_ID_T, SHAPE) %>% rename(NODE_ID = NODE_ID_T, Shape = SHAPE)
-in_centroids <- read_sf(dsn = outputDir, layer ="Meso_Ext_Int_Centroids", crs = 26771) %>% select(MESOZONE, NODE_ID_T, POINT_X, POINT_Y, SHAPE) %>%rename(NODE_ID = NODE_ID_T)
-in_mesozoneGeo<- read_sf(dsn = outputDir, layer ="Meso_External_CMAP_merge", crs = 26771)%>% select(MESOZONE, Shape)
-in_Rail<- read_sf(dsn = outputDir, layer ="CMAP_Rail", crs = 26771)
+in_logisticNodes <- read_sf(dsn = MFN_reference_dir, layer ="Meso_Logistic_Nodes", crs = 26771) %>% select(MESOZONE, POINT_X, POINT_Y, NODE_ID_T, SHAPE) %>% rename(NODE_ID = NODE_ID_T, Shape = SHAPE)
+in_centroids <- read_sf(dsn = MFN_reference_dir, layer ="Meso_Ext_Int_Centroids", crs = 26771) %>% select(MESOZONE, NODE_ID_T, POINT_X, POINT_Y, SHAPE) %>%rename(NODE_ID = NODE_ID_T)
+in_mesozoneGeo<- read_sf(dsn = MFN_reference_dir, layer ="Meso_External_CMAP_merge", crs = 26771)%>% select(MESOZONE, Shape)
 
 #For links not flagged as base MESO in MHN but should be (to fix w/Tim at a later time)
-in_forceMESO <- read.xlsx("../Input/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
-in_removeMESO <- read.xlsx("../Input/removeLinks.xlsx")
+in_forceMESO <- read.xlsx("V:/Secure/Master_Freight/Processing_Data/NetworkUpdate/new_MHN_MESO-LINKS.xlsx", sheet = "base_MESO")
+in_removeMESO <- read.xlsx("V:/Secure/Master_Freight/Processing_Data/NetworkUpdate/removeLinks.xlsx")
+
 #--FORMAT DATA--####
 #Important Nodes####
 #work to ensure all centroids and logistic nodes are properly included
@@ -81,13 +76,14 @@ logisticCMAP <- in_logisticNodes %>%
 qc_coreNodes = list(centroidsCMAP, logisticCMAP)
 qc_coreNodesMatch = list(qc_centroidsCMAP, qc_logisticCMAP)
 
-sink(outFile, append = FALSE)
+sink(out_QC_file, append = FALSE)
 i = 1
 for(df in qc_coreNodes){
   qcFile = as.data.frame(qc_coreNodesMatch[1]) 
   checkDF <- centroidsCMAP %>%
     filter(!(NODE_ID %in% qcFile$NODE_ID))
- # print(nrow(checkDF))
+  print('IF ANY NODES EXIST HERE, THEN WE HAVE EXTRA LOGISTICS OR CENTROIDS')
+  print(nrow(checkDF))
   i = i+1
 }
 sink()
@@ -97,10 +93,6 @@ specialNodes <- st_as_sf(rbind(centroidsCMAP, logisticCMAP)) %>%
   st_cast("MULTIPOINT")  %>%
   rename(centroidX = POINT_X, centroidY = POINT_Y, specialID = NODE_ID)
 
-#ID rail node140
-rail140 <- in_Rail %>%
-  st_drop_geometry() %>%
-  filter(INODE_T == 140 | JNODE_T == 140)
 #Format Base MHN####
 #Create list of links to be removed(hanging links)
 manualRemove <- in_removeMESO %>% mutate(linkID = paste(INODE, JNODE, sep = "-"))
@@ -140,15 +132,6 @@ base_MHN_MESO_nodes <- base_MHN_MESO %>%
 #2=replace link
 #3=delete link
 #4=add link
-i = inFirstYr
-while(i <= inLastYr){
-  if(i == inFirstYr){
-    years <- list(inBaseYr, inFirstYr)
-  }else{
-    years <-append(years, i)
-  }
-  i = i+5
-}
 print(years)
 for(yr in years){
   #Set year
@@ -175,6 +158,7 @@ for(yr in years){
     mutate(MESO = ifelse(MESO == 1, 1, NA)) %>%
     group_by(TIPID) %>%
     fill(MESO, .direction = "updown") %>%
+    ungroup() %>%
     mutate(MESO = ifelse(ABB %in% in_forceMESO$LINK_ABB, 1, MESO),                                     #force MESO flag for list of additional links
            THRULANES1 = ifelse(!is.na(NEW_THRULANES1), NEW_THRULANES1, THRULANES1),
            THRULANES2 = ifelse(!is.na(NEW_THRULANES2), NEW_THRULANES2, THRULANES2),
@@ -294,7 +278,7 @@ for(yr in years){
     select(lineID, lineID2, coordX, coordY) %>%
     distinct()
   
-  connectors = st_as_sf(connectors, coords = c("coordX", "coordY"), crs = 26771) #crs = 26771 this is the projection to be used for all shape files
+  connectors = st_as_sf(connectors, coords = c("coordX", "coordY"), crs = spatial_ref) #crs = 26771 this is the projection to be used for all shape files
   
   allConnectors_f <- st_as_sf(connectors, wkt = geometry) %>% 
     group_by(lineID, lineID2) %>%
@@ -370,61 +354,20 @@ for(yr in years){
     select(NODE_ID, POINT_X, POINT_Y) %>%
     mutate(xcoord = POINT_X, ycoord = POINT_Y) %>%
     filter(!is.na(NODE_ID)) %>%
-    st_as_sf(coords = c("xcoord", "ycoord"), crs = 26771)  %>%
+    st_as_sf(coords = c("xcoord", "ycoord"), crs = spatial_ref)  %>%
     st_intersection(in_mesozoneGeo) %>%
     distinct() %>%
     group_by(NODE_ID) %>%
     mutate(count = n()) %>%
     ungroup() %>%
-    filter(!(count == 2 & MESOZONE == 187)) %>%
-    rename(NODE_ID_T=NODE_ID)
+    filter(!(count == 2 & MESOZONE == 187)) #%>%
+    #rename(NODE_ID_T=NODE_ID)
   
-  #Identify node140 links####
-  node140 <- finalLinks %>%
-    st_drop_geometry() %>%
-    filter(INODE == 140 | JNODE == 140) %>%
-    select(INODE, JNODE)
-  
-  #Identify node143 links####
-  node143 <- finalLinks %>%
-    st_drop_geometry() %>%
-    filter(INODE == 143 | JNODE == 143) %>%
-    select(INODE, JNODE)
-  
-  #OUTPUT####
+  #OUTPUT####a
   file = paste("y", as.character(yr), sep = "")
   outLinkFile = paste("CMAP_HWY_LINK_", file, sep = "")
-  st_write(obj = finalLinks, layer = outLinkFile, dsn = outputDir, append = FALSE)
-  #arc.write(file.path(outputDir, paste("MFN/", outLinkFile, sep = "")), data = finalLinks, overwrite = TRUE)
+  st_write(obj = finalLinks, layer = outLinkFile, dsn = MFN_output_dir, append = FALSE, driver = "ESRI Shapefile")
   outNodeFile = paste("CMAP_HWY_NODE_", file, sep = "")
-  st_write(obj =finalNodes, layer = outNodeFile, dsn = outputDir, append = FALSE)
-  #arc.write(file.path(outputDir, paste("MFN/", outNodeFile, sep = "")), data = finalNodes, overwrite = TRUE)
-  
-  
-  #Write Node 140 file####
-  out140File = paste(outPath, "/Lognodes/unlink_lognode140_", file, ".txt", sep = "")
-  sink(out140File, append = FALSE)
-  writeLines(noquote("c MESO FREIGHT NETWORK BATCHIN FILE"))
-  writeLines(noquote(paste("c ", "Generated: ", Sys.Date(), sep = "")))
-  writeLines(noquote("c File to remove the highway and rail connector links for logistics node 140."))
-  writeLines("")
-  writeLines("")
-  writeLines(noquote("t links"))
-  writeLines(noquote(paste("d= ", node140$INODE, "   ", node140$JNODE)))
-  writeLines(noquote(paste("d= ", rail140$INODE_T, "   ", rail140$JNODE_T)))
-  sink()
-  
-  #Write Node 143 file####
-  out143File = paste(outPath, "/Lognodes/unlink_lognode143_", file, ".txt", sep = "")
-  sink(out143File, append = FALSE)
-  writeLines(noquote("c MESO FREIGHT NETWORK BATCHIN FILE"))
-  writeLines(noquote(paste("c ", "Generated: ", Sys.Date(), sep = "")))
-  writeLines(noquote("c File to remove the South Suburban Airport connector links for logistics node 143."))
-  writeLines("")
-  writeLines("")
-  writeLines(noquote("t links"))
-  writeLines(noquote(paste("d= ", node143$INODE, "   ", node143$JNODE)))
-  sink()
-
+  st_write(obj =finalNodes, layer = outNodeFile, dsn = MFN_output_dir, append = FALSE, driver = "ESRI Shapefile")
 }
 

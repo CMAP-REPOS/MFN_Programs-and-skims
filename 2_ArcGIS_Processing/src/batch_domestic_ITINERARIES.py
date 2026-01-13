@@ -210,13 +210,8 @@ for index, row in combineData.iterrows():
 # Cleanup final non-scenario specific temporary files
 # ---------------------------------------------------------------
 arcpy.AddMessage("---> Removing Temporary Files")
-toclean = [f for f in os.listdir(tempPath)]
-for f in toclean:
+if os.path.exists(tempPath):
     try:
-        os.remove(os.path.join(tempPath, f))
-        os.remove(tempPath)
-    except RuntimeError:
-        arcpy.management.Delete(os.path.join(tempPath, f))
+        shutil.rmtree(tempPath)
     except WindowsError:
-        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(f))
-        continue
+        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(tempPath))

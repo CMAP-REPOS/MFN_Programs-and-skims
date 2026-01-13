@@ -103,42 +103,46 @@ arcpy.Delete_management(mfnFd)      # Remove FC
 arcpy.AddMessage("---> Feature Dataset Removed: " + mfnFd)
 
 #- Add new CMAP freight highway links and nodes
-i=1
-for fd in hwyFd:
-    arcpy.env.workspace = HWYGDB            # Set workspace to highway MFN GDB
-    source_fd = os.path.join(HWYGDB, fd)    # Set path to source feature dataset
+#i=1
+#for fd in hwyFd:
+arcpy.env.workspace = HWYGDB            # Set workspace to highway MFN GDB
+#source_fd = os.path.join(HWYGDB, fd)    # Set path to source feature dataset
 
-    # Get feature classes within the feature dataset
-    fcs = arcpy.ListFeatureClasses(feature_dataset=fd)                
-    if not fcs:
-        raise Exception(f"No feature classes found in dataset {fd}")
+# Get feature classes within the feature dataset
+#fcs = arcpy.ListFeatureClasses(feature_dataset=fd)        
+fcs = arcpy.ListFeatureClasses()                  
+if not fcs:
+    raise Exception(f"No feature classes found in dataset") #{fd}
 
-    # Get spatial reference of feature dataset
-    first_fc_path = os.path.join(source_fd, fcs[0])
-    spatial_ref = arcpy.Describe(first_fc_path).spatialReference
-
+# Get spatial reference of feature dataset
+#first_fc_path = os.path.join(source_fd, fcs[0])
+first_fc_path = fcs[0]
+spatial_ref = arcpy.Describe(first_fc_path).spatialReference
     
-    if i == 1:
-        # Create the feature dataset in the updated MFN GDB
-        arcpy.CreateFeatureDataset_management(out_dataset_path=new_path,
-                                        out_name=mfnFd,              # Put nodes and links in the same feature dataset
-                                        spatial_reference=spatial_ref)
-        arcpy.AddMessage("---> Feature Dataset Added: " + mfnFd)
+#if i == 1:
+# Create the feature dataset in the updated MFN GDB
+arcpy.CreateFeatureDataset_management(out_dataset_path=new_path,
+                                out_name=mfnFd,              # Put nodes and links in the same feature dataset
+                                spatial_reference=spatial_ref)
+arcpy.AddMessage("---> Feature Dataset Added: " + mfnFd)
 
-        # Extract list of years
-        years =  [re.findall(r'\d+', s) for s in fcs]
-        years = [item[0] for item in years]
-        arcpy.AddMessage("Scenario Years: ")
-        arcpy.AddMessage(years)
+# Extract list of years
+years =  [re.findall(r'\d+', s) for s in fcs]
+years = list(set([item[0] for item in years]))
+arcpy.AddMessage("Scenario Years: ")
+arcpy.AddMessage(years)
 
-    # Copy each feature class to the new feature dataset
-    for fc in fcs:
-        source_fc_path = os.path.join(source_fd, fc)
-        target_fc_path = os.path.join(new_path, mfnFd, fc)
-        arcpy.CopyFeatures_management(source_fc_path, target_fc_path)
-        arcpy.AddMessage(f"---> Copied: {fc}") 
+# Copy each feature class to the new feature dataset
+for fc in fcs:
+    #source_fc_path = os.path.join(source_fd, fc)
+    source_fc_path = os.path.join(HWYGDB,fc)
+    fc_name = fc.split('.', 1)
+    fc_name=fc_name[0]
+    target_fc_path = os.path.join(new_path, mfnFd)
+    arcpy.conversion.FeatureClassToFeatureClass(source_fc_path, target_fc_path, fc_name)
+    arcpy.AddMessage(f"---> Copied: {fc_name}") 
 
-    i=i+1
+#i=i+1
 
 # ---------------------------------------------------------------
 # GENERATE UNLINK_LOGNODE140.TXT AND UNLINK_LOGNODE143.TXT
@@ -154,7 +158,7 @@ arcpy.env.workspace = new_path
 for yr in years:
     for node in logNodes:
         # Define highway layer
-        hwyLayer = 'final_links_' + yr
+        hwyLayer = mfnFd+'/CMAP_HWY_LINK_y' + yr
 
         # Final header info
         ln3 = "c File to remove the highway and rail connector links for logistics node " + str(node) + "\n"

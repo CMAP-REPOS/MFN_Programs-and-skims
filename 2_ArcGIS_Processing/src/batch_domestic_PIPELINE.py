@@ -304,13 +304,7 @@ for file in pipefiles:
 
 # Cleanup pipeline temporary files
 arcpy.AddMessage("---> Removing Temporary Pipeline Files")
-toclean = [f for f in os.listdir(tempPipePath)]
-for f in toclean:
-    try:
-        os.remove(os.path.join(tempPipePath, f))
-        os.remove(tempPipePath)
-    except RuntimeError:
-        arcpy.management.Delete(os.path.join(tempPipePath, f))
-    except WindowsError:
-        arcpy.AddMessage("WindowsError (probably access denied) for {}".format(f))
-        continue
+try:
+    shutil.rmtree(tempPipePath)
+except WindowsError:
+    arcpy.AddMessage("WindowsError (probably access denied) for {}".format(tempPipePath))

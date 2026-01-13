@@ -37,7 +37,6 @@ arcpy.OverwriteOutput = 1
 gdbDir = arcpy.GetParameterAsText(0)
 outFolder = arcpy.GetParameterAsText(1)
 
-tempPipePath = os.path.join(outFolder + "/Temp")
 tempHWYPath = os.path.join(outFolder + "/Temp")
 
 dateStr = str(datetime.now()) + '\n'
@@ -195,18 +194,18 @@ outFiles.append("export_temp_Inland_Waterways.csv")
 # ---------------------------------------------------------------
 # Create list of years     
 arcpy.env.workspace = gdbDir
-matching_fcs = arcpy.ListFeatureClasses("final_links_*") or []
+matching_fcs = arcpy.ListFeatureClasses("CMAP_HWY_LINK_y*") or []
 
 # Look in all feature datasets
 datasets = arcpy.ListDatasets(feature_type='feature') or []
 
 for ds in datasets:
     arcpy.env.workspace = os.path.join(gdbDir, ds)
-    fcs = arcpy.ListFeatureClasses("final_links_*") or []
+    fcs = arcpy.ListFeatureClasses("CMAP_HWY_LINK_y*") or []
     matching_fcs.extend([f"{ds}\\{fc}" for fc in fcs])  # preserve dataset name in path
 
 years =  [re.findall(r'\d+', s) for s in matching_fcs]
-years = [item[0] for item in years]
+years = list(set([item[0] for item in years]))
 arcpy.AddMessage("Scenario Years: ")
 arcpy.AddMessage(years)
 
@@ -221,8 +220,8 @@ for yr in years:
     arcpy.AddMessage("---> Directory created: " + outPath_scen)
 
     # Define Paths and Variables
-    hwyLinks = "final_links_" + yr
-    hwyNodes = "final_nodes_" + yr
+    hwyLinks = "CMAP_HWY_LINK_y" + yr
+    hwyNodes = "CMAP_HWY_NODE_y" + yr
     pNodeCMAP = tempHWYPath + "/temp_" + hwyNodes + ".dbf"
     pLinkCMAP = tempHWYPath + "/temp_" + hwyLinks + ".dbf"
     pOutNTWK = Path(outPath_scen + "/base_ntwk.txt")
@@ -242,10 +241,10 @@ for yr in years:
     inLinkCMAP = dbf_to_df(pLinkCMAP)
     inNodeCMAP = dbf_to_df(pNodeCMAP)
 
-    hwynode1 = inNodeCMAP[["NODE", "POINT_X", "POINT_Y", "MESOZONE"]]
-    hwynode1 = hwynode1.rename(columns={'NODE': 'NODE_ID'})
-    hwyarc1 = inLinkCMAP[["INODE", "JNODE", "MILES", "MODES", "TYPE", "LANES1", "VDF", 'LANES2', 'DIRECTIONS']]
-    hwyarc1 = hwyarc1.rename(columns={'MILES': 'Miles', 'MODES': 'Modes', 'TYPE': 'Type', 'LANES1':'LANES'})
+    hwynode1 = inNodeCMAP[["NODE_ID", "POINT_X", "POINT_Y", "MESOZONE"]]
+    #hwynode1 = hwynode1.rename(columns={'NODE': 'NODE_ID'})
+    hwyarc1 = inLinkCMAP[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTI']]
+   # hwyarc1 = hwyarc1.rename(columns={'MILES': 'Miles', 'MODES': 'Modes', 'TYPE': 'Type', 'LANES1':'LANES'})
 
     # Combine HWY Nodes with other nodes
     nodes = pd.concat([railnode1, railnode2, hwynode1, hwynode2, waternode])               #combine all network nodes
@@ -261,15 +260,15 @@ for yr in years:
     nodes = nodes[(nodes._merge2=='left_only')].drop('_merge2', axis=1)                    #antijoin with centroids (remove centroids)
 
     # Create Reverse CMAP Highway Arcs
-    rev_hwyarc1 = hwyarc1[hwyarc1['DIRECTIONS'] != '1']
-    rev_hwyarc1 = rev_hwyarc1.set_axis(["JNODE", "INODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS'], axis = 1)         #Flip Direction
-    rev_hwyarc1 = rev_hwyarc1[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTIONS']]   
+    rev_hwyarc1 = hwyarc1[hwyarc1['DIRECTI'] != '1']
+    rev_hwyarc1 = rev_hwyarc1.set_axis(["JNODE", "INODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTI'], axis = 1)         #Flip Direction
+    rev_hwyarc1 = rev_hwyarc1[["INODE", "JNODE", "Miles", "Modes", "Type", "LANES", "VDF", 'LANES2', 'DIRECTI']]   
     for idx, row in rev_hwyarc1.iterrows():               #switch lanes
-        if (row.DIRECTIONS == '3'):
+        if (row.DIRECTI == '3'):
             rev_hwyarc1.at[idx,'LANES'] = rev_hwyarc1.at[idx,'LANES2']
 
-    hwyarc1 = hwyarc1.drop(columns = ['LANES2', 'DIRECTIONS'])
-    rev_hwyarc1 = rev_hwyarc1.drop(columns = ['LANES2', 'DIRECTIONS'])
+    hwyarc1 = hwyarc1.drop(columns = ['LANES2', 'DIRECTI'])
+    rev_hwyarc1 = rev_hwyarc1.drop(columns = ['LANES2', 'DIRECTI'])
 
     # Combine rail arcs, highway arcs, and waterway arcs and all reverse arcs
     allLinks = pd.concat([railarc1, rev_railarc1, railarc2, rev_railarc2, 
@@ -352,9 +351,9 @@ for yr in years:
     for file in outFiles:
         df = pd.read_csv(file)
         try:
-            df['directions'] = df['DIRECTIONS']        
+            df['directi'] = df['DIRECTI']        
         except KeyError:
-            df['directions'] = 2
+            df['directi'] = 2
         try:
             df = df[['INODE','JNODE','Miles','ratio']]
         except:
