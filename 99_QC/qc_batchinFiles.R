@@ -1,42 +1,46 @@
-#KCazzato 3/25/2025
-#This script reviews the batchin files for the Freight network skimming
-#Files produced by batch_domestic_scen_working.py
-''
-args = commandArgs(trailingOnly=T)
-oldconf = as.character(args[1])
-newconf = as.character(args[2])
-inBaseYr = as.integer(args[3])
-inFirstYr = as.integer(args[4])
-inLastYr = as.integer(args[5])
-i = inFirstYr
-''
+# KCazzato 3/25/2025
+# Updated 1/14/2026 to accommodate translated SAS and toolbox structure
+# Change this from a script that runs in batch to a stand alone script
 
-#FOR TESTING####
-oldconf = 'c24q4'
-newconf = 'c25q2'
-inBaseYr = 2022
-inFirstYr = 2025
-inLastYr = 2050
-i = inFirstYr
-#####
+# This script reviews the batchin files for the Freight network skimming by comparing 
+# updated batchin files to the batchin files used in a previous conformity run
 
-while(i <= inLastYr){
-  if(i == inFirstYr){
-    years <- list(inBaseYr, inFirstYr)
-  }else{
-    years <-append(years, i)
-  }
-  i = i+5
-}
+# Context -----------------------------------------------------------------
+# Files produced by 
+# batch_domestic_PIPELINE.py 
+  # These files are static and do not change conformity to conformity
+  # QC checks that the data has no difference from the previous conformity
+  # If pipeline networks have been updated from the previous conformity, this script WILL THROW AN ERROR MESSAGE (but will keep running)
+  # If conus_ak (continuous US and Alaska) polygon feature class has changed, the DomesticPipelineNetwork.csv file may change, and this script WILL THROW AN ERROR MESSAGE (but will keep running)
+  # FILES:
+    # - cos_ntwk.txt
+    # - nec_19_ntwk.txt
+    # - p1718_ntwk.txt
+    # - DomesticPipelineNetwork.csv 
+# batch_domestic_ITINERARIES.py
+  # This file is static and does not change conformity to conformity
+  # QC checks that the data has no difference from the previous conformity
+  # If rail itineraries have been updated from the previous conformity, this script WILL THROW AN ERROR
+  # FILE: 
+    # - lines.in
+# batch_domestic_SCENARIOS.py
+  # These files will change with each conformity update
+  # - FILES FOR EACH YEAR: 
+    # - base_ntwk.txt
+    # - DomesticNetwork.csv
 
-oldBatchinDir = paste("../Input/BatchinFiles_", oldconf, sep="")
-newMHN = paste("../Input/MHN_", newconf, ".gdb", sep="")
-newDir = "../Output/BatchinFiles"
-outputDir = "../Output/QC"
-outFile = "../Output/QC/batchinTIPIDs.xlsx"
+# Set user parameters -----------------------------------------------------
+# Provide folder name to updated/new batchin files:
+updated_files_directory = 'test2_1.14.2025_c25q2' 
 
-#LOAD LIBRARIES, DATA, AND VARIABLES####
-packages <- c("tidyverse", "readxl", "openxlsx", "sf")
+# Provide MHN conformity used to develop the updated MFN batchin files:
+conformity_for_update = 'c25q2'
+
+# Provide conformity (format: 'c##q#') to compare updated batchin files to:
+comparison_files_conformity = 'c25q2_v1'
+
+# Import Libraries & Set WD to current directory --------------------------
+packages <- c("tidyverse", "readxl", "openxlsx", "sf", 'rstudioapi')
 
 package.check <- lapply(
   packages,
@@ -47,14 +51,55 @@ package.check <- lapply(
     }
   }
 )
+currentDir = dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(currentDir)
 
-files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
+# Set Paths ---------------------------------------------------------------
+# Define path to updated/new batchin files
+newBatchinDir = paste('../Output_', updated_files_directory, sep = '')
 
-#MHN formatting data
-in_MHN_hwyproj_coding <- read_sf(dsn = newMHN, layer = "hwyproj_coding", crs = 26771)
-in_MHN_hwyproj <- read_sf(dsn = newMHN, layer = "hwyproj", crs = 26771)
+# Define path to comparison batchin files
+compareBatchinDir = paste("V:/Secure/Master_Freight/Archive/", comparison_files_conformity, '/BatchinFiles', sep="")
 
-#Define function for reading base_ntwk.txt and formatting####
+# Define path to associated MHN GDB to check if changes in MFN correspond to network changes in the MHN
+referenceMHN = paste("V:/Secure/Master_Highway/archive/gdb/conformity/mhn_", conformity_for_update, ".gdb", sep="")
+
+# Define path to QC output directory and file
+qc_out_dir = paste(newBatchinDir, '/QC_batchin_files',sep = '')
+qc_out_years = paste(qc_out_dir, '/batchin_hwy_years.csv', sep="")
+qc_out_file = paste(qc_out_dir, '/batchinTIPIDs.xlsx',sep = '')
+
+# Create output folder if it does not exist
+if (!dir.exists(file.path(qc_out_dir))) {
+  dir.create(file.path(qc_out_dir))
+}
+
+# Define lists for file names ---------------------------------------------
+# List all static files
+static_files = c("cos_ntwk.txt", "DomesticPipelineNetwork.csv", "lines.in", "nec_19_ntwk.txt", "p1718_ntwk.txt")
+
+# Find list of years - only compare highway data files for the same years and report if there's mismatched years in qc_out_years
+folders_new = gsub(".*/scen_", "", list.dirs(newBatchinDir, recursive = TRUE)[-1])              # find year folders in new output folder
+folders_compare =  gsub(".*/scen_", "", list.dirs(compareBatchinDir, recursive = TRUE)[-1])     # find year folders in comparison output folder
+
+years_new = data.frame(years = folders_new, new_output =1) %>%                  # Format new data years
+  mutate(years = as.numeric(years)) %>%
+  filter(!is.na(years))
+
+years_compare = data.frame(years = folders_compare, compare_output =1) %>%      # Format comparison data years
+  mutate(years = as.numeric(years)) %>%
+  filter(!is.na(years))
+
+years_to_analyze <- years_new %>%            # Combine new and comparison available years
+  full_join(years_compare, by = 'years')
+
+write.csv(years_to_analyze, qc_out_years)    # Export QC file to use as reference if needed 
+
+years_to_analyze <- years_to_analyze %>%
+  filter(!is.na(new_output) & !is.na(compare_output))    # Filter to keep only years where data is available for both the new and comparison batchin file sets
+
+# Define Functions for reading & formatting base_ntwk.txt -----------------
+# Function to import the base_ntwk.txt file
 readBaseNtwk <- function(file){
   in1 <- scan(file, what = character(), sep = "\n", skip = 2)
   
@@ -65,6 +110,7 @@ readBaseNtwk <- function(file){
     fill(RemVal, .direction = "updown") 
 }
 
+# Function to format the nodes from base_ntwk.txt
 fmtNodes <- function(df){
   nodes <- df %>%
     filter(Index < RemVal) %>%
@@ -74,6 +120,7 @@ fmtNodes <- function(df){
   
 }
 
+# Function to format the links from base_ntwk.txt
 fmtLinks <- function(df){
   links <- df %>%
     filter(Index > (RemVal + 1))%>%
@@ -82,7 +129,12 @@ fmtLinks <- function(df){
   
 }
 
-#Format MHN Project Information####
+# Import MHN reference data -----------------------------------------------
+#MHN formatting data
+in_MHN_hwyproj_coding <- read_sf(dsn = referenceMHN, layer = "hwyproj_coding", crs = 26771)
+in_MHN_hwyproj <- read_sf(dsn = referenceMHN, layer = "hwyproj", crs = 26771)
+
+# Format MHN Project Information####
 TIPIDs <- in_MHN_hwyproj %>% select(TIPID:RSP_ID) %>% st_drop_geometry() %>% filter(COMPLETION_YEAR != 9999)
 
 projCode <- in_MHN_hwyproj_coding %>%
@@ -111,16 +163,16 @@ confIDs <- in_MHN_hwyproj_coding %>%
   unique() %>%
   mutate(flag = "conformity") 
 
-#Compare static data####
+# Compare static data####
 print("QA/QC STATIC DATA")
-for(file in files){
+for(file in static_files){
   print(file)
   #Load current data
-  fileC = paste(oldBatchinDir, "/", file, sep = "")
+  fileC = paste(compareBatchinDir, "/", file, sep = "")
   in1 <- scan(fileC, what = character(), sep = "\n", skip = 2)
   
   #Load new data
-  fileN = paste(newDir, "/", file, sep = "")
+  fileN = paste(newBatchinDir, "/", file, sep = "")
   in2 <- scan(fileN, what = character(), sep = "\n", skip = 2)
   
   #Compare
@@ -145,24 +197,24 @@ loopDistance <- data.frame(cINODE=as.numeric(), JNODE=as.numeric(), LENGTH=as.nu
                            dom_ratio=as.numeric(), DmstDist=as.numeric(), flag.x=as.character(), flag.y=as.character())
 
 print("QA/QC HIGHWAY DATA")
-for(yr in years){
+for(yr in years_to_analyze$years){
   #LOAD DATA####
   #Load current data
-  fileC = paste(oldBatchinDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
+  fileC = paste(compareBatchinDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
   c1 <- readBaseNtwk(fileC)
   cNodes <- fmtNodes(c1) %>% mutate(flag = "current")
   cLinks <- fmtLinks(c1) %>% mutate(flag = "current")
 
-  fileC = paste(oldBatchinDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
+  fileC = paste(compareBatchinDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
   cDist <- read.csv(fileC) %>% mutate(flag = "current")
   
   #Load new data
-  fileN = paste(newDir, "/scen_", yr, "/base_ntwk.txt", sep = "")
+  fileN = paste(newBatchinDir, "/Batchin//scen_", yr, "/base_ntwk.txt", sep = "")
   n1 <- readBaseNtwk(fileN)
   nNodes <- fmtNodes(n1) %>% mutate(flag = "new")
   nLinks <- fmtLinks(n1) %>% mutate(flag = "new")
   
-  fileN = paste(newDir, "/scen_", yr, "/DomesticNetwork.csv", sep = "")
+  fileN = paste(newBatchinDir, "/Batchin/scen_", yr, "/DomesticNetwork.csv", sep = "")
   nDist <- read.csv(fileN) %>% mutate(flag = "new")
   
   #COMPARE####
@@ -238,7 +290,6 @@ add_chTIPID <- rbind(t1, t2, t3) %>%
 #Removed Nodes and Links####
 t1 <- loopNodes %>%
   filter(is.na(flag.y)) %>%
-  select(-modYear) %>%
   distinct() %>%
   rename(NODE = node) %>%
   left_join(allNodes, by = "NODE") %>%
@@ -275,7 +326,7 @@ rem_chTIPID <- rbind(t1, t2, t3) %>%
 if(nrow(add_chTIPID) > 1 | nrow(rem_chTIPID) > 1){
   print("UH OH, there's changes here attributed to features that aren't associated with an expected TIPID")
   exportList <- list(added = add_chTIPID, removed = rem_chTIPID)
-  write.xlsx(exportList, outFile)
+  write.xlsx(exportList, qc_out_file)
   stop("REVIEW ../Output/QC/batchinTIPIDs.xlsx")
 }else{
   print("all good to go")

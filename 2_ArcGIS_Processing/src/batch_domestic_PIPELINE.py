@@ -49,15 +49,18 @@ arcpy.OverwriteOutput = 1
 # Read Script Arguments
 # ---------------------------------------------------------------
 ###
-gdbDir = arcpy.GetParameterAsText(0)
-outFolder = arcpy.GetParameterAsText(1)
+testNm = arcpy.GetParameterAsText(0)
 
-tempPipePath = os.path.join(outFolder + "/Temp")
+currentDir = os.getcwd()
+outputDir = "../../Output_" + testNm
+batchinDir = outputDir + '/Batchin'
+tempPipePath = os.path.join(batchinDir + "/Temp")
+MFNdir = os.path.join(outputDir + '/MFN.gdb')
 
 # Create output folder if it doesn't exist
-if not os.path.exists(outFolder):
-    os.mkdir(outFolder)
-    arcpy.AddMessage("---> Output Directory created: " + outFolder)
+if not os.path.exists(batchinDir):
+    os.mkdir(batchinDir)
+    arcpy.AddMessage("---> Output Directory created: " + batchinDir)
 
 # Delete and recreate temporary folder
 if os.path.exists(tempPipePath):
@@ -72,7 +75,7 @@ def dbf_to_df(table_path):
 # ---------------------------------------------------------------
 # Prepare Data for Pipeline File Generation
 # ---------------------------------------------------------------
-arcpy.env.workspace = gdbDir
+arcpy.env.workspace = MFNdir
 
 # Define Lists, Dictionaries, and Variables
 shapefiles_links = ["Crude_Oil_System", "NEC_NG_19_System", "Prod_17_18_System", "Inland_Waterways"]
@@ -106,7 +109,7 @@ while i < 3:
     arcpy.AddMessage(status)
     pNodes = tempPipePath + pipeDict['pNodes'][i]
     pLinks = tempPipePath + pipeDict['pLinks'][i]
-    pOutput = Path(outFolder + pipeDict['pOutput'][i])
+    pOutput = Path(batchinDir + pipeDict['pOutput'][i])
     dateStr = 'c' + str(datetime.now()) + '\n'
 
     # Read data
@@ -280,11 +283,11 @@ for i in pipe_list_get:
     pipefiles.append("export_{}.csv".format(i))
 
 arcpy.AddMessage("---> preparing pipeline final files")
-os.chdir(tempPipePath)
 
 # Export final pipeline files
 pipedflist = []
 for file in pipefiles:
+    os.chdir(tempPipePath)
     df = pd.read_csv(file)
     try:
         df['directions'] = df['DIRECTIONS']
@@ -299,7 +302,8 @@ for file in pipefiles:
     df = pd.concat([x for x in pipedflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
-    df.to_csv(outFolder+"/DomesticPipelineNetwork.csv", index=False)
+    os.chdir(currentDir)
+    df.to_csv(batchinDir+"/DomesticPipelineNetwork.csv", index=False)
     arcpy.AddMessage("---> pipelinenetwork file saved")
 
 # Cleanup pipeline temporary files

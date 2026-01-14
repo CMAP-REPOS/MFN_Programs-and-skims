@@ -61,10 +61,9 @@ arcpy.OverwriteOutput = 1
 # Read Script Arguments and Set Paths
 # ---------------------------------------------------------------
 ###
-newGDB = arcpy.GetParameterAsText(0)        # Folder path of new GDB
-nmGDB = arcpy.GetParameterAsText(1)         # Name for new GDB, suggest c##q#
-MFNGDB = arcpy.GetParameterAsText(2)        # Take from the most recent/up to date MFN GDB
-HWYGDB = arcpy.GetParameterAsText(3)        # Takes from recent run of MFN update tools from MFHRN processing
+nmGDB = arcpy.GetParameterAsText(0)         # Name for output folder label, suggest c##q#
+MFNGDB = arcpy.GetParameterAsText(1)        # Take from the most recent/up to date MFN GDB
+HWYGDB = arcpy.GetParameterAsText(2)        # Takes from recent run of MFN update tools from MFHRN processing
 
 dateStr = str(datetime.now()) + '\n'
 
@@ -72,12 +71,18 @@ hwyFd=['final_links', 'final_nodes']        # List of layers to be copied from M
 mfnFd='CMAP_Hwy'                            # Name of CMAP highway feature class in new updated GDB
 logNodes = [140, 143]                       # List of logistics nodes to create unlink files for
 
+# Create output folder
+currentDir = os.getcwd()
+outputDir = "../../Output_" + nmGDB
+if not os.path.exists(outputDir):
+    os.makedirs(outputDir)
+
 # ---------------------------------------------------------------
 # CREATE OUTPUT LOGNODE FOLDER AND GDB FOLDER FOR UPDATED MFN
 # ---------------------------------------------------------------
 #- Create Folder for new GDB
-new_path = newGDB + "/MFN_" + nmGDB + ".gdb"             # Define path with full name for new GDB: MFN_%userinput%.gdb
-new_lognod = newGDB + "/LogNodes_" + nmGDB               # Define floder path for logistics node unline file output
+new_path = outputDir + "/MFN.gdb"             # Define path with full name for new GDB: MFN_%userinput%.gdb
+new_lognod = outputDir + "/LogNodes"             # Define floder path for logistics node unline file output
 
 #- Clear lostistics node unlink output if exists
 if os.path.exists(new_lognod):

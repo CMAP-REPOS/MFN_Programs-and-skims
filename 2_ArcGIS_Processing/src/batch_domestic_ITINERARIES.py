@@ -39,11 +39,15 @@ arcpy.OverwriteOutput = 1
 # Read Script Arguments and Set Paths
 # ---------------------------------------------------------------
 ###
-gdbDir = arcpy.GetParameterAsText(0)           # MFN GDB                 
-outFolder = arcpy.GetParameterAsText(1)        # Output folder
+testNm = arcpy.GetParameterAsText(0)
 
-tempPath = os.path.join(outFolder + "/Temp")   # Temporary folder for data processing
-pOutLines = Path(outFolder + "/lines.in")      # Output file 
+currentDir = os.getcwd()
+outputDir = "../../Output_" + testNm
+batchinDir = outputDir + '/Batchin'
+MFNdir = os.path.join(outputDir + '/MFN.gdb')
+
+tempPath = os.path.join(batchinDir + "/Temp")   # Temporary folder for data processing
+pOutLines = Path(batchinDir + "/lines.in")      # Output file 
 
 dateStr = str(datetime.now()) + '\n'           # Timestamp for output files
 
@@ -54,9 +58,9 @@ pItinCMAP = tempPath + "/temp_railitin1.dbf"
 pItinNat = tempPath + "/temp_railitin2.dbf"
 
 # Create output folder if it doesn't exist
-if not os.path.exists(outFolder):
-    os.mkdir(outFolder)
-    arcpy.AddMessage("---> Output Directory created: " + outFolder)
+if not os.path.exists(batchinDir):
+    os.mkdir(batchinDir)
+    arcpy.AddMessage("---> Output Directory created: " + batchinDir)
 
 # Delete and recreate temporary folder
 if os.path.exists(tempPath):
@@ -73,10 +77,10 @@ def dbf_to_df(table_path):
 # Prepare Data for File Generation
 # ---------------------------------------------------------------
 # Make temporary folder within Output/BatchinFiles to store temporary copies of the shapefiles
-arcpy.env.workspace = gdbDir
+arcpy.env.workspace = MFNdir
 
 # Define Lists, Dictionaries, and Paths
-rail_itineraries = [gdbDir + "\\CMAP_Rail_Itinerary", gdbDir + "\\National_Rail_Itinerary"]
+rail_itineraries = [MFNdir + "\\CMAP_Rail_Itinerary", MFNdir + "\\National_Rail_Itinerary"]
 
 # Create temporary copies
 for y in ["CMAP_Rail_Routes", "National_Rail_Routes"]:
@@ -209,6 +213,7 @@ for index, row in combineData.iterrows():
 # ---------------------------------------------------------------
 # Cleanup final non-scenario specific temporary files
 # ---------------------------------------------------------------
+os.chdir(currentDir)
 arcpy.AddMessage("---> Removing Temporary Files")
 if os.path.exists(tempPath):
     try:

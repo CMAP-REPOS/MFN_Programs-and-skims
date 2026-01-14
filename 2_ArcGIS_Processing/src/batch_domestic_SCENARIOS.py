@@ -34,10 +34,14 @@ arcpy.OverwriteOutput = 1
 # Read Script Arguments and Set Paths
 # ---------------------------------------------------------------
 ###
-gdbDir = arcpy.GetParameterAsText(0)
-outFolder = arcpy.GetParameterAsText(1)
+testNm = arcpy.GetParameterAsText(0)
 
-tempHWYPath = os.path.join(outFolder + "/Temp")
+currentDir = os.getcwd()
+outputDir = "../../Output_" + testNm
+batchinDir = outputDir + '/Batchin'
+MFNdir = os.path.join(outputDir + '/MFN.gdb')
+
+tempHWYPath = os.path.join(batchinDir + "/Temp")
 
 dateStr = str(datetime.now()) + '\n'
 
@@ -54,9 +58,9 @@ pLinkNat = tempHWYPath + "/temp_National_Highway.dbf"
 pLinkWater = tempHWYPath + "/temp_Inland_Waterways.dbf"
 
 # Create output folder if it doesn't exist
-if not os.path.exists(outFolder):
-    os.mkdir(outFolder)
-    arcpy.AddMessage("---> Output Directory created: " + outFolder)
+if not os.path.exists(batchinDir):
+    os.mkdir(batchinDir)
+    arcpy.AddMessage("---> Output Directory created: " + batchinDir)
 
 # Delete and recreate temporary folder
 if os.path.exists(tempHWYPath):
@@ -73,7 +77,7 @@ def dbf_to_df(table_path):
 # Create Temporary Layers for Domestic Network File
 # ---------------------------------------------------------------
 # Make temporary folder within Output/BatchinFiles to store temporary copies of the shapefiles
-arcpy.env.workspace = gdbDir
+arcpy.env.workspace = MFNdir
 
 # Define Lists, Dictionaries, and Paths
 shapefiles_links = ["CMAP_Rail","National_Rail","National_Highway","Inland_Waterways"]
@@ -193,14 +197,14 @@ outFiles.append("export_temp_Inland_Waterways.csv")
 # Generate Highway Batchin Files
 # ---------------------------------------------------------------
 # Create list of years     
-arcpy.env.workspace = gdbDir
+arcpy.env.workspace = MFNdir
 matching_fcs = arcpy.ListFeatureClasses("CMAP_HWY_LINK_y*") or []
 
 # Look in all feature datasets
 datasets = arcpy.ListDatasets(feature_type='feature') or []
 
 for ds in datasets:
-    arcpy.env.workspace = os.path.join(gdbDir, ds)
+    arcpy.env.workspace = os.path.join(MFNdir, ds)
     fcs = arcpy.ListFeatureClasses("CMAP_HWY_LINK_y*") or []
     matching_fcs.extend([f"{ds}\\{fc}" for fc in fcs])  # preserve dataset name in path
 
@@ -213,7 +217,7 @@ for yr in years:
     arcpy.AddMessage("---> Generating Batchin Files for: " + yr)
     
     # Create output and temporary folder if it does not exist
-    outPath_scen = outFolder + "\\scen_" + yr
+    outPath_scen = batchinDir + "\\scen_" + yr
     if os.path.exists(outPath_scen):
         shutil.rmtree(outPath_scen)
     os.mkdir(outPath_scen)
@@ -229,7 +233,7 @@ for yr in years:
     yearM = "c YEAR = " + yr + "\n"
 
     # Create Temporary Copies of HWY network
-    arcpy.env.workspace = gdbDir
+    arcpy.env.workspace = MFNdir
     for x in [hwyLinks, hwyNodes]:
         arcpy.AddMessage("---> creating temporary: " + x)
         arcpy.management.SelectLayerByAttribute(x, "CLEAR_SELECTION")
@@ -363,6 +367,7 @@ for yr in years:
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
+    os.chdir(currentDir)
     df.to_csv(outPath_scen+"/DomesticNetwork.csv", index=False)
     arcpy.AddMessage("---> domesticnetwork file saved")
 
