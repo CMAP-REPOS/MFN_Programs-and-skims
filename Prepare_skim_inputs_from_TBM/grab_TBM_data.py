@@ -43,7 +43,7 @@ def main():
     # NOTE: I know this references zone system 09 but it IS zone system 17
 
     # Define Output Path
-    outputDir = os.path.join(os.getcwd(),'Freight_Skim_Inputs')
+    outputDir = os.path.join(os.getcwd(),f'Freight_Skim_Inputs_{conformity}_{scenario}')
 
     # Delete and recreate output folder
     if os.path.exists(outputDir):
@@ -94,7 +94,7 @@ def main():
 
     # 2. OBTAIN SUBZONE EMPLOYMENT FROM cmap_trip-based_model/Database/tg/fortran/ATTR_IN.TXT
     # Create dictionary to define correspondance between TBM scenarios and Freight Skim years
-    scen_year_corr = {200: [2022, 2025], 300: [2030], 400: [2035], 500: [2040, 2045], 700: [2050, 2060]}
+    scen_year_corr = {100:[2019],200: [2022, 2025], 300: [2030], 400: [2035], 500: [2040, 2045], 700: [2050, 2060]}
     output_years = scen_year_corr[scenario]
 
     # Format subzone employment by attaching zone
