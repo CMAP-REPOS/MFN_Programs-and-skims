@@ -104,7 +104,7 @@ def main():
 
     # Export subzone employment
     for yr in output_years:
-        output_nm = outputDir + "/subzn_emp.csv" 
+        output_nm = outputDir + "/subzn_emp_" + str(yr) + ".csv" 
         out_emp.to_csv(output_nm)  
 
     
