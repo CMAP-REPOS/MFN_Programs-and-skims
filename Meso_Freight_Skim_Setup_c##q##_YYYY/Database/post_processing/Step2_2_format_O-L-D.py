@@ -21,7 +21,7 @@ outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scena
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
-pth_nodeznmeso= os.path.join(inDir + "/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_CCdist= os.path.join(inDir2 + "/CCdist.txt")               ##-- Highway centroid connector length
 pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
 pth_skims=os.path.join(outTempDir + "/allSkims_" + year+".csv")

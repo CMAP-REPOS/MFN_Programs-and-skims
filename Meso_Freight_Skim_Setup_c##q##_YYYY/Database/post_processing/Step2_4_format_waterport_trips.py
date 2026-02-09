@@ -23,9 +23,9 @@ outTempDir = os.path.join(outDir + '/tempOut/')
 ##-- Inputs 
 pth_dports= os.path.join(inDir + "/domestic_ports.csv")        ##-- Top 30 US ports for international shipping (based on 2013 tonnage, including total foreign tonnage [imports+exports])
 pth_fports= os.path.join(inDir + "/foreign_ports.csv")         ##-- Ocean used for each foreign port for international shipping 
-pth_nodeznmeso= os.path.join(inDir + "/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
-pth_sptime= os.path.join(inDir + "/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
-pth_charges= os.path.join(inDir + "/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
+pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
+pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
 pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
 pth_mf32=os.path.join(outTempDir + "/mf32_formatted_" + year+".csv")
 pth_OLD= os.path.join(outTempDir + "/all_O-L-D_" + year + ".csv")        ##-- New output file of modepath skim costs and times 

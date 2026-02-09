@@ -25,7 +25,7 @@ os.mkdir(outTempDir)
 
 ##-- Inputs
 inMatNames = os.path.join(inDir, "matrix.in")
-pth_nodeznmeso= os.path.join(inDir + "/post_processing/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_nodeznmeso= os.path.join(inDir + "/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 
 ##-- Outputs
 outskims= os.path.join(outTempDir + "/allSkims_" + year + ".csv")        ##-- New output file of modepath skim costs and times 

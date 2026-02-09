@@ -42,7 +42,7 @@ inDir = os.path.join(databaseDir + '/input_data/post_processing')          ##-- 
 outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
 
 ##-- Inputs 
-pth_nodeznmeso= os.path.join(inDir + "/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_modepathcosts = os.path.join(outDir + "/data_all_modepath_costs_" + year + ".csv")
 
 # ---------------------------------------------------------------

@@ -29,9 +29,9 @@ pth_intdr = os.path.join(outTempDir + "/outWaterintdr_" + year + ".csv")
 pth_inland = os.path.join(outTempDir + "/waterInland_" + year + ".csv") 
 pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
 pth_mf31=os.path.join(outTempDir + "/mf31_formatted_" + year+".csv")
-pth_nodeznmeso= os.path.join(inDir + "/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
-pth_sptime= os.path.join(inDir + "/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
-pth_charges= os.path.join(inDir + "/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
+pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
+pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
 
 ##-- Outputs
 pth_outTimeCosts= os.path.join(outTempDir + "/data_modepath_skim1_"+year + ".csv")         ##-- New output file of modepath skim costs and times 

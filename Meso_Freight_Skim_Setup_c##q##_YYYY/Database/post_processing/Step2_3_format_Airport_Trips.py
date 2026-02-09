@@ -21,9 +21,9 @@ outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
 pth_frair= os.path.join(inDir + "/domestic_airports.csv")      ##-- Top 30 US airports for foreign trade (based on FAF4 2013 tonnage [imports+exports]) 
-pth_nodeznmeso= os.path.join(inDir + "/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
-pth_charges= os.path.join(inDir + "/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
-pth_sptime= os.path.join(inDir + "/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
+pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
+pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
+pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
 pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
 pth_skims = os.path.join(outTempDir + '/all_O-L-D_' + year + ".csv")
 
