@@ -368,7 +368,7 @@ for yr in years:
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
     os.chdir(currentDir)
-    df.to_csv(outPath_scen+"/DomesticNetwork.csv", index=False)
+    df.to_csv(outPath_scen+"/DomesticNetwork.csv", index=False, header=False)
     arcpy.AddMessage("---> domesticnetwork file saved")
 
     # Remove highway layer to the domestic network csv export list (so next loop doesn't include the data)

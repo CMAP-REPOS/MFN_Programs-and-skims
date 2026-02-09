@@ -155,7 +155,7 @@ for fc in fcs:
 # Header info
 ln1 = "c MESO FREIGHT NETWORK BATCHIN FILE \n"
 ln2 = "c " + dateStr
-ln5 = "t lines init \n"
+ln5 = "t links \n"
 railLayer = 'CMAP_Rail'
 
 # Loop through each year and each lognode

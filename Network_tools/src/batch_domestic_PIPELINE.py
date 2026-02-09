@@ -303,7 +303,7 @@ for file in pipefiles:
     df['DmstDist'] = df['ratio'] * df['Miles']
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
     os.chdir(currentDir)
-    df.to_csv(batchinDir+"/DomesticPipelineNetwork.csv", index=False)
+    df.to_csv(batchinDir+"/DomesticPipelineNetwork.csv", index=False, header=False)
     arcpy.AddMessage("---> pipelinenetwork file saved")
 
 # Cleanup pipeline temporary files
