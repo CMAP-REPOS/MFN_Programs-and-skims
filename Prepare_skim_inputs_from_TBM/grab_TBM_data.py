@@ -27,8 +27,10 @@
 # Output should be stored in Meso_Freight_Skim_Setup_c##q##_YYYY\Database\input_data\post_processing                                          #
 ###############################################################################################################################################
 import os, sys, shutil
-import inro.emme.desktop.app as _app
+from pathlib import Path
 import inro.modeller as _m
+sys.path.append(str(Path(__file__).resolve().parents[1].joinpath('Scripts')))
+from tbmtools import project as tbm
 import pandas as pd
     
 def main():
@@ -51,21 +53,11 @@ def main():
     os.mkdir(outputDir)
 
     # Define the path to the Emme project (.emp file)
-    empFl = conformity + "_" + str(scenario) + '.emp'
-    directory = os.getcwd().replace('\\Database','')
-    empFile = os.path.join(directory,empFl)
-    print(empFile)
-
-    # start a dedicated instance of Emme Desktop connected to the specified project
-    desktop = _app.start_dedicated(
-        visible=True,
-        user_initials='KCC',
-        project= empFile
-    )
+    proj_dir = Path(__file__).resolve().parents[2]
+    my_modeller = tbm.connect(proj_dir)
     
     # Connect to the Modeller
-    modeller = _m.Modeller(desktop=desktop)
-    export_matrix = modeller.tool('inro.emme.data.matrix.export_matrices')
+    export_matrix = my_modeller.tool('inro.emme.data.matrix.export_matrices')
 
     # 1. EXPORT AM PEAK AND MIDDAY TIME AND AM PEAK DISTANCES FROM EMME
     matrices_file = os.path.join(outputDir, "hwytime_pk")

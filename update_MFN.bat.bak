@@ -92,7 +92,7 @@ rem copy model set up for year
 xcopy "Meso_Freight_Skim_Setup_c##q##_YYYY\" "Model_Setups\%nameMod%" /s /e
 
 rem copy batchin data for the year
-copy "%procDir%/%newconf%/Batchin\scen_%counter%" "Model_Setups\%nameMod%\Database\input_data" 
+copy "Input\Batchin\scen_%counter%" "Model_Setups\%nameMod%\Database\input_data" 
 
 rem copy lognode data for the year
 copy "Input\Lognodes\unlink_lognode140_%counter%.txt" "Model_Setups\%nameMod%\Database\input_data" 

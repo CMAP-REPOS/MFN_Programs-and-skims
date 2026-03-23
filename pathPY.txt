@@ -1,0 +1,2 @@
+C:\Users\kcazzato\AppData\Local\ESRI\conda\envs\arcgispro-py3-MFN\python.exe
+C:\Users\kcazzato\AppData\Local\ESRI\conda\envs\arcgispro-py3-MFN\Lib\venv\scripts\nt\python.exe
