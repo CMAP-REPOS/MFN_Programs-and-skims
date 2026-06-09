@@ -1,6 +1,6 @@
-#filename: distr_m01_data.py
-#description: Python script uses the EMME Modeler API to punch transit network and itinerary data for DISTR and M01 files creation
-#author: Karly Cazzato, 9/20/2023
+#filename: 2_build_network.py
+#description: Python script uses the EMME Modeler API to ...
+#author: Karly Cazzato, 6/9/2026
 
 import os, sys, shutil, yaml
 import inro.emme.desktop.app as _app
@@ -10,9 +10,12 @@ import pandas as pd
 def main():
     # Read input parameters
     scenario = sys.argv[1]
-    year = sys.argv[2]
-    flag140 = int(sys.argv[3])
-    flag143 = int(sys.argv[4])
+    flag140 = int(sys.argv[2])
+    year = int(sys.argv[3])
+    print('BUILDING SCENARIOS::::::::::::::::::::::::::::::::::::::::::::::::::::::::')
+    print(f'SCENARIO = {scenario}')
+    print(f'YEAR = {year}')
+    print(f'FLAG140 = {flag140}')
 
     # Define Input Paths
     input_dir =  os.path.join(os.getcwd(),"input_data")
@@ -68,37 +71,61 @@ def main():
     try:
         delScen = emmebank.scenario(scenario)
         delete_scenario(scenario=delScen)
-    except:
-        None
+        print(f'Deleted scenario {delScen}')
+    except: None
 
     # Create scenario
-    scenTitle = f'Base Meso Freight Network_{year}_{scenario}'
-    hwyScen = create_scenario(scenario_id=scenario, scenario_title=scenTitle, overwrite = True)
-    change_scenario(scenario=scenario)     # Set current scenario to empty scenario
+    scenTitle = f'Base Meso Freight Network_{scenario}'
+    try:
+        hwyScen = create_scenario(scenario_id=str(scenario+"00"), scenario_title=scenTitle, overwrite = True)
+        change_scenario(scenario=str(scenario+"00"))     # Set current scenario to empty scenario
+        print(f"Created {scenTitle} scenario")
+    except: print(f"ERROR CREATING SCENARIO: {scenTitle}")
 
     # Import Modes
-    process_modes(transaction_file = pth_modes, revert_on_error = True, scenario = _m.Modeller().scenario)
+    try: 
+        process_modes(transaction_file = pth_modes, revert_on_error = True, scenario = _m.Modeller().scenario)
+        print("--- Imported modes to base")
+    except: print("ERROR IMPORTING MODES TO BASE NETWORK")
     
     # Import Vehicles
-    process_vehicles(transaction_file = pth_vehicles, revert_on_error = True, scenario = _m.Modeller().scenario)
+    try: 
+        process_vehicles(transaction_file = pth_vehicles, revert_on_error = True, scenario = _m.Modeller().scenario)
+        print("--- Imported vehicles to base")
+    except: print("ERROR IMPORTING VEHICLES TO BASE NETWORK")
     
     # Import base network
-    process_network(transaction_file = pth_base_ntwk, revert_on_error=True, scenario=_m.Modeller().scenario)
+    try: 
+        process_network(transaction_file = pth_base_ntwk, revert_on_error=True, scenario=_m.Modeller().scenario)
+        print("--- Imported base network")
+    except: print("ERROR IMPORTING BASE NETWORK")
     
     # Import logistics nodes files
-    # Flag 140: Is extra logistics terminal (in Crete) active? 0 = no, 1 = yes
-    if flag140 == 0:
-        process_network(transaction_file = pth_140, revert_on_error=True, scenario=_m.Modeller().scenario)
+    # Flag 140: Is extra logistics terminal (in Crete as of June 2026) active? 1 = no, 2 = yes
+    if flag140 == 1:
+        try:
+            process_network(transaction_file = pth_140, revert_on_error=True, scenario=_m.Modeller().scenario)
+            print('--- Logistics node 140 removed from network')
+        except: print("ERROR REMOVING LOGISTICS NODE 140")
 
-    # Flag 143: Is extra logistics terminal (South Suburban Airport) active? 0 = no, 1 = yes
-    if flag143 == 0:
-        process_network(transaction_file = pth_143, revert_on_error=True, scenario=_m.Modeller().scenario)
+    # Flag 143: Is extra logistics terminal (South Suburban Airport as of June 2026) active? 22 = no, other year = yes
+    if year == 22:
+        try:
+            process_network(transaction_file = pth_143, revert_on_error=True, scenario=_m.Modeller().scenario)
+            print('--- Logistics node 143 removed from network')
+        except: print("ERROR REMOVING LOGISTICS NODE 143")
 
     # Import Transit Lines
-    process_lines(transaction_file=pth_lines, revert_on_error=True, scenario=_m.Modeller().scenario)
+    try:
+        process_lines(transaction_file=pth_lines, revert_on_error=True, scenario=_m.Modeller().scenario)
+        print("--- Imported transit lines")
+    except: print("ERROR IMPORTING TRANSIT LINES")
 
     # Import VDF
-    process_VDF(transaction_file=pth_vdf, throw_on_error=True)
+    try: 
+        process_VDF(transaction_file=pth_vdf, throw_on_error=True)
+        print("--- Imported VDF")
+    except: print("ERROR IMPORTING VDF")
     
     # Create extra attribute
     extra_attributes = {
@@ -111,37 +138,44 @@ def main():
     }
     
     for extAtt in extra_attributes:
-        create_extra_att= create_extra(extra_attribute_type=f'{extra_attributes[extAtt][0]}',
-                        extra_attribute_name=f'{extAtt}',
-                        extra_attribute_description=f'{extra_attributes[extAtt][1]}',
-                        overwrite=True) 
+        try:
+            create_extra_att= create_extra(extra_attribute_type=f'{extra_attributes[extAtt][0]}',
+                            extra_attribute_name=f'{extAtt}',
+                            extra_attribute_description=f'{extra_attributes[extAtt][1]}',
+                            overwrite=True) 
+            print(f"--- Imported {extAtt}")
+        except: print(f"ERROR CREATING {extAtt}")
     
     # Initialize extra attribute with poe.in
-    process_extra(pth_poe,
-              scenario=_m.Modeller().scenario,
-              field_separator=" ",
-              has_header = True,
-              revert_on_error=True)
+    try:
+        process_extra(pth_poe, scenario=_m.Modeller().scenario, field_separator=" ", has_header = True, revert_on_error=True)
+        print("--- Initialized extra attributes with poe.in file")
+    except: print("ERROR INITIALIZING EXTRA ATTRIBUTES WITH POE.IN FILE")
 
     # Import domestic distance
     # Forward
-    process_extra(pth_domdist,
-              scenario=_m.Modeller().scenario,
-              has_header=False,
-              field_separator=",",
-              column_labels={0: "i_node", 
-                             1: "j_node", 
-                             5: "@domestic"},
-              revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
-    # Reverse
-    process_extra(pth_domdist,
-              scenario=_m.Modeller().scenario,
-              has_header=False,
-              field_separator=",",
-              column_labels={0: "j_node", 
-                             1: "i_node", 
-                             5: "@domestic"},
-              revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+    try:
+        process_extra(pth_domdist,
+                scenario=_m.Modeller().scenario,
+                has_header=False,
+                field_separator=",",
+                column_labels={0: "i_node", 
+                                1: "j_node", 
+                                5: "@domestic"},
+                revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+        print("--- Imported domestic distance forward to base network")
+        # Reverse
+        process_extra(pth_domdist,
+                scenario=_m.Modeller().scenario,
+                has_header=False,
+                field_separator=",",
+                column_labels={0: "j_node", 
+                                1: "i_node", 
+                                5: "@domestic"},
+                revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+        print("--- Imported domestic distance reverse to base network")
+    except: print("ERROR IMPORTING DOMESTIC DISTANCE TO BASE NETWORK")
+
     
     # Assign links node poe code
     poe_spec = {
@@ -194,13 +228,16 @@ def main():
     }
 
     # Run network calculations
-    report=net_calc([poe_spec, us1_spec, mzone_spec, lhdist_spec, rdwell_spec])
+    try: 
+        report=net_calc([poe_spec, us1_spec, mzone_spec, lhdist_spec, rdwell_spec])
+        print("--- Completed network calculations")
+    except: print("ERROR WITH NETWORK CALCULATION")
 
     ##-- SETUP PIPELINE NETWORKS
     pipelines = {
-        'crude_oil' : [f'Crude Oil Pipeline Network_{year}_{scenario}', int(scenario)+10,pth_cos_ntwk],
-        'petroleum': [f'Petroleum Products Pipeline Network_{year}_{scenario}', int(scenario)+11, pth_p1718_ntwk],
-        'natural_gas':[f'Coal N.E.C. Pipeline Network_{year}_{scenario}', int(scenario)+12, pth_nec19_ntwk]
+        'crude_oil' : [f'Crude Oil Pipeline Network_{scenario}', int(scenario+"10"),pth_cos_ntwk],
+        'petroleum': [f'Petroleum Products Pipeline Network_{scenario}', int(scenario+"11"), pth_p1718_ntwk],
+        'natural_gas':[f'Coal N.E.C. Pipeline Network_{scenario}', int(scenario+"12"), pth_nec19_ntwk]
     }
 
     for pipe in pipelines:
@@ -208,55 +245,71 @@ def main():
         try:
             delScen = emmebank.scenario(pipelines[pipe][1])
             delete_scenario(scenario=delScen)
-        except:
-            None
+            print(f'Deleted scenario {delScen}')
+        except: None
 
         # Create scenario
-        scenTitle = f'Base Meso Freight Network_{year}_{str(pipelines[pipe][1])}'
-        hwyScen = create_scenario(scenario_id=pipelines[pipe][1], scenario_title=scenTitle, overwrite = True)
-        change_scenario(scenario=pipelines[pipe][1])     # Set current scenario to empty scenario
+        scenTitle = str(pipelines[pipe][0])
+        try:
+            hwyScen = create_scenario(scenario_id=pipelines[pipe][1], scenario_title=scenTitle, overwrite = True)
+            change_scenario(scenario=pipelines[pipe][1])     # Set current scenario to empty scenario
+            print(f"Created scenario: {scenTitle}")
+        except: print(f"ERROR CREATING SCENARIO {scenTitle}")
 
         # Import Modes
-        process_modes(transaction_file = pth_modes, revert_on_error = True, scenario = _m.Modeller().scenario)
+        try: 
+            process_modes(transaction_file = pth_modes, revert_on_error = True, scenario = _m.Modeller().scenario)
+            print('--- Processed modes for pipeline scenario')
+        except: print("ERROR PROCESSING MODES FOR PIPELINE SCENARIO")
 
         # Import base network
-        process_network(transaction_file = pipelines[pipe][2], revert_on_error=True, scenario=_m.Modeller().scenario)
+        try: 
+            process_network(transaction_file = pipelines[pipe][2], revert_on_error=True, scenario=_m.Modeller().scenario)
+            print("--- Imported base network for pipeline scenario")
+        except: print("ERROR IMPORTING BASE NETWORK FOR PIPELINE SCENARIO")
 
         # Create mzone
-        create_extra_att= create_extra(extra_attribute_type=extra_attributes['@mzone'][0],
-                        extra_attribute_name='@mzone',
-                        extra_attribute_description=extra_attributes['@mzone'][1],
-                        overwrite=True) 
-        report = net_calc(mzone_spec)
+        try:
+            create_extra_att= create_extra(extra_attribute_type=extra_attributes['@mzone'][0],
+                            extra_attribute_name='@mzone',
+                            extra_attribute_description=extra_attributes['@mzone'][1],
+                            overwrite=True) 
+            report = net_calc(mzone_spec)
+            print("--- Calculated @mzone for pipeline scenario")
+        except: print("ERROR CALCULATING @MZONE FOR PIPELINE SCENARIO")
 
         # Create pipeline domestic distance
-        create_extra_att= create_extra(extra_attribute_type=extra_attributes['@domestic'][0],
-                        extra_attribute_name='@domestic',
-                        extra_attribute_description=extra_attributes['@domestic'][1],
-                        overwrite=True) 
-        # Forward
-        process_extra(pth_domdistPipe,
-                scenario=_m.Modeller().scenario,
-                field_separator=",",
-                has_header=False,
-                column_labels={0: "i_node", 
-                                1: "j_node", 
-                                5: "@domestic"},
-                revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
-        # Reverse
-        process_extra(pth_domdistPipe,
-                scenario=_m.Modeller().scenario,
-                has_header=False,
-                field_separator=",",
-                column_labels={0: "j_node", 
-                                1: "i_node", 
-                                5: "@domestic"},
-                revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+        try:
+            create_extra_att= create_extra(extra_attribute_type=extra_attributes['@domestic'][0],
+                            extra_attribute_name='@domestic',
+                            extra_attribute_description=extra_attributes['@domestic'][1],
+                            overwrite=True) 
+            # Forward
+            process_extra(pth_domdistPipe,
+                    scenario=_m.Modeller().scenario,
+                    field_separator=",",
+                    has_header=False,
+                    column_labels={0: "i_node", 
+                                    1: "j_node", 
+                                    5: "@domestic"},
+                    revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+            # Reverse
+            process_extra(pth_domdistPipe,
+                    scenario=_m.Modeller().scenario,
+                    has_header=False,
+                    field_separator=",",
+                    column_labels={0: "j_node", 
+                                    1: "i_node", 
+                                    5: "@domestic"},
+                    revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
+            print("--- Imported pipeline domestic distance")
+        except: print("ERROR IMPORTING PIPELINE DOMESTIC DISTANCE")
         
     ##-- PROCESS MATRICES
-    process_matrices(transaction_file=pth_matrices,
-        throw_on_error=True,
-        scenario=_m.Modeller().scenario)
+    try:
+        process_matrices(transaction_file=pth_matrices, throw_on_error=True, scenario=_m.Modeller().scenario)
+        print("Processed matrices")
+    except: print("ERROR PROCESSING MATRICES")
     
 if __name__ == '__main__':
     main()

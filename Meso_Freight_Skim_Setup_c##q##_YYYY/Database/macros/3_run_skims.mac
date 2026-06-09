@@ -40,7 +40,7 @@
 ~# =================================================================================================
 ~#
 ~z=%0%
-~+;~?!z=2;~$>error
+~+;~?!z=1;~$>error
 ~#
 ~+;s=%1%;~?e;~$>bad_scen
 ~/ Scenario number argument is valid.
@@ -67,9 +67,9 @@
 ~!if exist %t2% (del %t2%)
 reports=%t2%
 ~#  -- Initialize Matrices --
-~#+;3.12;7;y;q
-~#batchin=input_data\matrix.in
-~#+;3.11;2
+~+;3.12;7;y;q
+batchin=input_data\matrix.in
+~+;3.11;2
 ~#
 ~#
 ~+;~y=%1%;~y+1

@@ -9,36 +9,35 @@ rem Karly Cazzato, CMAP
 rem =========================================================================================
 rem =========================================================================================
 REM USER INPUT
-@echo Enter year to run skims: 
+@echo Enter last two digits of year to run skims: 
 set /p year=
 
-@echo Enter 100 to run model WITHOUT logistics node 140 connected
-@echo Enter 200 to run model WITH logistics node 140 connected
-set /p scenario=
+@echo Enter 1 to run model WITHOUT logistics node 140 connected
+@echo Enter 2 to run model WITH logistics node 140 connected
+set /p in_scenario=
+
+set /a scenario = %year%%in_scenario%
 
 @echo Run analyze_mode_access ('y' or 'no'; note, this will take at least an hour)
 set /p flagAccess="[RUN analyze_mode_access? (y/n)] "
 
-if "%year%"=="2022" (
+if "%year%"=="22" (
 	set flag143="---> NOTE: Node 143 not active"
 	goto proceed143)
-if NOT "%year%" == "2022" (
+if NOT "%year%" == "22" (
 	set flag143="---> NOTE: Node 143 active"
 	goto proceed143)
 :proceed143
 
 
-if "%scenario%"=="200" (
+if "%in_scenario%"=="2" (
 	set flag140="---> NOTE: Node 140 active"
 	goto proceed140)
 
-if "%scenario%"=="100" (
+if "%in_scenario%"=="1" (
 	set flag140="---> NOTE: Node 140 not active"
 	goto proceed140)
 :proceed140
-
-set /a scenMax = 212
-
 
 @echo Model run year: %year%
 @echo Model run scenario: %scenario%
@@ -66,12 +65,9 @@ if exist %infile% (del %infile% /Q)
 cd Database
 
 @echo CLEANING UP OUTPUT FOLDERS
-cd output_data
-rmdir /S /Q "%scenario%"
-rmdir /S /Q "output_data\post_processing_%scenario%\tempOut\"
-rmdir /S /Q "post_processing_%scenario%"
+rmdir /s /q reports\%scenario%\
+mkdir reports\%scenario%\
 @echo CLEANUP COMPLETE
-cd ..
 
 @echo ==================================================================
 @ECHO.
@@ -82,9 +78,10 @@ cd ..
 @ECHO.
 @ECHO %CD%
 @Echo RUNNING 1_remove_old_scenarios
-call python macros\1_remove_old_scenarios.py %scenario% %scenMax%
+call python macros\1_remove_old_scenarios.py %scenario% >>reports\%scenario%\remove_scenarios_%scenario%.rpt
 @Echo RUNNING 2_build_network
-call emme -ng 000 -m macros\2_build_network.mac %scenario% %year% 
+call python macros\2_build_network.py %scenario% %in_scenario% %year% >>reports\%scenario%\build_network_%scenario%.rpt
+pause
 @Echo RUNNING 3_run_skims
 call emme -ng 000 -m macros\3_run_skims.mac %scenario%
 

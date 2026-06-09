@@ -10,7 +10,6 @@ import pandas as pd
 def main():
     scenario = sys.argv[1]
     output_dir = os.getcwd() + f"\\output_data\\{scenario}"
-    report_dir = os.getcwd() + f"\\reports\\{scenario}"
 
     # Define the path to the Emme project (.emp file)
     empFl = 'MesoFreightNetwork.emp'
@@ -39,11 +38,13 @@ def main():
         sEmpty = create_scenario(scenario_id=1,
                             scenario_title="empty scenario",
                             overwrite = True)
-        
+        print('Empty Scenario 1 created')
         # Set current scenario to empty scenario
         change_scenario(scenario=1)
+        print('Current scenario changed to 1')
     except:
         change_scenario(scenario=1)
+        print('Current scenario changed to 1')
     
     # Delete all matrices 
     for matrix in emmebank.matrices():
@@ -51,6 +52,7 @@ def main():
         try:
             delMat = emmebank.matrix(stMat)
             delete_matrix(matrix=delMat) 
+            print(f'matrix {stMat} deleted')
         except:
             print(f'matrix {stMat} NOT DELETED')
 
@@ -60,13 +62,17 @@ def main():
             try:
                 delScen = emmebank.scenario(scenario.number())
                 delete_scenario(scenario=delScen)
+                print(f'Scenario {scenario.number()} deleted')
             except:
                 print(f'DID NOT DELETE SCENARIO {scenario.number()}')
+        else:
+            print("Skip deleting scenario 1")
 
     # Remove output folder and reports 
-    if os.path.isdir(output_dir): shutil.rmtree(output_dir)
-    if os.path.isdir(report_dir): shutil.rmtree(report_dir)
+    if os.path.isdir(output_dir): 
+        shutil.rmtree(output_dir)
+        print(f"Removed folder {output_dir}")
 
-    
+
 if __name__ == '__main__':
     main()
