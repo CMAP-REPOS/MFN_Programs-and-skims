@@ -1,0 +1,8 @@
+{
+  "bundle": "t002_gcd_haversine",
+  "source_file": "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/SAS/Step1_Create_GCD_file.sas",
+  "source_blob_sha": "53f1a767d1bda46d6b37518c26748596325d7e01",
+  "source_commit": "772611d8692d9987d3bcc824182f95ce99369cc8",
+  "tier": "mock_data",
+  "notes": "Great Circle Distance core of Step 1: reads mesozone lat/lon, converts degrees->radians (constant('pi')), PROC SQL cross-join to form every mesozone pair, Haversine GCD (sin/cos/arsin/sqrt, 3961-mile earth radius), both-directions expansion, and the intrazonal sqrt(area)/2 distance. The mesozone lon/lat and area inputs are provided as inline DATALINES so the bundle is a single self-contained script. Downstream POE/centroid sections that read Emme batchin files and the call system() mkdir are outside this slice and omitted. Edits: PROC IMPORT-from-CSV replaced by inline DATA steps with the same columns; explicit 'quit;' after PROC SQL (step boundary the author left implicit); PROC EXPORT writes data_mesozone_gcd.csv via a literal path."
+}
