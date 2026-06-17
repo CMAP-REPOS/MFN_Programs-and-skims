@@ -1,0 +1,19 @@
+{
+  "_captured_at": "2026-06-17T13:27:07+07:00",
+  "_captured_run_id": "r_019ed442df1c7693b0eadf965447a51d",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Table allmeso created.",
+    "NOTE: Wrote allmeso (36 rows",
+    "NOTE: Wrote sqmi (6 rows"
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}

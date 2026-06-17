@@ -1,0 +1,8 @@
+{
+  "bundle": "t005_verify_rail_macro",
+  "source_file": "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/macros/verify_rail_service.sas",
+  "source_blob_sha": "5a3a2431490713876f888856e8f22fddd6852b46",
+  "source_commit": "772611d8692d9987d3bcc824182f95ce99369cc8",
+  "tier": "mock_data",
+  "notes": "Keeps the %ReadSkims macro and its %do %while loop: per rail carrier it takes the Emme distance (mf61) and in-vehicle time (mf62) skim dumps, explodes the wide o/dest:value rows to long form, sorts nodupkey, MERGEs distance with time, and deletes pairs that have both dist>0 and ivtt>0 -- leaving the connector-to-connector (zero-skim) pairs the QC is meant to surface. PROC TRANSPOSE then pivots the flagged modes and the result is exported. The two Emme matrix dumps are provided as inline DATA steps (mf61_raw/mf62_raw, the same wide layout the .in files hold) so the bundle is a single self-contained script; the macro reads them via SET mf&i._raw instead of INFILE. Edits: %let OP=rl in the autoexec (caller-supplied in production); the call system() that created the QC folder is omitted; PROC EXPORT uses an explicit data= and literal path."
+}

@@ -1,0 +1,28 @@
+                                 CRUDE OIL SYSTEM NETWORK LINKS WITHOUT A CODED LENGTH                                  
+
+No observations in dataset.
+
+                                  CRUDE OIL SYSTEM NETWORK LINKS WITHOUT A CODED MODE                                   
+
+No observations in dataset.
+
+                                   CRUDE OIL SYSTEM NETWORK NODES WITH NO COORDINATES                                   
+
+No observations in dataset.
+
+                                   MESO FREIGHT NETWORK CENTROIDS WITH NO COORDINATES                                   
+
+No observations in dataset.
+
+                                   MESO FREIGHT NETWORK CENTROIDS WITH NO COORDINATES                                   
+
+                                 CRUDE OIL SYSTEM NETWORK NODES WITH DUPLICATE NUMBERS                                  
+
+No observations in dataset.
+
+                                 CRUDE OIL SYSTEM NETWORK NODES WITH DUPLICATE NUMBERS                                  
+
+                                 MESO FREIGHT NETWORK CENTROIDS WITH DUPLICATE NUMBERS                                  
+
+No observations in dataset.
+

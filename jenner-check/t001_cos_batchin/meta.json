@@ -1,0 +1,8 @@
+{
+  "bundle": "t001_cos_batchin",
+  "source_file": "2_ArcGIS_Processing/create_emme_batchin_files_mfn_cos.sas",
+  "source_blob_sha": "70632bcf8207aa30782b3514ed854ea2fb743420",
+  "source_commit": "772611d8692d9987d3bcc824182f95ce99369cc8",
+  "tier": "mock_data",
+  "notes": "Builds the Crude Oil System Emme network batchin file. The two ArcGIS-exported .dbf inputs are replaced by inline DATA steps carrying the columns the program keeps (node_id/point_x/point_y/MESOZONE for nodes & centroids; inode/jnode/miles/modes/type/lanes/vdf for links). Output FILENAME rewritten from an absolute &outpath to a relative cos_ntwk.txt. The original 'where=(modes is null)' verification line uses the SAS-equivalent 'is missing'. PROC SORT/FREQ duplicate checks, PROC PRINT verifications and the batchin PUT statements are unchanged; the program writes a complete nodes+links Emme batchin file."
+}

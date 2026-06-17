@@ -1,0 +1,8 @@
+{
+  "bundle": "t004_zonal_employment",
+  "source_file": "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/SAS/Step4_Create_Zonal_Truck_Tour_files.sas",
+  "source_blob_sha": "17164e7d7127589c56ecf986c10bd77f00bfb2c9",
+  "source_commit": "772611d8692d9987d3bcc824182f95ce99369cc8",
+  "tier": "mock_data",
+  "notes": "Zonal-employment slice of Step 4: imports subzone employment (subzone09/i18) and the subzone-zone-mesozone correspondence (subzone09/zone09/mesozone), sorts and MERGEs on subzone09, then PROC SUMMARY NWAY with CLASS Zone / VAR i18 / ID Mesozone / OUTPUT SUM= rolls employment up to zonal totals, dropping _type_/_freq_ before export. Inputs are bundled small CSVs. The Emme matrix-dump skim sections are outside this slice and omitted. Edits: relative input paths; explicit 'run;' after each PROC IMPORT; PROC EXPORT writes cmap_data_zone_employment.csv via a literal path with explicit data=."
+}

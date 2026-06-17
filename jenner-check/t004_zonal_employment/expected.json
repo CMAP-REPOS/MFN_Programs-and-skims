@@ -1,0 +1,19 @@
+{
+  "_captured_at": "2026-06-17T13:28:09+07:00",
+  "_captured_run_id": "r_019ed444059373b3bf3d35d7346b1ee2",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Wrote z (5 rows",
+    "NOTE: Wrote szemp (8 rows",
+    "NOTE: Wrote corresp (8 rows"
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}
