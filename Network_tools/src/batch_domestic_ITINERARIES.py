@@ -42,7 +42,8 @@ arcpy.OverwriteOutput = 1
 testNm = arcpy.GetParameterAsText(0)
 
 currentDir = os.getcwd()
-outputDir = "../../Output_" + testNm
+parent_dir = os.path.dirname(currentDir)
+outputDir = parent_dir + "/Output_" + testNm
 batchinDir = outputDir + '/Batchin'
 MFNdir = os.path.join(outputDir + '/MFN.gdb')
 

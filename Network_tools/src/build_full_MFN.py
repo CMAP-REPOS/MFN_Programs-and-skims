@@ -73,9 +73,11 @@ logNodes = [140, 143]                       # List of logistics nodes to create 
 
 # Create output folder
 currentDir = os.getcwd()
-outputDir = "../../Output_" + nmGDB
+parent_dir = os.path.dirname(currentDir)
+outputDir = parent_dir + "/Output_" + nmGDB
 if not os.path.exists(outputDir):
     os.makedirs(outputDir)
+print(f'Output dir: {outputDir}')
 
 # ---------------------------------------------------------------
 # CREATE OUTPUT LOGNODE FOLDER AND GDB FOLDER FOR UPDATED MFN
