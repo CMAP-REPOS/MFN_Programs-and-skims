@@ -302,6 +302,7 @@ for file in pipefiles:
 
     df = pd.concat([x for x in pipedflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
+    df=df.astype({'INODE':int, 'JNODE': int})        ##-- Format data types
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
     os.chdir(currentDir)
     df.to_csv(batchinDir+"/DomesticPipelineNetwork.csv", index=False, header=False)

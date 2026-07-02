@@ -367,6 +367,7 @@ for yr in years:
     
     df = pd.concat([x for x in dflist])
     df['DmstDist'] = df['ratio'] * df['Miles']
+    df=df.astype({'INODE':int, 'JNODE': int})        ##-- Format data types
     df.rename(columns={'Miles':'LENGTH','ratio':'dom_ratio','INODE':'cINODE'},inplace=True)
     os.chdir(currentDir)
     df.to_csv(outPath_scen+"/DomesticNetwork.csv", index=False, header=False)
