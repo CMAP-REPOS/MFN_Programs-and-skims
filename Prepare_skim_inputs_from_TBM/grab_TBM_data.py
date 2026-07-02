@@ -10,11 +10,14 @@
 #       - subzn_emp_YYYY.csv                                                                                                                  #
 #                                                                                                                                             #
 # TBM scenario number correspondance to MFN scenario years                                                                                    #
-#       200 = 2022 (MFN only) and 2025 (TBM and MFN)                                                                                          #
-#       300 = 2030 (TBM and MFN)                                                                                                              #
-#       400 = 2035 (TBM and MFN)                                                                                                              #
-#       500 = 2040 (TBM and MFN) and 2045 (MFN only)                                                                                          #
-#       700 = 2050 (TBM and MFN), 2060 (MFN only)                                                                                             #
+#       100 - 2019
+#       200 - 2026
+#       300 - 2030
+#       400 - 2032 (don't run for conformity)
+#       500 - 2035
+#       600 - 2040
+#       700 - 2045 (don't run for conformity)
+#       800 - 2050                                                                                         #
 #                                                                                                                                             #
 # TO RUN:                                                                                                                                     #
 #   1. Paste this script into the 'Database' folder of a TBM setup                                                                            #
@@ -86,7 +89,7 @@ def main():
 
     # 2. OBTAIN SUBZONE EMPLOYMENT FROM cmap_trip-based_model/Database/tg/fortran/ATTR_IN.TXT
     # Create dictionary to define correspondance between TBM scenarios and Freight Skim years
-    scen_year_corr = {100:[2019],200: [2022, 2025], 300: [2030], 400: [2035], 500: [2040, 2045], 700: [2050, 2060]}
+    scen_year_corr = {100:[2019], 200: [2026], 300: [2030], 400: [2032], 500: [2035], 600: [2040], 700: [2045], 800: [2050]}
     output_years = scen_year_corr[scenario]
 
     # Format subzone employment by attaching zone

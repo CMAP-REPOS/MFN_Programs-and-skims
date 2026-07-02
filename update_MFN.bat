@@ -26,11 +26,11 @@ CD %~dp0
 REM ###################################################################################################################################################
 rem HEADER INFO
 @echo ENTER NAME OF TEST OR CONFORMITY TO RUN
-set /p newconf="[Conformity number (enter c##q#)] "
+set /p newconf="[Conformity number (enter c##q##)] "
 @echo ENTER CONFORMITY NUMBER FOR TO COMPARE UPDATE TO 
 @echo Usually the previous conformity number
 @echo EX: if you're updating to c25q2, enter c24q4
-set /p oldconf="[Conformity number (enter c##q#)] "
+set /p oldconf="[Conformity number (enter c##q##)] "
 @ECHO SELECT MODE TO RUN
 @ECHO 	1. Setup only
 @echo 	2. Skims only
@@ -43,8 +43,8 @@ set procDir=V:/Secure/Master_Freight/Processing_Data
 
 rem SET VARIABLES
 set /a scenMax = 212
-set /a baseYr = 2022
-set /a firstYr = 2025
+set /a baseYr = 2019
+set /a firstYr = 2026
 set /a lastYr = 2050
 
 REM ###################################################################################################################################################
@@ -72,12 +72,15 @@ rem DEVELOP REMAINING FOLDER STRUCTURE
 if not exist "Model_Setups" (mkdir "Model_Setups")
 
 REM add processing data to base model setup
-xcopy "%procDir%\Skim_input_data\Static" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/input_data" /s 
+@echo --- Copying static input data from %procDir%\Skim_input_data\Static
+xcopy "%procDir%\Skim_input_data\Static" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/input_data" /S /Q /Y >nul 2>&1
 
 REM add non-year or scenario specific batchin Data
-xcopy "%procDir%/%newconf%/Batchin" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/input_data"
+@echo --- Copying batchin input data from %procDir%\Skim_input_data\%newconf%
+xcopy "%procDir%\Skim_input_data\%newconf%" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database/input_data" /Q /Y >nul 2>&1
 
 REM add emmebank to base model setup
+@echo --- Copying emmebank from %procDir%\EmmeBank\emmebank
 copy "%procDir%\EmmeBank\emmebank" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database" 
 
 rem COPY AND RENAME SKIMS SETUPS, INCLUDING EMMEBANK FROM V DRIVE
@@ -89,32 +92,32 @@ set nameMod=Meso_Freight_Skim_Setup_%newconf%_%counter%
 if not exist "Model_Setups\%nameMod%" (mkdir = "Model_Setups\%nameMod%")
 
 rem copy model set up for year
-xcopy "Meso_Freight_Skim_Setup_c##q##_YYYY\" "Model_Setups\%nameMod%" /s /e
+@echo --- Copying model setup for %counter%
+xcopy "Meso_Freight_Skim_Setup_c##q##_YYYY\" "Model_Setups\%nameMod%" /E /Q /Y 
 
 rem copy batchin data for the year
-copy "%procDir%/%newconf%/Batchin\scen_%counter%" "Model_Setups\%nameMod%\Database\input_data" 
-
-rem copy lognode data for the year
-copy "Input\Lognodes\unlink_lognode140_%counter%.txt" "Model_Setups\%nameMod%\Database\input_data" 
-rename "Model_Setups\%nameMod%\Database\input_data\unlink_lognode140_%counter%.txt" unlink_lognode140.txt
-copy "Input\Lognodes\unlink_lognode143_%counter%.txt" "Model_Setups\%nameMod%\Database\input_data" 
-rename "Model_Setups\%nameMod%\Database\input_data\unlink_lognode143_%counter%.txt" unlink_lognode143.txt
+@echo --- Copying input data from %procDir%\Skim_input_data\%newconf%\scen_%counter%
+xcopy "%procDir%\Skim_input_data\%newconf%\scen_%counter%\" "Model_Setups\%nameMod%\Database\input_data" /S /Q /Y
 
 rem find name of FOLDER
-if %counter% LEQ %firstYr% (set scen=200)
+if %counter% EQU 2019 (set scen=100)
+if %counter% EQU 2026 (set scen=200)
 if %counter% EQU 2030 (set scen=300)
-if %counter% EQU 2035 (set scen=400)
-if %counter% EQU 2040 (set scen=500)
-if %counter% EQU 2045 (set scen=500)
-if %counter% EQU 2050 (set scen=700)
+if %counter% EQU 2035 (set scen=500)
+if %counter% EQU 2040 (set scen=600)
+if %counter% EQU 2050 (set scen=800)
 
-@echo %tbmInputDir%\Freight_Skim_Inputs_%newconf%_%scen%\
-xcopy "%tbmInputDir%\Freight_Skim_Inputs_%newconf%_%scen%\" "Model_Setups\%nameMod%\Database\input_data\post_processing" /s /e
+if not exist "Model_Setups\%nameMod%\Database\input_data\post_processing" (mkdir "Model_Setups\%nameMod%\Database\input_data\post_processing")
+@echo --- Copying data from %tbmInputDir%\Freight_Skim_Inputs_%newconf%_%scen%
+xcopy "%tbmInputDir%\Freight_Skim_Inputs_%newconf%_%scen%" "Model_Setups\%nameMod%\Database\input_data\post_processing" /S /Q /Y
 rename "Model_Setups\%nameMod%\Database\input_data\post_processing\subzn_emp%counter%.csv" subzn_emp.csv
 
 rem increment counter
-if %counter% GTR %baseYr% (set /A counter=counter+5)
+if %counter% GTR %firstYr% (set /A counter=counter+5)
+if %counter% EQU 2045 (set /A counter=counter+5)
+if %counter% EQU %firstYr% (set /A counter=counter+4)
 if %counter% EQU %baseYr% (set /A counter=%firstYr%)
+
 goto while
 :loopend
 @echo created skim folders and copied Data
@@ -181,71 +184,59 @@ call python macros\1_remove_old_scenarios.py
 call python macros\2_build_network.py %scen% %yrcounter% %flag140% %flag143%
 @Echo -----RUNNING 3_run_skims >> %~dp0/model_run_timestamp.txt
 call emme -ng 000 -m macros\3_run_skims.mac %scen% %flag140% 
-pause
+@echo RUNNING Post-Processing Procedures
+@echo
+call %~dp0..\Scripts\manage\env\activate_env.cmd MFN_ENVNAME
+@echo CURRENT DIRECTORY:
+@echo %cd%
 
+@Echo RUNNING Step1_Create_GCD_file.py
+call python post_processing\Step1_Create_GCD_file.py %yrcounter% %scen%
+
+@Echo RUNNING Step2_1_formatSkims
+call python post_processing\Step2_1_formatSkims.py %yrcounter% %scen%
+
+@Echo RUNNING Step2_2_format_O-L-D
+call python post_processing\Step2_2_format_O-L-D.py %yrcounter% %scen%
+
+@Echo RUNNING Step2_3_format_Airport_Trips
+call python post_processing\Step2_3_format_Airport_Trips.py %yrcounter% %scen%
+
+@Echo RUNNING Step2_4_format_waterport_trips
+call python post_processing\Step2_4_format_waterport_trips.py %yrcounter% %scen%
+
+@Echo RUNNING Step2_5_finalize_skims
+call python post_processing\Step2_5_finalize_skims.py %yrcounter% %scen%
+
+@Echo RUNNING Step3_1_Verify_Costs_Times
+call python post_processing\Step3_1_Verify_Costs_Times.py %yrcounter% %scen%
+
+@Echo RUNNING Step3_2_port_summary
+call python post_processing\Step3_2_port_summary.py %yrcounter% %scen%
+
+@Echo RUNNING Step4_create_zonal_truck_tour_files
+call python post_processing\Step4_create_zonal_truck_tour_files.py %yrcounter% %scen%
+
+@ECHO -----RUNNING step 5 
+%rpath% post_processing\Step5_determine_pipeline_costs.R %scen% %yrcounter%
+
+@echo DELETING TEMPORARY FILES
+rmdir /S /Q "output_data\post_processing_%scen%\tempOut\"
 
 rem increment scenario counter
 if %scen% EQU 200 (goto newScen)
 if %scen% EQU 100 (set /A scen=200) 
 goto sameScen
-
-
-
 :loopend2
-goto END
-
-
-
-
-:END
-@echo END
+@ECHO ====================================================== >> %~dp0/model_run_timestamp.txt
+@ECHO END CMAP FREIGHT NETWORK UPDATE AND SKIMS >> %~dp0/model_run_timestamp.txt
+@ECHO Model Run End Time: %date% %time% >> %~dp0/model_run_timestamp.txt
+@ECHO ====================================================== >> %~dp0/model_run_timestamp.txt
+@ECHO.
+@ECHO END OF BATCH FILE
+@ECHO ==================================================================
+@ECHO ==================================================================
 pause
-
-
-
-:while3
-
-
-
-
-
-
-
-rem @Echo -----RUNNING analyze_mode_access >> %~dp0/model_run_timestamp.txt
-rem @ECHO NOTE: this may take over an hour per network >> %~dp0/model_run_timestamp.txt
-rem call emme -ng 000 -m macros\analyze_mode_access.mac %scen%
-@ECHO -----RUNNING verify rail service >> %~dp0/model_run_timestamp.txt
-if exist macros\Verify_rail_service.lst (del Step1_Create_GCD_file.lst /Q)
-%saspath% macros\Verify_rail_service.sas -sysparm "%scen%"
-if %ERRORLEVEL% GTR 1 (goto saserr)
-CD SAS
-if exist Step1_Create_GCD_file.lst (del Step1_Create_GCD_file.lst /Q)
-if exist Step2_Create_ModePath_Skim_file.lst (del Step2_Create_ModePath_Skim_file.lst /Q)
-if exist Step3_Verify_Costs_Times.lst (del Step3_Verify_Costs_Times.lst /Q)
-if exist Step4_Create_Zonal_Truck_Tour_files.lst (del Step4_Create_Zonal_Truck_Tour_files.lst /Q)
-
-@echo %CD%
-@ECHO -----RUNNING step 1 >> %~dp0/model_run_timestamp.txt
-%saspath% Step1_Create_GCD_file.sas -sysparm "%scen% %counter%"
-if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO -----RUNNING step 2 >> %~dp0/model_run_timestamp.txt
-%saspath% Step2_Create_ModePath_Skim_file.sas -sysparm "%scen% %flag140% %flag143% %counter%"
-if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO -----RUNNING step 3 >> %~dp0/model_run_timestamp.txt
-%saspath% Step3_Verify_Costs_Times.sas -sysparm "%scen% %flag143%"
-if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO -----RUNNING step 4 >> %~dp0/model_run_timestamp.txt
-if exist Step3_Verify_Costs_Times.lst (goto mode_err)
-%saspath% Step4_Create_Zonal_Truck_Tour_files.sas -sysparm "%scen% %counter% %newconf%"
-if %ERRORLEVEL% GTR 1 (goto saserr)
-@ECHO -----RUNNING step 5 >> %~dp0/model_run_timestamp.txt
-%rpath% Step5_determine_pipeline_costs.R %scen% %counter%
-CD %~dp0
-if %counter% GTR %baseYr% (set /A counter=counter+5)
-if %counter% EQU %baseYr% (set /A counter=%firstYr%)
-goto while3
-:loopend3
-
 CD %~dp0
 @ECHO Working Directory = %~dp0
 @ECHO All skims complete
@@ -273,35 +264,7 @@ goto filepass
 @ECHO.
 goto end
 
-:mode_err
-@ECHO.
-@ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@ECHO   SAS IDENTIFIED MODEPATH ERRORS!!! 
-@ECHO   REVIEW .LST FILE AND CORRECT ISSUE.
-@ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@ECHO.
-goto end
-
-:saserr
-@ECHO.
-@ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@ECHO   SAS DID NOT TERMINATE PROPERLY!!! 
-@ECHO   REVIEW .LOG FILE TO IDENTIFY AND CORRECT ISSUE.
-@ECHO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@ECHO.
-goto end
-
-:last
-@ECHO ====================================================== >> %~dp0/model_run_timestamp.txt
-@ECHO END CMAP FREIGHT NETWORK UPDATE AND SKIMS >> %~dp0/model_run_timestamp.txt
-@ECHO Model Run End Time: %date% %time% >> %~dp0/model_run_timestamp.txt
-@ECHO ====================================================== >> %~dp0/model_run_timestamp.txt
-@ECHO.
-@ECHO END OF BATCH FILE
-@ECHO ==================================================================
-@ECHO ==================================================================
-goto end
-
-:end
+:END
+@echo END
 pause
 exit
