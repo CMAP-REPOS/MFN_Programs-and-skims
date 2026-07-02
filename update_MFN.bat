@@ -175,15 +175,18 @@ if exist %infile% (del %infile% /Q)
 cd Database
 
 @Echo %date% %time% Running Skims for %nameMod% scenario %scen%...  >> %~dp0/model_run_timestamp.txt
+@Echo %date% %time% Running Skims for %nameMod% scenario %scen%...
+
 rem Activate Emme Python env
 call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd emme
 
 @Echo -----RUNNING 1_remove_old_scenarios >> %~dp0/model_run_timestamp.txt
-call python macros\1_remove_old_scenarios.py
+call python macros\1_remove_old_scenarios.py %scen%
 @Echo -----RUNNING 2_build_network >> %~dp0/model_run_timestamp.txt
 call python macros\2_build_network.py %scen% %yrcounter% %flag140% %flag143%
 @Echo -----RUNNING 3_run_skims >> %~dp0/model_run_timestamp.txt
-call emme -ng 000 -m macros\3_run_skims.mac %scen% %flag140% 
+call emme -ng 000 -m macros\3_run_skims.mac %scen% 
+pause
 @echo RUNNING Post-Processing Procedures
 @echo
 call %~dp0..\Scripts\manage\env\activate_env.cmd MFN_ENVNAME

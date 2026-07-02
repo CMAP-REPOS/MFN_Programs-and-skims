@@ -42,7 +42,7 @@
 ~z=%0%
 ~+;~?!z=1;~$>error
 ~#
-~+;s=%1%;~?e;~$>bad_scen
+~+;s=%1%00;~?e;~$>bad_scen
 ~/ Scenario number argument is valid.
 ~#
 ~# ##########################################################
@@ -72,7 +72,7 @@ batchin=input_data\matrix.in
 ~+;3.11;2
 ~#
 ~#
-~+;~y=%1%;~y+1
+~+;~y=%1%00;~y+1
 ~x=1
 ~# =============================================================================
 ~# KC removed rail loop 1/7/2025
@@ -82,7 +82,7 @@ batchin=input_data\matrix.in
 ~+;s=%y%;~?e;~$>new
 ~+;1.22;2;%y%;y;q
 ~:new
-~+;1.22;3;%1%;%y%;Skim Network for Trucks;y;q
+~+;1.22;3;%1%00;%y%;Skim Network for Trucks;y;q
 ~# ## -- Truck Skims -- ##
 ~# ## -- store length in ul3 for vdf -- ##
 ~+|2.41|1|y|ul3|length| |all|4|q
@@ -108,7 +108,7 @@ batchin=input_data\matrix.in
 ~+;s=%y%;~?e;~$>new
 ~+;1.22;2;%y%;y;q
 ~:new
-~+;1.22;3;%1%;%y%;Skim Network for Inland Waterways;y;q
+~+;1.22;3;%1%00;%y%;Skim Network for Inland Waterways;y;q
 ~# ## -- Water Skims -- ##
 ~# ## -- store length in ul3 for vdf -- ##
 ~+|2.41|1|y|ul3|length| |all|4|q
@@ -128,10 +128,10 @@ batchout=%t3%
 ~#
 ~# =============================================================================
 ~y+8                / scenario
-~+;~r1=%1%;~r1+10
-~+;~r2=%1%;~r2+11
-~+;~r3=%1%;~r3+12
-~+;~r4=%1%;~r4+13
+~+;~r1=%1%00;~r1+10
+~+;~r2=%1%00;~r2+11
+~+;~r3=%1%00;~r3+12
+~+;~r4=%1%00;~r4+13
 ~:pipeline_loop
 ~/ ## -- Scenario %y%: Pipeline Skimming -- ##
 s=%y%
@@ -156,7 +156,9 @@ s=%y%
 ~#
 ~#
 ~# =============================================================================
-s=%1%
+s=%1%00
+~r1=600                / rail interchange wait time factor
+~r2=300                / rail interchange boarding time (minutes)
 ~/ ## -- Scenario %s%: Integrated Rail Network Skimming -- ##
 ~+;~t3=BUXNpnKae;~t4=mf61;~t5=mf62;~t6=mf63;~t7=mf64;~t8=mf65;~#     -- All Rail options;
 ~#
@@ -231,9 +233,10 @@ len               / Additional auxiliary transit attribute
 batchin=input_data\mo80.txt
 ~+;3.11;2
 ~#
-~y=%1%
+~y=%1%00
+~r1=%1%                / set for flag
 ~t2=151,399
-~+;~?!y=100;~$>run_LogNode140
+~+;~?!r1=100;~$>run_LogNode140
 ~# ## -- OPTION 1: Triple-Indexing excluding LogNode 140 -- ##
 3.23
 1             ~/ compute triple-index operation
