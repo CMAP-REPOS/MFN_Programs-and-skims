@@ -148,12 +148,13 @@ rem setup
 set nameMod=Meso_Freight_Skim_Setup_%newconf%_%yrcounter%
 CD %~dp0/Model_Setups/%nameMod%/Database
 
-if "%yrcounter%"=="2022" (
-	set /A flag143=0
-	goto proceed143)
-if NOT "%yrcounter%" == "2022" (
-	set /A flag143=1
-	goto proceed143)
+
+IF %yrcounter% GTR 2034 (
+    SET /A flag143=1
+) ELSE (
+    SET /A flag143=0
+)
+GOTO proceed143
 :proceed143
 if "%scen%"=="200" (
 	set /A flag140=1
@@ -180,52 +181,47 @@ cd Database
 rem Activate Emme Python env
 call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd emme
 
+rem goto skipSkims
 @Echo -----RUNNING 1_remove_old_scenarios >> %~dp0/model_run_timestamp.txt
 call python macros\1_remove_old_scenarios.py %scen%
 @Echo -----RUNNING 2_build_network >> %~dp0/model_run_timestamp.txt
-call python macros\2_build_network.py %scen% %yrcounter% %flag140% %flag143%
+call python macros\2_build_network.py %scen% %yrcounter%
 @Echo -----RUNNING 3_run_skims >> %~dp0/model_run_timestamp.txt
 call emme -ng 000 -m macros\3_run_skims.mac %scen% 
-pause
+:skipSkims
 @echo RUNNING Post-Processing Procedures
 @echo
-call %~dp0..\Scripts\manage\env\activate_env.cmd MFN_ENVNAME
+call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
 @echo CURRENT DIRECTORY:
 @echo %cd%
-
+pause
 @Echo RUNNING Step1_Create_GCD_file.py
 call python post_processing\Step1_Create_GCD_file.py %yrcounter% %scen%
-
 @Echo RUNNING Step2_1_formatSkims
 call python post_processing\Step2_1_formatSkims.py %yrcounter% %scen%
-
 @Echo RUNNING Step2_2_format_O-L-D
 call python post_processing\Step2_2_format_O-L-D.py %yrcounter% %scen%
-
 @Echo RUNNING Step2_3_format_Airport_Trips
 call python post_processing\Step2_3_format_Airport_Trips.py %yrcounter% %scen%
-
 @Echo RUNNING Step2_4_format_waterport_trips
 call python post_processing\Step2_4_format_waterport_trips.py %yrcounter% %scen%
-
 @Echo RUNNING Step2_5_finalize_skims
 call python post_processing\Step2_5_finalize_skims.py %yrcounter% %scen%
-
 @Echo RUNNING Step3_1_Verify_Costs_Times
 call python post_processing\Step3_1_Verify_Costs_Times.py %yrcounter% %scen%
-
+pause
 @Echo RUNNING Step3_2_port_summary
 call python post_processing\Step3_2_port_summary.py %yrcounter% %scen%
-
+pause
 @Echo RUNNING Step4_create_zonal_truck_tour_files
 call python post_processing\Step4_create_zonal_truck_tour_files.py %yrcounter% %scen%
-
+pause
 @ECHO -----RUNNING step 5 
 %rpath% post_processing\Step5_determine_pipeline_costs.R %scen% %yrcounter%
-
+pause
 @echo DELETING TEMPORARY FILES
 rmdir /S /Q "output_data\post_processing_%scen%\tempOut\"
-
+pause
 rem increment scenario counter
 if %scen% EQU 200 (goto newScen)
 if %scen% EQU 100 (set /A scen=200) 

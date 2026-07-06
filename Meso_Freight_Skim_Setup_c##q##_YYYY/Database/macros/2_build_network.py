@@ -10,12 +10,10 @@ import pandas as pd
 def main():
     # Read input parameters
     scenario = sys.argv[1]
-    flag140 = int(sys.argv[2])
-    year = int(sys.argv[3])
+    year = int(sys.argv[2])
     print('BUILDING SCENARIOS::::::::::::::::::::::::::::::::::::::::::::::::::::::::')
     print(f'SCENARIO = {scenario}')
     print(f'YEAR = {year}')
-    print(f'FLAG140 = {flag140}')
 
     # Define Input Paths
     input_dir =  os.path.join(os.getcwd(),"input_data")
@@ -102,14 +100,14 @@ def main():
     
     # Import logistics nodes files
     # Flag 140: Is extra logistics terminal (in Crete as of June 2026) active? 1 = no, 2 = yes
-    if flag140 == 1:
+    if scenario != 200:
         try:
             process_network(transaction_file = pth_140, revert_on_error=True, scenario=_m.Modeller().scenario)
             print('--- Logistics node 140 removed from network')
         except: print("ERROR REMOVING LOGISTICS NODE 140")
 
     # Flag 143: Is extra logistics terminal (South Suburban Airport as of June 2026) active? 22 = no, other year = yes
-    if year == 22:
+    if year < 2035:
         try:
             process_network(transaction_file = pth_143, revert_on_error=True, scenario=_m.Modeller().scenario)
             print('--- Logistics node 143 removed from network')
@@ -161,7 +159,7 @@ def main():
                 field_separator=",",
                 column_labels={0: "i_node", 
                                 1: "j_node", 
-                                5: "@domestic"},
+                                4: "@domestic"},
                 revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
         print("--- Imported domestic distance forward to base network")
         # Reverse
@@ -171,7 +169,7 @@ def main():
                 field_separator=",",
                 column_labels={0: "j_node", 
                                 1: "i_node", 
-                                5: "@domestic"},
+                                4: "@domestic"},
                 revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
         print("--- Imported domestic distance reverse to base network")
     except: print("ERROR IMPORTING DOMESTIC DISTANCE TO BASE NETWORK")
@@ -219,7 +217,7 @@ def main():
 
     # Calculate rail dwell time
     rdwell_spec = {
-        "result": "@poecd",
+        "result": "@rdwell",
         "expression": f"(@mzone.eq.{str(in_dwlCode['stLouisMESO1'])} .or. @mzone.eq.{str(in_dwlCode['stLouisMESO2'])})*{str(in_dwlCode['stLouisDWL'])} + (@mzone.eq.{str(in_dwlCode['memphisMESO'])})*{str(in_dwlCode['memphisDWL'])} + (@mzone.eq.{str(in_dwlCode['newOrleansMESO'])})*{str(in_dwlCode['newOrleansDWL'])} + (@mzone.eq.{str(in_dwlCode['kansasCityMESO1'])} .or. @mzone.eq.{str(in_dwlCode['kansasCityMESO2'])})*{str(in_dwlCode['kansasCityDWL'])}",
         "selections": {
             "node": "all"

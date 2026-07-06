@@ -220,7 +220,10 @@ centroids['result2'] = centroids['result'].str.replace('*', '', regex=False)    
 
 centroids[['skip1', 'node', 'xcoord', 'ycoord', 'skip']] = centroids['result2'].str.split('\s+', expand = True)  ##-- Create new columns deliminated by spaces
 centroids=centroids[['node', 'xcoord', 'ycoord']]                                                                ##-- Select final centroid coordinate columns
-centroids=centroids.astype({'node':int, 'xcoord': float, 'ycoord': float})                                       ##-- Format data types
+centroids['node'] = centroids['node'].astype(str).str.strip().str.replace(',', '', regex=False)
+centroids['node'] = pd.to_numeric(centroids['node'], errors='coerce')
+centroids['node'] = centroids['node'].round().astype('Int64')  
+centroids = centroids.astype({'xcoord': 'float64', 'ycoord': 'float64'})
 centroids['xcoord']=(centroids['xcoord']/5280).round(3)       ##-- Convert xcoord from State Plane feet to miles
 centroids['ycoord']=(centroids['ycoord']/5280).round(3)       ##-- Convert ycoord from State Plane feet to miles
 
@@ -236,8 +239,9 @@ mesoCoords.to_csv(outMesoCentroids, index=False)                 ##-- Export mes
 # Format data for POE files
 # ---------------------------------------------------------------
 ##-- Format POE node ID's
-in_poe.columns = ['node', 'poeCode', 'type']                    ##-- Rename columns
-poes=in_poe.astype({'node':int, 'poeCode': int, 'type': str})   ##-- Format data types
+in_poe.columns = ['node', 'poeCode']                    ##-- Rename columns
+poes=in_poe.astype({'node':int, 'poeCode': int})        ##-- Format data types
+poes['type'] = np.where(poes['node'] > 3000, 'T', 'R')  ##-- Flag truck and rail POEs
 trkpoe=poes.loc[poes['type'] == 'T']                            ##-- Keep only truck modes
 trkpoe=trkpoe[['node', 'poeCode']]                              ##-- Rename columns
 
