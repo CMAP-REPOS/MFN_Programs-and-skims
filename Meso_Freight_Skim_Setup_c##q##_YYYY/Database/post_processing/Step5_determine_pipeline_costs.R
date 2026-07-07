@@ -17,12 +17,10 @@ args = commandArgs(trailingOnly=T)
 # source("../get_dir.R")  		## -- Intelligently create DirPath variable
 library(rstudioapi)
 DirPath = getwd()
-print(DirPath)
 scenario = args[1]
 year = args[2]
 InDir1 = file.path(DirPath, "emmemat")
 InDir2 = file.path(DirPath, paste0("output_data/post_processing_", scenario, "/"))
-print(InDir2)
 infile1 = paste0("data_mesozone_gcd_",year, ".csv", sep = "")
 infile2 = paste0("tempOut/data_modepath_miles1_",year, ".csv", sep = "")
 infile3 = paste0("tempOut/data_modepath_skim1_",year, ".csv", sep = "")
@@ -195,7 +193,6 @@ intra[, TrDray:=round(TrDray, 1)]
 intra[, TrDrayDms:=TrDray]
 intra[p>273, TrDrayDms:=0]
 setkey(intra,p)
-
 setwd(InDir1)
 ## -- Highway Network --
 h1 <- convertMatrix("mf31.emx", maxOb, maxZn, znUsed)	
@@ -209,7 +206,6 @@ setkey(h1,p)
 h1b <- copy(h1)
 setnames(h1b, c("p","p1"), c("q1","q"))
 setkey(h1b,q)
-
 ## =======================================================
 ## -- Crude Oil Network (SCTG 16) --
 ## =======================================================
@@ -304,7 +300,6 @@ sc19 <- pipeIntra(sc19,intra,57,LastCmap,LastUS)
 l = list(pipelines,sc16,sc17,sc19)
 pipelines <- rbindlist(l, use.names=T, fill=T)	
 
-
 ## =======================================================
 ## -- Pipeline Costs and Times --
 ## =======================================================
@@ -345,13 +340,14 @@ pipeMiles[, c("CmapPsTR","CmapPsRL","RlDwlCode","RlTrnfr"):=0]
 setnames(pipeMiles, c("p","q","LhMilesDms","DrayMilesDms"), c("Origin","Destination","DmsLhMiles","DmsDrayMiles"))
 pipeMiles[, temp:=NULL]
 
-
 Miles <- fread(infile2)
+setnames(Miles, c("origin", "destination"), c('Origin', 'Destination'))
 l = list(Miles,pipeMiles)
 Miles <- rbindlist(l, use.names=T, fill=T)
 setorder(Miles,Origin,Destination,MinPath)
 write.csv(Miles, outfile1, row.names=F)
-if(file.exists(infile2)){file.remove(infile2)} 
+#if(file.exists(infile2)){file.remove(infile2)} 
+
 ## -- QC
 x <- Miles[TotalNtwkMiles==0]
 if(nrow(x)>0) {cat("ERROR: Instances where TotalNtwkMiles is missing:", nrow(x), fill=T)}
@@ -360,19 +356,22 @@ if(nrow(x)>0) {cat("ERROR: Instances where DmsLhMiles is missing:", nrow(x), fil
 x <- Miles[DmsDrayMiles==0 & !MinPath %in% c(3,13,31,46) & Origin<=LastUS & Destination<=LastUS]
 if(nrow(x)>0) {cat("ERROR: Instances where DmsDrayMiles is missing:", nrow(x), fill=T)}
 
-
 Costs <- fread(infile3)
-Costs[Origin==1 & Destination==1, c("time55","time56","time57","cost55","cost56","cost57"):=NA]		## -- reset to missing
-setnames(pipelines, c("p","q"), c("Origin","Destination"))
-pt1 <- pipelines[tm55>0, list(Origin,Destination,tm55,cst55)]
-pt2 <- pipelines[tm56>0, list(Origin,Destination,tm56,cst56)]
-pt3 <- pipelines[tm57>0, list(Origin,Destination,tm57,cst57)]
-setkey(pt1,Origin,Destination)
-setkey(pt2,Origin,Destination)
-setkey(pt3,Origin,Destination)
-pt1 <- merge(pt1, pt2, by=c("Origin","Destination"), all.x=T, all.y=T)
-pt1 <- merge(pt1, pt3, by=c("Origin","Destination"), all.x=T, all.y=T)
-setkey(Costs,Origin,Destination)
+
+for (j in c("time55","time56","time57","cost55","cost56","cost57")) {
+  data.table::set(Costs, j = j, value = as.numeric(Costs[[j]]))
+}
+Costs[origin == 1 & destination == 1, c("time55","time56","time57","cost55","cost56","cost57") := NA_real_]
+setnames(pipelines, c("p","q"), c("origin","destination"))
+pt1 <- pipelines[tm55>0, list(origin,destination,tm55,cst55)]
+pt2 <- pipelines[tm56>0, list(origin,destination,tm56,cst56)]
+pt3 <- pipelines[tm57>0, list(origin,destination,tm57,cst57)]
+setkey(pt1,origin,destination)
+setkey(pt2,origin,destination)
+setkey(pt3,origin,destination)
+pt1 <- merge(pt1, pt2, by=c("origin","destination"), all.x=T, all.y=T)
+pt1 <- merge(pt1, pt3, by=c("origin","destination"), all.x=T, all.y=T)
+setkey(Costs,origin,destination)
 newCost <- pt1[Costs]	
 newCost[tm55>0, time55:=tm55]
 newCost[cst55>0, cost55:=cst55]
@@ -382,26 +381,27 @@ newCost[tm57>0, time57:=tm57]
 newCost[cst57>0, cost57:=cst57]
 newCost[,c("tm55","cst55","tm56","cst56","tm57","cst57"):=NULL]
 write.csv(newCost, outfile2, row.names=F)
-if(file.exists(infile3)){file.remove(infile3)} 
+#if(file.exists(infile3)){file.remove(infile3)} 
 
 ## =======================================================
 ## -- QC data_modepath_skims & data_modepath_miles --
 ## =======================================================
-modes1 <- melt(newCost, id.vars=c("Origin","Destination"), measure.vars=paste0("time",1:57), variable.name="timepath", value.name="time", na.rm=T)
+modes1 <- melt(newCost, id.vars=c("origin","destination"), measure.vars=paste0("time",1:57), variable.name="timepath", value.name="time", na.rm=T)
 modes1 <- modes1 %>%
   mutate(MinPath = as.integer(str_replace(timepath, "time", ""))) %>%
-  select(Origin, Destination, MinPath) %>%
-  arrange(Origin, Destination, MinPath)
+  select(origin, destination, MinPath) %>%
+  arrange(origin, destination, MinPath)
 #modes1[,timepath:=str_replace(timepath, "time", "")]
 #modes1[,MinPath:=as.integer(timepath)]
 #modes1 <- modes1[,list(Origin,Destination,MinPath)]
 #setkey(modes1,Origin,Destination,MinPath)
 
-miles <- Miles[,list(Origin,Destination,MinPath,TotalNtwkMiles)]
-setkey(miles,Origin,Destination,MinPath)
+setnames(Miles, c("Origin", "Destination"), c('origin', 'destination'))
+miles <- Miles[,list(origin,destination,MinPath,TotalNtwkMiles)]
+setkey(miles,origin,destination,MinPath)
 cat(nrow(modes1), "records in modepath file", fill=T)
 cat(nrow(miles), "records in miles file", fill=T)
-modes1 <- merge(modes1, miles, by=c("Origin","Destination","MinPath"), all.x=T)
+modes1 <- merge(modes1, miles, by=c("origin","destination","MinPath"), all.x=T)
 chk <- modes1 %>% filter(is.na(TotalNtwkMiles))
 if(nrow(chk)>0) {
   cat("*********************************************************",fill=T)
