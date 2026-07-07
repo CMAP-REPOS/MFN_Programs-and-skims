@@ -33,7 +33,7 @@ import pandas as pd, numpy as np
 # Define paths
 # ---------------------------------------------------------------
 ##-- System inputs
-year = sys.argv[1]       ##-- Model run year, used to label output files
+year = int(sys.argv[1])       ##-- Model run year, used to label output files
 scenario = sys.argv[2]
 
 ##-- File directories
@@ -43,7 +43,7 @@ outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scena
 
 ##-- Inputs 
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
-pth_modepathcosts = os.path.join(outDir + "/data_all_modepath_costs_" + year + ".csv")
+pth_modepathcosts = os.path.join(outDir + "/data_all_modepath_costs_" + str(year) + ".csv")
 
 # ---------------------------------------------------------------
 # Import Data
@@ -112,7 +112,7 @@ if len(v_options) > 0:
 # Check for missing data (NA) when data should be present
 def qc_MissingData(input_df, condition, modepaths, strOD):
     qc1 = input_df.loc[condition].copy()
-    if year!='2022':
+    if year>2030:
         modepaths.append(49)
     for _, row in qc1.iterrows(): 
         for path in modepaths:
@@ -346,7 +346,7 @@ md_verifyIntra3 = [47, 51, 52, 53, 54]
 # Add logistics node 149 modepath as option where necessary
 addLogo = [md_Canada_CMAP, bd_Canada_NonCMAP_NH, md_Mexico_CMAP, bd_Mexico_NonCMAP_NH, md_Hawaii_CMAP,
            md_Alaska_CMAP, md_Foreign_CMAP]
-if year!='2022':
+if year>2030:
     for lst in addLogo:
         lst.append(49)
 

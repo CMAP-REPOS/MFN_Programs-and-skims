@@ -113,7 +113,7 @@ for nm in dupNames:
 
 # Keep only the last row of each origin-destination group (will have the largest Tdist00)
 updatedi = updatedi.sort_values(by=['origin', 'destination', 'Tdist00'])
-lasti = updatedi.groupby(['origin', 'destination'], as_index=False).last().reset_index()  # Keep only the last row in each origin-destination group
+lasti = updatedi.groupby(['origin', 'destination'], as_index=False).last() #.reset_index()  # Keep only the last row in each origin-destination group
 
 # Merge with additional data
 allData = pd.merge(lasti, in_emskim, how='left', on=['origin', 'destination'])

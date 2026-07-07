@@ -30,9 +30,9 @@ outEmp= os.path.join(outDir + "/cmap_data_zone_employment_" + year + ".csv")    
 # Import Data
 # ---------------------------------------------------------------
 #https://www.geeksforgeeks.org/python/how-to-read-text-files-with-pandas/
-in_hwydist = pd.read_csv(pth_hwydist, sep = ' ', skiprows = 5, header=None)           ##-- AM Peak skimmed miles 
-in_hwytmpk = pd.read_csv(pth_hwytmpk, sep = ' ', skiprows = 5, header=None)           ##-- AM Peak skimmed minutes
-in_hwymop = pd.read_csv(pth_hwytmop, sep = ' ', skiprows = 5, header=None)            ##-- Midday skimmed minutes 
+in_hwydist = pd.read_csv(pth_hwydist, sep = ',', skiprows = 5, header=None)           ##-- AM Peak skimmed miles 
+in_hwytmpk = pd.read_csv(pth_hwytmpk, sep = ',', skiprows = 5, header=None)           ##-- AM Peak skimmed minutes
+in_hwymop = pd.read_csv(pth_hwytmop, sep = ',', skiprows = 5, header=None)            ##-- Midday skimmed minutes 
 
 in_znsqmi = pd.read_csv(pth_znsqmi, sep = ' all', skiprows = 5, header=None, engine='python')   ##-- zonal area
 in_znx = pd.read_csv(pth_znx, sep = ' all:', skiprows = 3, header=None, engine='python')        ##-- zone x-coordinate
@@ -100,47 +100,23 @@ empAgg.to_csv(outEmp, index=False)                                              
 #  Format skim data
 # ----------------------------------------------------------------------------
 matLst = [in_hwydist, in_hwytmpk, in_hwymop]               ##-- List of input data files
-type_dict = {'origin': int, 'dest': int, 'value':float}    ##-- Dictionary of data types
+type_dict = {'origin': int, 'destination': int, 'value':float}    ##-- Dictionary of data types
 
 i=1   ##-- set counter for naming end df
 ##-- For each input file in the list
 for mat in matLst: 
     mat_in = mat
-    mat_in.columns=['skip','origin', 'dest1', 'dest2', 'dest3', 'dest4']         ##-- Rename columns
-    mat_in = mat_in[['origin', 'dest1', 'dest2', 'dest3', 'dest4']].copy()              ##-- Select columns
+    mat_in.columns = ['origin', 'destination', 'value']
 
-    ##-- Split destination zone and value (formatted: dzone:value)
-    mat_in[['dest1', 'val1']] = mat_in['dest1'].str.split(':', expand = True)   
-    mat_in[['dest2', 'val2']] = mat_in['dest2'].str.split(':', expand = True) 
-    mat_in[['dest3', 'val3']] = mat_in['dest3'].str.split(':', expand = True)
-    mat_in[['dest4', 'val4']] = mat_in['dest4'].str.split(':', expand = True)
-    mat_in = mat_in[['origin', 'dest1','val1', 'dest2', 'val2', 'dest3', 'val3', 'dest4', 'val4']].reset_index()   ##-- Select columns
-
-    ##-- Create temporary df for each set of OD-Value column pairs
-    tmp1=mat_in[['origin', 'dest1','val1']]
-    tmp1.columns=['origin', 'dest', 'value']
-    tmp2=mat_in[['origin', 'dest2','val2']]
-    tmp2.columns=['origin', 'dest', 'value']
-    tmp3=mat_in[['origin', 'dest3','val3']]
-    tmp3.columns=['origin', 'dest', 'value']
-    tmp4=mat_in[['origin', 'dest4','val4']]
-    tmp4.columns=['origin', 'dest', 'value']
-    p_mat = pd.concat([tmp1, tmp2, tmp3, tmp4])   ##-- Row bind temporary dfs for final df: origin, destination, value
-
-    ##-- Clean up, not sure if any of this is even necessary now...KC Check
-    p_mat = p_mat.dropna()                         #-- Filter to remove NA
-    p_mat = p_mat.loc[p_mat['value'] != '.'].copy()       #-- Filter to remove links not in sl analysis
-    p_mat = p_mat.loc[p_mat['value'] != ''].copy()        #-- Filter to remove links not in sl analysis
-
-    p_mat = p_mat.astype(type_dict)    ##-- Convert data types
+    mat_in = mat_in.astype(type_dict)    ##-- Convert data types
 
     ##-- Rename df for manipulation outside loop
     if i==1:
-        hwydist = p_mat
+        hwydist = mat_in
     if i==2:
-        hwytmpk = p_mat
+        hwytmpk = mat_in
     if i==3:
-        hwymop = p_mat
+        hwymop = mat_in
 
     i = i+1
 

@@ -14,15 +14,18 @@
 ## ---------------------------------------------------------------
 args = commandArgs(trailingOnly=T)
 #setwd('D://cmh_data//FY18_Meso_Freight_Skim_Setup//Database//SAS') 
-source("../get_dir.R")  		## -- Intelligently create DirPath variable
-
+# source("../get_dir.R")  		## -- Intelligently create DirPath variable
+library(rstudioapi)
+DirPath = getwd()
+print(DirPath)
 scenario = args[1]
 year = args[2]
 InDir1 = file.path(DirPath, "emmemat")
-InDir2 = file.path(DirPath, paste0("SAS/outputs/", scenario))
+InDir2 = file.path(DirPath, paste0("output_data/post_processing_", scenario, "/"))
+print(InDir2)
 infile1 = paste0("data_mesozone_gcd_",year, ".csv", sep = "")
-infile2 = paste0("data_modepath_miles1_",year, ".csv", sep = "")
-infile3 = paste0("data_modepath_skims1_",year, ".csv", sep = "")
+infile2 = paste0("tempOut/data_modepath_miles1_",year, ".csv", sep = "")
+infile3 = paste0("tempOut/data_modepath_skim1_",year, ".csv", sep = "")
 outfile1 = paste0("data_modepath_miles_",year, ".csv", sep = "")	
 outfile2 = paste0("data_modepath_skims_",year, ".csv", sep = "")
 
