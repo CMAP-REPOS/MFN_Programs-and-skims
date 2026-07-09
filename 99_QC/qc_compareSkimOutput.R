@@ -41,8 +41,8 @@ in_zones <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "zones")
 #--Define Lists & Variables####
 allFiles = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
 chFiles = c("cmap_data_truck_EE_poe.csv", "cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims",
-            "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports")
-stFiles = c("cmap_data_zone_centroids.csv", "data_mesozone_centroids.csv", "data_mesozone_gcd.csv", "data_modepath_airports.csv")
+            "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", "data_modepath_airports.csv")
+stFiles = c("cmap_data_zone_centroids.csv", "data_mesozone_centroids.csv", "data_mesozone_gcd.csv")
 
 skLim = 0.05  #mesozone skims print if percent difference > 5%
 

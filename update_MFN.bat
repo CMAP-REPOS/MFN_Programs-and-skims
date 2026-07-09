@@ -70,6 +70,7 @@ if exist model_run_timestamp.txt (del model_run_timestamp.txt /Q)
 REM ###################################################################################################################################################
 rem DEVELOP REMAINING FOLDER STRUCTURE
 if not exist "Model_Setups" (mkdir "Model_Setups")
+if not exist "Compare_%oldconf%_inputs" (mkdir "Compare_%oldconf%_inputs")
 
 REM add processing data to base model setup
 @echo --- Copying static input data from %procDir%\Skim_input_data\Static
@@ -82,6 +83,13 @@ xcopy "%procDir%\Skim_input_data\%newconf%" "Meso_Freight_Skim_Setup_c##q##_YYYY
 REM add emmebank to base model setup
 @echo --- Copying emmebank from %procDir%\EmmeBank\emmebank
 copy "%procDir%\EmmeBank\emmebank" "Meso_Freight_Skim_Setup_c##q##_YYYY/Database" 
+
+REM add MFN crosswalk to comparison input Data
+@echo --- Copying MFN_crosswalks.xlsx to input com
+copy "%procDir%\NetworkUpdate\MFN_crosswalks.xlsx" "Compare_%oldconf%_inputs" 
+
+REM add comparison data to input FOLDER
+xcopy "V:/Secure/Master_Freight/Archive/%oldconf%/Skim_Output" "Compare_%oldconf%_inputs" /S /Q /Y >nul 2>&1
 
 rem COPY AND RENAME SKIMS SETUPS, INCLUDING EMMEBANK FROM V DRIVE
 set /A counter=%baseYr%
@@ -214,8 +222,7 @@ if %ERRORLEVEL% GTR 0 (goto issue)
 @Echo RUNNING Step4_create_zonal_truck_tour_files
 call python post_processing\Step4_create_zonal_truck_tour_files.py %yrcounter% %scen%
 if %ERRORLEVEL% GTR 0 (goto issue)
-
-@ECHO -----RUNNING step 5 
+@ECHO RUNNING step 5 
 %rpath% post_processing\Step5_determine_pipeline_costs.R %scen% %yrcounter%
 if %ERRORLEVEL% GTR 0 (goto issue)
 @echo DELETING TEMPORARY FILES
@@ -226,6 +233,19 @@ if %scen% EQU 200 (goto newScen)
 if %scen% EQU 100 (set /A scen=200) 
 goto sameScen
 :loopend2
+
+REM ###################################################################################################################################################
+CD %~dp0
+@Echo FINAL QC
+@Echo %date% %time% Final QC and Clean Up...  >> %~dp0/model_run_timestamp.txt
+rem RUN FINAL QC SCRIPTS
+@ECHO Running qc_finalSkimOutput.R >> %~dp0/model_run_timestamp.txt
+%rpath% 99_QC\qc_finalSkimOutput.R %newconf%
+if %ERRORLEVEL% GTR 0 (goto issue)
+@ECHO Running qc_compareSkimOutput.R >> %~dp0/model_run_timestamp.txt
+rem %rpath% 99_QC\qc_compareSkimOutput.R %oldconf%
+
+
 @ECHO ====================================================== >> %~dp0/model_run_timestamp.txt
 @ECHO END CMAP FREIGHT NETWORK UPDATE AND SKIMS >> %~dp0/model_run_timestamp.txt
 @ECHO Model Run End Time: %date% %time% >> %~dp0/model_run_timestamp.txt
@@ -234,22 +254,12 @@ goto sameScen
 @ECHO END OF BATCH FILE
 @ECHO ==================================================================
 @ECHO ==================================================================
-pause
+
 CD %~dp0
 @ECHO Working Directory = %~dp0
 @ECHO All skims complete
-REM ###################################################################################################################################################
-:run4
-CD %~dp0
-@Echo FINAL QC
-@Echo %date% %time% Final QC and Clean Up...  >> %~dp0/model_run_timestamp.txt
-rem RUN FINAL QC SCRIPTS
-@ECHO Running qc_finalSkimOutput.R >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_finalSkimOutput.R %newconf% %baseYr% %firstYr% %lastYr%
-@ECHO Running qc_compareSkimOutput.R >> %~dp0/model_run_timestamp.txt
-%rpath% 99_QC\qc_compareSkimOutput.R %oldconf%
-
-goto last
+pause
+goto END
 REM ###################################################################################################################################################
 :CheckEmpty
 if %~z1 == 0 (goto badfile)

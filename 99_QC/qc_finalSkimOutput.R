@@ -14,17 +14,14 @@ package.check <- lapply(
 #--Define paths and create folders####
 args = commandArgs(trailingOnly=T)
 newConf = args[1]
-inBaseYr = as.integer(args[2])
-inFirstYr = as.integer(args[3])
-inLastYr = as.integer(args[4])
-setupName = "../Skim_New/Model_Setups/Meso_Freight_Skim_Setup_"
+setupName1 = "../Model_Setups"
+setupName = "../Model_Setups/Meso_Freight_Skim_Setup_"
 newFolName = paste(setupName,newConf, "_", sep = "")
 
-outDir = "../Skim_New/Skim_Output"
+outDir = "../Skim_Output"
 out100 = paste(outDir, "/No_LogNode140", sep = "")
 out200 = paste(outDir, "/LogNode140", sep = "")
-outReport = "../Output/QC"
-report = paste(outReport, "/qc_finalSkimReport.txt", sep = "")
+report = paste(outDir, "/qc_finalSkimReport.txt", sep = "")
 
 #--Delete Output Folder if it exists
 if(file.exists(outDir) == TRUE){unlink(outDir, recursive = TRUE)}
@@ -34,26 +31,29 @@ if(file.exists(outReport) == TRUE){unlink(outReport, recursive = TRUE)}
 dir.create(outDir)
 dir.create(out100)
 dir.create(out200)
-dir.create(outReport)
 
 #--Delete report if exists
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 
 #--Define Lists####
-i = inFirstYr
-while(i <= inLastYr){
-  if(i == inFirstYr){
-    years <- list(inBaseYr, inFirstYr)
-  }else{
-    years <-append(years, i)
-  }
-  i = i+5
-}
+
+files <- list.files(setupName1)
+
+years <- regmatches(
+  files,
+  gregexpr("(?<=_)\\d{4}", files, perl = TRUE)
+) |>
+  unlist() |>
+  as.integer() |>
+  unique() |>
+  sort()
+
+
 scen = c(100, 200)
 smFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_centroids", "data_mesozone_centroids",
-            "data_mesozone_gcd", "data_modepath_airports")
+            "data_mesozone_gcd")
 yrFiles = c("cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims")
-scFiles = c("cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports")
+scFiles = c("cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", "data_modepath_airports")
 
 #2. Compare within new run####
 #--Confirm universal data is consistent across folders####
@@ -71,7 +71,7 @@ for(file in smFiles){
     for(sc in scen){
       cat(sc, file =report,append=TRUE)  
       cat("\n", file =report,append=TRUE)
-      inFile = paste(newFolName, year, "/Database/SAS/outputs/", sc, "/", file, "_", year, ".csv", sep = "")
+      inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
       
       if(i == 1){
         in1 <- read.csv(inFile)
@@ -96,17 +96,21 @@ print("QA/QC CHECKING YEAR SPECIFIC DATA")
 cat("CHECKING YEAR SPECIFIC DATA \n", file =report,append=TRUE)
 
 for(file in yrFiles){
+  print(file)
   cat(file, file =report,append=TRUE)
   cat("\n", file =report,append=TRUE)
   for(year in years){
     cat(year, file =report,append=TRUE)
     cat("\n", file =report,append=TRUE)
-    inFile1 = paste(newFolName, year, "/Database/SAS/outputs/100", "/", file, "_", year, ".csv", sep = "")
-    inFile2 = paste(newFolName, year, "/Database/SAS/outputs/200", "/", file, "_", year, ".csv", sep = "")
+    inFile1 = paste(newFolName, year, "/Database/output_data/post_processing_100", "/", file, "_", year, ".csv", sep = "")
+    inFile2 = paste(newFolName, year, "/Database/output_data/post_processing_200", "/", file, "_", year, ".csv", sep = "")
     in1 <- read.csv(inFile1)
     in2 <- read.csv(inFile2)
     resp = all.equal(in1, in2)
-    if(resp != TRUE){stop()}
+    if(resp != TRUE){
+      print('issue')
+      stop()
+      }
   }
 }
 
@@ -116,10 +120,10 @@ cat("COPYING & RENNAMING DATA \n", file=report,append=TRUE)
 
 #--Move Files
 #Files that are the same all years, all scenarios, go in 'Skim_Output' with amended name to remove year
-year = inBaseYr
+year = min(years)
 sc = 100
 for(file in smFiles){
-  inFile = paste(newFolName, year, "/Database/SAS/outputs/", sc, "/", file, "_", year, ".csv", sep = "")
+  inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
   file.copy(inFile, outDir)
   
   currentName = paste(outDir,"/", file, "_", year, ".csv", sep = "")
@@ -135,7 +139,7 @@ for(file in smFiles){
 #Files that are the same all scenarios, different years, go in 'Skim_Output'
 for(file in yrFiles){
   for(year in years){
-    inFile = paste(newFolName, year, "/Database/SAS/outputs/", sc, "/", file, "_", year, ".csv", sep = "")
+    inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
     file.copy(inFile, outDir)
   }
   
@@ -146,7 +150,7 @@ for(file in scFiles){
   for(year in years){
     for(sc in scen){
       if(sc == 100){od = out100}else{od = out200}
-      inFile = paste(newFolName, year, "/Database/SAS/outputs/", sc, "/", file, "_", year, ".csv", sep = "")
+      inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
       file.copy(inFile, od)
     }
   }
