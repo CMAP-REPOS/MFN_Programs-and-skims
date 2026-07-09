@@ -174,7 +174,6 @@ cd Database
 
 rem Activate Emme Python env
 call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd emme
-
 @Echo -----RUNNING 1_remove_old_scenarios >> %~dp0/model_run_timestamp.txt
 call python macros\1_remove_old_scenarios.py %scen%
 if %ERRORLEVEL% GTR 0 (goto issue)
@@ -186,8 +185,8 @@ call emme -ng 000 -m macros\3_run_skims.mac %scen%
 if %ERRORLEVEL% GTR 0 (goto issue)
 @echo RUNNING Post-Processing Procedures
 @echo
-call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
 
+call %~dp0\Model_Setups\%nameMod%\Scripts\manage\env\activate_env.cmd CMAP-TRIP2
 @Echo RUNNING Step1_Create_GCD_file.py
 call python post_processing\Step1_Create_GCD_file.py %yrcounter% %scen%
 if %ERRORLEVEL% GTR 0 (goto issue)
@@ -214,13 +213,14 @@ call python post_processing\Step3_2_port_summary.py %yrcounter% %scen%
 if %ERRORLEVEL% GTR 0 (goto issue)
 @Echo RUNNING Step4_create_zonal_truck_tour_files
 call python post_processing\Step4_create_zonal_truck_tour_files.py %yrcounter% %scen%
+if %ERRORLEVEL% GTR 0 (goto issue)
 
 @ECHO -----RUNNING step 5 
 %rpath% post_processing\Step5_determine_pipeline_costs.R %scen% %yrcounter%
 if %ERRORLEVEL% GTR 0 (goto issue)
 @echo DELETING TEMPORARY FILES
 rmdir /S /Q "output_data\post_processing_%scen%\tempOut\"
-pause
+
 rem increment scenario counter
 if %scen% EQU 200 (goto newScen)
 if %scen% EQU 100 (set /A scen=200) 

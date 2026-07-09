@@ -35,7 +35,6 @@ import pandas as pd, numpy as np
 ##-- System inputs
 year = int(sys.argv[1])       ##-- Model run year, used to label output files
 scenario = sys.argv[2]
-flag143 = int(sys.argv[3])
 
 ##-- File directories
 databaseDir = os.getcwd()            ##-- Database     
@@ -113,7 +112,7 @@ if len(v_options) > 0:
 # Check for missing data (NA) when data should be present
 def qc_MissingData(input_df, condition, modepaths, strOD):
     qc1 = input_df.loc[condition].copy()
-    if flag143==1:
+    if scenario==200:
         modepaths.append(49)
     for _, row in qc1.iterrows(): 
         for path in modepaths:
@@ -124,7 +123,7 @@ def qc_MissingData(input_df, condition, modepaths, strOD):
             if pd.isnull(row[f'cost{path}']):
                 print(f"Missing Cost Data for {strOD}: ")
                 print(row[['origin', 'destination', f'cost{path}']])
-                sys.exit()
+                sys.exit(1)
 
 # Check for data when no data should be there for all modepaths
 def qc_badData(input_df, condition, modepaths, strOD):
@@ -138,7 +137,7 @@ def qc_badData(input_df, condition, modepaths, strOD):
             if row[f'cost{path}'] > 0:
                 print(f"Bad Cost Data for {strOD}: ")
                 print(row[['origin', 'destination', f'cost{path}']])
-                sys.exit()
+                sys.exit(1)
 
 # Check that some modepaths have non-zero max time and cost
 def qc_nonZeroMax(input_df, condition, modepaths, strOD):
@@ -151,7 +150,7 @@ def qc_nonZeroMax(input_df, condition, modepaths, strOD):
             sys.exit()
         if maxCost == 0:
             print(f"ERROR: No Rail Service Cost found for {strOD}: ")
-            sys.exit()    
+            sys.exit(1)    
 
 # -----------------------------------------------------------------------------------------------
 # Define Geography Filter Conditions
@@ -347,7 +346,7 @@ md_verifyIntra3 = [47, 51, 52, 53, 54]
 # Add logistics node 149 modepath as option where necessary
 addLogo = [md_Canada_CMAP, bd_Canada_NonCMAP_NH, md_Mexico_CMAP, bd_Mexico_NonCMAP_NH, md_Hawaii_CMAP,
            md_Alaska_CMAP, md_Foreign_CMAP]
-if flag143==1:
+if scenario==0:
     for lst in addLogo:
         lst.append(49)
 
