@@ -35,6 +35,7 @@ import pandas as pd, numpy as np
 ##-- System inputs
 year = int(sys.argv[1])       ##-- Model run year, used to label output files
 scenario = sys.argv[2]
+flag143 = int(sys.argv[3])
 
 ##-- File directories
 databaseDir = os.getcwd()            ##-- Database     
@@ -112,7 +113,7 @@ if len(v_options) > 0:
 # Check for missing data (NA) when data should be present
 def qc_MissingData(input_df, condition, modepaths, strOD):
     qc1 = input_df.loc[condition].copy()
-    if year>2030:
+    if flag143==1:
         modepaths.append(49)
     for _, row in qc1.iterrows(): 
         for path in modepaths:
@@ -346,13 +347,9 @@ md_verifyIntra3 = [47, 51, 52, 53, 54]
 # Add logistics node 149 modepath as option where necessary
 addLogo = [md_Canada_CMAP, bd_Canada_NonCMAP_NH, md_Mexico_CMAP, bd_Mexico_NonCMAP_NH, md_Hawaii_CMAP,
            md_Alaska_CMAP, md_Foreign_CMAP]
-if year>2030:
+if flag143==1:
     for lst in addLogo:
         lst.append(49)
-
-
-# In[148]:
-
 
 # ---------------------------------------------------------------
 # Define Dictionaries to loop through 
