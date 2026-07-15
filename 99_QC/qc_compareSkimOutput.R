@@ -12,19 +12,19 @@ package.check <- lapply(
     }
   }
 )
-TMPDIR="S:/AdminGroups/ResearchAnalysis/kcc/temp"
+TMPDIR="M:/proj1/kcc/temp"
 terraOptions(tempdir = TMPDIR)  
 
 #--Define paths####
 args = commandArgs(trailingOnly=T)
 oldConf = args[1]
 
-newDir = "../Skim_New/Skim_Output/"
-currentDir =  paste("../Input/Skim_Output_", oldConf, "/", sep = "")
+newDir = "Skim_Output/"
+compareDir =  paste("Compare_", oldConf, "_inputs/", sep = "")
 
-empUpdate = "no"
+empUpdate = "yes"
 
-rpDir = "../Output/QC/"
+rpDir = "Skim_Output/"
 outXL = paste(rpDir, "finalSkim_compareQC.xlsx", sep = "")
 report = paste(rpDir, "qc_CompareReport.txt", sep = "")
 
@@ -33,22 +33,26 @@ if(file.exists(outXL) == TRUE){unlink(outXL, recursive = TRUE)}
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 
 #--Import crosswalks####
-in_modePath <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "modePath")
-in_ports <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "Ports")
-in_POE <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "POE")
-in_zones <- read_xlsx("../Input/MFN_crosswalks.xlsx", sheet = "zones")
+crosswalkDir = paste0(compareDir, "MFN_crosswalks.xlsx")
+in_modePath <- read_xlsx(crosswalkDir, sheet = "modePath")
+in_ports <- read_xlsx(crosswalkDir, sheet = "Ports")
+in_POE <- read_xlsx(crosswalkDir, sheet = "POE")
+in_zones <- read_xlsx(crosswalkDir, sheet = "zones")
 
 #--Define Lists & Variables####
-allFiles = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
-chFiles = c("cmap_data_truck_EE_poe.csv", "cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims",
-            "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", "data_modepath_airports.csv")
-stFiles = c("cmap_data_zone_centroids.csv", "data_mesozone_centroids.csv", "data_mesozone_gcd.csv")
+allFilesNew = list.files(newDir, include.dirs = FALSE, recursive=TRUE)
+allFilesCompare = list.files(compareDir, include.dirs = FALSE, recursive=TRUE)
+allFiles = intersect(allFilesNew, allFilesCompare)
+
+chFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims",
+            "cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", "data_modepath_airports")
+stFiles = c("cmap_data_zone_centroids", "data_mesozone_centroids", "data_mesozone_gcd")
 
 skLim = 0.05  #mesozone skims print if percent difference > 5%
 
 #--Define Empty Template DF for Comparison####
 #depending on format, amend to full df then export as tab in xlsx, or just export
-all_TruckEE <- data.frame(Year = as.numeric(), Production_zone = as.integer(), Consumption_zone = as.integer(),
+all_TruckEE <- data.frame(Production_zone = as.integer(), Consumption_zone = as.integer(),
                           C_poe2 = as.integer(), C_poe = as.integer(), N_poe2 = as.integer(), N_poe = as.integer(), 
                           CState = as.character(), NState = as.character(), CDirection = as.character(), NDirection = as.character(),
                           CState2 = as.character(), NState2 = as.character(), CDirection2 = as.character(), NDirection2 = as.character())
@@ -71,7 +75,7 @@ all_znSkim <- data.frame(Year = as.numeric(), OCounty= as.character(), DCounty= 
                          COffPeak= as.numeric(), NOffPeak= as.numeric(), perc_OffPeak= as.numeric(),
                          CMiles= as.numeric(), NMiles= as.numeric(), perc_Mi= as.numeric())
 
-all_mesoSkim <- data.frame(Year = as.numeric(), Origin= as.integer(), Destination= as.integer(), currentTime= as.numeric(), 
+all_mesoSkim <- data.frame(Year = as.numeric(), origin= as.integer(), destination= as.integer(), currentTime= as.numeric(), 
                            newTime= as.numeric(), Difference= as.numeric(), Percent= as.numeric())
 
 
@@ -86,35 +90,39 @@ all_modeSkim <- data.frame(Scenario = as.numeric(), Year = as.numeric(), Mode=as
 print("QA/QC COMPARING NEW DATA TO V DRIVE CURRENT DATA")
 for(file in allFiles){
   #Load data
-  inCurrent <- read.csv(paste(currentDir, file, sep = ""))
+  inCurrent <- read.csv(paste(compareDir, file, sep = ""))
   inNew <- read.csv(paste(newDir, file, sep = ""))
-  
   #Determine file name to send it to the correct loop
-  if(grepl("140/", file)){
-    name = str_split_i(file, "140/", 2)
-    name = str_split_i(name, "_2", 1)
-    
-    scen = str_split_i(file, "140/", 1)
-    temp = str_split_i(file, "_20", 2)
-    temp = str_split_i(temp, ".csv", 1)
-    year = as.numeric(paste("20", temp, sep = ""))
-    
+  if(!(grepl("_20", file))){
+    print("Not a year-specific file")
+    name = str_split_i(file, ".csv", 1)
   }else{
-    name = str_split_i(file, "_2", 1)
-    scen = NA
-    temp = str_split_i(file, "_20", 2)
-    temp = str_split_i(temp, ".csv", 1)
-    year = as.numeric(paste("20", temp, sep = ""))
+    # Determine if the file name is in one of the lognode folders
+    if(grepl("140/", file)){
+      name = str_split_i(file, "140/", 2)
+      name = str_split_i(name, "_2", 1)
+        
+      scen = str_split_i(file, "140/", 1)
+      temp = str_split_i(file, "_20", 2)
+      temp = str_split_i(temp, ".csv", 1)
+      year = as.numeric(paste("20", temp, sep = ""))
+        
+    }else{
+      name = str_split_i(file, "_2", 1)
+      temp = str_split_i(file, "_20", 2)
+      temp = str_split_i(temp, ".csv", 1)
+      year = as.numeric(paste("20", temp, sep = ""))
+    }
   }
+  print(name)
 
   if(name %in% chFiles){
     printOut = paste("chFiles: ", file, sep = "")
     cat(printOut, file =report,append=TRUE)
     cat("\n", file =report,append=TRUE)
-    if(name == "cmap_data_truck_EE_poe.csv"){
+    if(name == "cmap_data_truck_EE_poe"){
       inCurrent<- inCurrent %>% rename(C_poe = poe, C_poe2 = poe2)                                             #Load Current file and amend column names
       inNew<- inNew %>% rename(N_poe = poe, N_poe2 = poe2)                                                     #Load New file and amend column names
-      
       qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%                #Join data
         left_join(in_POE, by = c("C_poe2" = "POE")) %>%                                                        #Bind crosswalk
         rename(CState2 = State, CDirection2 = Direction) %>%
@@ -125,14 +133,16 @@ for(file in allFiles){
         left_join(in_POE, by = c("N_poe" = "POE")) %>%
         rename(NState = State, NDirection = Direction) %>%
         filter((NDirection != CDirection) | (NDirection2 != CDirection2)) %>%
-        mutate(Year = year) %>%
         select(colnames(all_TruckEE))
       
       #Confirm all POE ID's are in expected range; if not stop code
       check <- qcOut %>%
         filter((!(N_poe %in% in_POE$POE))|(!(C_poe %in% in_POE$POE))) %>%
         filter(!(is.na(N_poe) | is.na(C_poe)))
-      if(nrow(check) != 0){stop()}
+      if(nrow(check) != 0){
+        print("ERROR, not all POEs in expected range")
+        print(check)
+        stop() }
       
       #Combine all year &/or scenario data from file
       all_TruckEE <- rbind(all_TruckEE, qcOut)
@@ -224,11 +234,12 @@ for(file in allFiles){
         
       }else if(name == "data_mesozone_skims"){
         #Amend Current and New file column names
-        inCurrent <- inCurrent %>% rename(currentTime = Time)
-        inNew <- inNew %>% rename(newTime = Time)
-        
+        inCurrent <- inCurrent 
+        colnames(inCurrent) <- c('origin', 'destination', 'currentTime')
+        inNew <- inNew
+        colnames(inNew) <- c('origin', 'destination', 'newTime')
         #Merge new and current data; calculate differencepercent difference in 
-        qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%   #Merge current and new data
+        qcOut <- full_join(inCurrent, inNew, by = join_by(origin, destination)) %>%   #Merge current and new data
           mutate(Year = year,                                                         #Flag current year of data
                  Difference = newTime - currentTime,                                  #Calculate difference in skim time
                  Percent = round(Difference/(newTime + currentTime),3)) %>%           #Calculate percent difference in skim time
@@ -237,21 +248,23 @@ for(file in allFiles){
         
         #Combine with template dataframe
         all_mesoSkim <- rbind(all_mesoSkim, qcOut) %>%
-          arrange(Origin, Destination, Year)
+          arrange(origin, destination, Year)
         
       }else if(name == "data_modepath_skims"){
         
         #Check for 0 in 2022 and not in other years
         ch140 <- inNew %>%
-          select(Origin, Destination, time49, cost49) %>%
+          select(origin, destination, time49, cost49) %>%
           filter(!is.na(time49) | !is.na(cost49))
-        if(year == 2022 & nrow(ch140) > 0){
-          printOut = "ERROR: Values for modepath 49, logistics  node 140 shouldn't be active, it's only 2022!"
+        if((year < 2035) & (nrow(ch140) > 0)){
+          print(head(ch140))
+          printOut = "ERROR: Values for modepath 49, logistics  node 140 shouldn't be active, it's not 2035 yet!"
           cat(printOut, file =report,append=TRUE)
           stop()
           
-        }else if(year != 2022 & nrow(ch140) == 0){
-          printOut = "ERROR: No values for modepath 49, logistics  node 140 should be active, it's after 2022!"
+        }else if((year >= 2035) & (nrow(ch140) == 0)){
+          print(head(ch140))
+          printOut = "ERROR: No values for modepath 49, logistics  node 140 should be active, it's after 2035!"
           cat(printOut, file =report,append=TRUE)
           printOut = paste("Year = ", year, "\n", sep = "")
           cat(printOut, file =report,append=TRUE)
@@ -368,7 +381,6 @@ for(file in allFiles){
         #Flag current and new data
         inCurrent<- inCurrent %>% rename(C_mesoNB = Port_mesozoneNB, C_nameNB = Port_NameNB, C_mesoB = Port_mesozoneB, C_nameB = Port_NameB)
         inNew<- inNew %>% rename(N_mesoNB = Port_mesozoneNB, N_nameNB = Port_NameNB, N_mesoB = Port_mesozoneB, N_nameB = Port_NameB)
-        
         #Join current and new data by all fields
         qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
           mutate(flagB = ifelse(N_mesoB == C_mesoB, 1, 0),
@@ -404,7 +416,8 @@ for(file in allFiles){
     if(equ != TRUE){
       printOut = "uh oh! These files are not equal"
       cat(printOut, file =report,append=TRUE)
-      stop()
+      cat("\n", file =report,append=TRUE)
+      #stop()
       }
     
   }else{

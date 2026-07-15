@@ -55,16 +55,8 @@ in_modepathcosts = pd.read_csv(pth_modepathcosts, low_memory=False)
 with open(pth_nodeznmeso, 'r') as file:         ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
     in_nodeznmeso = yaml.safe_load(file)
 
-
-# In[43]:
-
-
 portData = in_modepathcosts.loc[~pd.isnull(in_modepathcosts['GCD'])]
 portData = portData[['origin','destination', 'Port_NameNB', 'Port_mesozoneNB','Port_NameB', 'Port_mesozoneB']]
-
-
-# In[57]:
-
 
 def port_summary(inDF, origins, destinations, label):
     print(label)
@@ -90,10 +82,6 @@ def port_summary(inDF, origins, destinations, label):
     sumDataB.to_csv(outPortSummary, mode="a", header=False, index=False)
     sumDataNB.to_csv(outPortSummary, mode="a", header=False, index=False)
 
-
-# In[ ]:
-
-
 # Ports
 kansasCity = [189, 209]
 chicago = [1,20,33,42,49,58,62,71,78,85,87,109,127,128,129]
@@ -106,10 +94,6 @@ cincinnati = [231]
 eastAsia = [316,374,403,418,456]
 europe = [275,285,291,292,304,324,328,330,339,344,345,350,353,364,370,372,382,388,412,419,430,431,434,435,446,451,452,458,463,464,469,481,483]
 restAmerica = [281,283,293,297,300,302,310,312,315,319,323,333,334,336,356,359,360,363,373,399,414,424,426,427,484,487]
-
-
-# In[63]:
-
 
 dict_ports = {
     'Kansas City' : [189, 209],
@@ -125,9 +109,6 @@ dict_areas = {
     'Europe': [275,285,291,292,304,324,328,330,339,344,345,350,353,364,370,372,382,388,412,419,430,431,434,435,446,451,452,458,463,464,469,481,483],
     'Rest of America': [281,283,293,297,300,302,310,312,315,319,323,333,334,336,356,359,360,363,373,399,414,424,426,427,484,487]
 }
-
-
-# In[66]:
 
 
 with open(outPortSummary, "w", newline="") as f:

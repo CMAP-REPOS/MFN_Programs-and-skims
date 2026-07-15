@@ -1,8 +1,8 @@
 #KCC
 #script to read MHN future network coding and produce future MFN networks
-MHN_conf = 'c25q2'
-reference_conf = 'c24q4'
-years = c(2022, 2025, 2030, 2035, 2040, 2045, 2050, 2060)
+MHN_conf = 'c26q2'
+reference_conf = 'c25q2'
+years = c(2019, 2026, 2030, 2035, 2040, 2050)
 
 #--SETUP--####
 packages <- c("tidyverse", "scales", "openxlsx", "sf", "sfheaders", "sp", "geosphere", 'rstudioapi')

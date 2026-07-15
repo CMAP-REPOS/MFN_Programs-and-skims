@@ -807,7 +807,7 @@ DRmile = {idx: np.nan for idx in range(1,55)}
 
 # modepath, cost, time, mile, lhmile, drmile
 allOutData['NA'] = np.nan
-if scenario == '100': 
+if int(year) < 2035: 
     cost49 = 'NA'
     time49 = 'NA'
     mile49 = 'NA'
@@ -1067,7 +1067,7 @@ mesoSkim.to_csv(pth_outMesoSkim, index=False)
 port = outModepaths.loc[outModepaths['Port_mesozoneNB'].notnull()].copy()
 port=port[['origin', 'destination', 'Port_mesozoneNB', 'Port_NameNB', 'Port_mesozoneB', 'Port_NameB']]
 
-port = port.groupby(['origin', 'destination']).nth(0)
+port = port.groupby(['origin', 'destination']).nth(0).reset_index()
 port.rename(columns={'destination':'Consumption_zone', 'origin':'Production_zone'}, inplace=True)
 
 port.to_csv(pth_outPorts, index=False)

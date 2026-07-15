@@ -100,13 +100,13 @@ def main():
     
     # Import logistics nodes files
     # Flag 140: Is extra logistics terminal (in Crete as of June 2026) active? 1 = no, 2 = yes
-    if scenario != 200:
+    if scenario != '200':
         try:
             process_network(transaction_file = pth_140, revert_on_error=True, scenario=_m.Modeller().scenario)
             print('--- Logistics node 140 removed from network')
         except: print("ERROR REMOVING LOGISTICS NODE 140")
 
-    # Flag 143: Is extra logistics terminal (South Suburban Airport as of June 2026) active? 22 = no, other year = yes
+    # Flag 143: Is extra logistics terminal (South Suburban Airport as of June 2026) 
     if year < 2035:
         try:
             process_network(transaction_file = pth_143, revert_on_error=True, scenario=_m.Modeller().scenario)

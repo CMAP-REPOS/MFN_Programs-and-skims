@@ -14,18 +14,18 @@ package.check <- lapply(
 #--Define paths and create folders####
 args = commandArgs(trailingOnly=T)
 newConf = args[1]
-setupName1 = "../Model_Setups"
-setupName = "../Model_Setups/Meso_Freight_Skim_Setup_"
+print(getwd())
+setupName1 = "Model_Setups"
+setupName = "Model_Setups/Meso_Freight_Skim_Setup_"
 newFolName = paste(setupName,newConf, "_", sep = "")
 
-outDir = "../Skim_Output"
+outDir = "Skim_Output"
 out100 = paste(outDir, "/No_LogNode140", sep = "")
 out200 = paste(outDir, "/LogNode140", sep = "")
 report = paste(outDir, "/qc_finalSkimReport.txt", sep = "")
 
 #--Delete Output Folder if it exists
 if(file.exists(outDir) == TRUE){unlink(outDir, recursive = TRUE)}
-if(file.exists(outReport) == TRUE){unlink(outReport, recursive = TRUE)}
 
 #--Create Folders
 dir.create(outDir)
