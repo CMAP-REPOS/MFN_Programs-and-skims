@@ -289,7 +289,7 @@ def main():
                     has_header=False,
                     column_labels={0: "i_node", 
                                     1: "j_node", 
-                                    5: "@domestic"},
+                                    4: "@domestic"},
                     revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
             # Reverse
             process_extra(pth_domdistPipe,
@@ -298,7 +298,7 @@ def main():
                     field_separator=",",
                     column_labels={0: "j_node", 
                                     1: "i_node", 
-                                    5: "@domestic"},
+                                    4: "@domestic"},
                     revert_on_error=False)              # False otherwise if 140 or 143 were removed, this will fail
             print("--- Imported pipeline domestic distance")
         except: print("ERROR IMPORTING PIPELINE DOMESTIC DISTANCE")
