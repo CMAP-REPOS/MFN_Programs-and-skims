@@ -1,7 +1,31 @@
-#this script updates the MFN logistic node locations
-#KCazzato 1/7/2025
-#library(scales)
-#library(plotrix)
+###############################################################################################
+# KCazzato 1/7/2025                                                                           #
+#                                                                                             #
+# This program updates the location of user specified logistic nodes in the MFN               #
+#     - Logistics nodes designate specific modal terminals:                                   #
+#       Rail terminal, Truck terminal, airport, water port                                    #
+#     - Updates node location in highway and rail network                                     #
+#     - Attaches node to rail network                                                         #
+#                                                                                             #
+# User specified inputs:                                                                      #
+#     - BASE_GDB: file path to GDB containing a recent MFN GDB                                #
+#     - TARGET_GDB: file path to GDB containing the target MFN GDB where update will occur    #
+#     - IN_FILE: file with updated logistics node location and attributes                     #
+#             COLUMNS:                                                                        #
+#                 *NODE_ID: number 133-150, inclusive                                         #
+#                 *LN_Type: string, "Rail terminal", "Truck terminal",                        #
+#                              "Airport", or "Water Port"                                     #
+#                 *LN_descrp: string description of the terminal (ex: "O'Hare")               # 	
+#                 *POINT_X: number, updated x coordinate for node                             #
+#                 *POINT_Y: number, updated y coordinate for node                             #
+#                                                                                             #
+###############################################################################################
+##-- DEFINE USER INPUTS --##
+BASE_GDB = ""        # recent version of MFN GDB, .gdb file
+TARGET_GDB = ""      # target MFN GDB, .gdb file
+IN_FILE = ""         # Input file with updated logistics node information, .xlsx
+
+##-- IMPORT LIBRARIES --##
 library(tidyverse)
 library(sf)
 library(openxlsx)
@@ -9,21 +33,18 @@ library(sfheaders)
 library(sp)
 library(geosphere)
 
-baseDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/SB_current/MFN.gdb"                               #Old Version of MFN
-outputDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_currentFY25.gdb"
-
+##-- IMPORT DATA --##
+in_Railnodes <- read_sf(dsn = BASE_GDB, layer = "CMAP_Rail_nodes", crs = 26771)
+in_Raillinks <- read_sf(dsn = BASE_GDB, layer = "CMAP_Rail", crs = 26771) 
+in_mesozones <- read_sf(dsn=BASE_GDB, layer = "Meso_External_CMAP_Merge", crs = 26771)
 in_nodes <- data.frame(NODE_ID = c(133:150))
-in_newNodes <- read.xlsx("../../Input/update_LogisticNodes.xlsx")
+in_newNodes <- read.xlsx(inFile)
 
-in_Railnodes <- read_sf(dsn = baseDir, layer = "CMAP_Rail_nodes", crs = 26771)
-in_Raillinks <- read_sf(dsn = baseDir, layer = "CMAP_Rail", crs = 26771) 
-in_mesoCentroids <- read_sf(dsn = baseDir, layer = "Meso_Ext_Int_Centroids", crs = 26771)
-in_mesozones <- read_sf(dsn=outputDir, layer = "Meso_External_CMAP_Merge", crs = 26771)
-
-#Update attributes and geography
+##- UPDATE HIGHWAY AND RAIL FEATURE CLASSES --## 
+# Highway
 update_att <- in_nodes %>%
   left_join(in_newNodes, by = "NODE_ID") %>%
-  rename(LN_Type = newType, LN_descrp = newDescrp, POINT_X = newX, POINT_Y = newY) %>%
+  select(NODE_ID, LN_Type, LN_descrp, POINT_X, POINT_Y) %>%
   mutate(xcoord = POINT_X, ycoord = POINT_Y) %>%
   st_as_sf(coords = c("xcoord", "ycoord"), crs = 26771) %>%
   rename(Shape = geometry) %>%
@@ -40,7 +61,7 @@ update_Rail <- update_att %>%
   st_intersection(in_mesozones) %>%
   select(colnames(in_Railnodes))
 
-#Update Rail Nodes####
+# Rail Nodes
 cleanNodes <- in_Railnodes %>%
   filter(!(NODE_ID %in% update_Rail$NODE_ID)) 
 
@@ -50,7 +71,7 @@ newNodes <- in_Railnodes %>%
   rbind(update_Rail) %>%
   rename(NODE_ID_T = NODE_ID)
 
-#Update Rail Links####
+# Rail Links
 #Link DF without the old linds
 otherLinks <- in_Raillinks %>%
   filter(!(INODE %in% update_Rail$NODE_ID)) %>%
@@ -62,13 +83,15 @@ originalLog <- in_Raillinks %>%
   select(JNODE:VDF) %>%
   st_drop_geometry() %>%
   distinct()
-#Attach special nodes to base nodes and find distance####
+
+##-- ATTACH NEW LOGISTICS NODES TO NETWORK --##
+# Attach special nodes to base nodes and find distance
 temp_dist1 <- update_Rail %>%
   rename(centroidX = POINT_X, centroidY = POINT_Y, logisticID = NODE_ID) %>%
   cross_join(cleanNodes) %>%
   mutate(distance = sqrt(((centroidX - POINT_X)^2) + ((centroidY - POINT_Y)^2)))
 
-#Develop special links#### 
+# Develop special links
 logisticNodes <- temp_dist1 %>%
   group_by(logisticID) %>%
   arrange(distance) %>%
@@ -101,7 +124,7 @@ allLogistic_f <- st_as_sf(logisticNodes, wkt = geometry) %>%
 allLinks <- rbind(allLogistic_f, otherLinks) %>%
   rename(INODE_T = INODE, JNODE_T = JNODE)
 
-#Export####
-st_write(obj = update_att, layer = "Meso_Logistic_Nodes", dsn = outputDir, append = FALSE)
-st_write(obj = allLinks, layer = "CMAP_Rail", dsn = outputDir, append = FALSE)
-st_write(obj = newNodes, layer = "CMAP_Rail_nodes", dsn = outputDir, append = FALSE)
+##-- EXPORT UPDATED LAYERS--## 
+st_write(obj = update_att, layer = "Meso_Logistic_Nodes", dsn = TARGET_GDB, append = FALSE)
+st_write(obj = allLinks, layer = "CMAP_Rail", dsn = TARGET_GDB, append = FALSE)
+st_write(obj = newNodes, layer = "CMAP_Rail_nodes", dsn = TARGET_GDB, append = FALSE)
