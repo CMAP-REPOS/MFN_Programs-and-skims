@@ -1,31 +1,39 @@
-#this script updates the MFN national highway network from sz09 --> sz17 highway POE node IDs
+#############################################################################
+# KCazzato 1/2025                                                           #
+#                                                                           #
+# This script updates the MFN national highway network POE nodes            #
+#   from zone09 system to the zone17 system and relocates node              #
+#   1955 from zone09 (3643 in zone17)                                       #
+#                                                                           #
+# User specified inputs:                                                    #
+#     - BASE_GDB: gdb file path, MFN with zone09 national highway network   #
+#     - TARGET_GDB: gdb file path, target MFN to contain updated zone17 POE #
+#     - ID_crosswalk: user entered lists of POE NODE_IDs                    #
+#############################################################################
+##-- USER INPUTS --##
+BASE_GDB = ""          # GDB file path, MFN with zone09 national highway network
+TARGET_GDB = ""        # GDB file path, target MFN to update with zone17 national highway network
 
-#library(scales)
-#library(plotrix)
-library(tidyverse)
-library(sf)
-#library(openxlsx)
-library(sfheaders)
-library(sp)
-library(geosphere)
-
-#Set Directories and Data####
-baseDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/SB_current/MFN.gdb"                               #Old Version of MFN
-outputDir = "S:/AdminGroups/ResearchAnalysis/kcc/FY25/MFN/Current_copies/Output/MFN_currentFY25.gdb"        #New Version of MFN
-
-ID_crosswalk <- data.frame(old_ID = c(1946, 1948, 1951, 1952, 1953, 1954, 1955, 1956, 1959, 1960),        #Old IDs
-                           new_ID = c(3634, 3636, 3639, 3640, 3641, 3642, 3643, 3644, 3647, 3648))        #New IDs
+ID_crosswalk <- data.frame(old_ID = c(1946, 1948, 1951, 1952, 1953, 1954, 1955, 1956, 1959, 1960),        #Old IDs (zone09)
+                           new_ID = c(3634, 3636, 3639, 3640, 3641, 3642, 3643, 3644, 3647, 3648))        #New IDs (zone17)
 
 #special handling - need to move the location of this node in the national network to match the current MHN (c24q2 as of 1/9/2025)
 new1955X = 617405.946526     
 new1955Y = 1576236.419566
 
-#national highway network from gdb to be updated
-in_nodes <- read_sf(dsn = baseDir, layer = "National_Hwy_nodes", crs = 26771)
-in_links <- read_sf(dsn = baseDir, layer = "National_Highway", crs = 26771) 
+##-- IMPORT LIBRARIES --##
+library(tidyverse)
+library(sf)
+library(sfheaders)
+library(sp)
+library(geosphere)
+
+##-- IMPORT DATA --##
+in_nodes <- read_sf(dsn = BASE_GDB, layer = "National_Hwy_nodes", crs = 26771)
+in_links <- read_sf(dsn = BASE_GDB, layer = "National_Highway", crs = 26771) 
 in_links$index <- 1:nrow(in_links)
 
-#Move node 1955####
+##-- MOVE NODE 1955 --## 
 updatedLink <- in_links %>%
   st_drop_geometry() %>%
   select(-Shape_Length) %>%
@@ -35,7 +43,7 @@ updatedLink <- in_links %>%
 
 updatedLinks_att <- updatedLink %>% ungroup()
 
-#--Link layer####
+# update in link layer
 #format node pairs
 updated2 <- updatedLink %>%
   mutate(lineID = INODE,
@@ -67,7 +75,7 @@ otherLinks <- in_links %>%
 
 allLinks <- rbind(updated_links, otherLinks)
 
-#--Node layer####
+# update in node layer
 node_coords <- in_nodes %>%
   st_drop_geometry()  %>%
   mutate(POINT_X = ifelse(NODE_ID == 1955, new1955X, POINT_X),
@@ -82,7 +90,7 @@ node_coords2<- node_coords %>%
   rename(Shape = geometry) %>%
   mutate(Shape_Length = st_length(Shape))
 
-#Renumber####
+##-- RENUMBER POE --##
 final_links <- allLinks %>%
   left_join(ID_crosswalk, by = c("INODE" = "old_ID")) %>%
   mutate(INODE = ifelse(is.na(new_ID), INODE, new_ID)) %>%
@@ -101,5 +109,5 @@ final_nodes <- node_coords2 %>%
   rename(NODE_ID_T = NODE_ID)
 
 #Export####
-st_write(obj = final_nodes, layer = "National_Hwy_nodes", dsn = outputDir, append = FALSE)
-st_write(obj =final_links, layer = "National_Highway", dsn = outputDir, append = FALSE)
+st_write(obj = final_nodes, layer = "National_Hwy_nodes", dsn = TARGET_GDB, append = FALSE)
+st_write(obj =final_links, layer = "National_Highway", dsn = TARGET_GDB, append = FALSE)
