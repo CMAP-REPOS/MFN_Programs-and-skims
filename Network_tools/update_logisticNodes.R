@@ -38,7 +38,7 @@ in_Railnodes <- read_sf(dsn = BASE_GDB, layer = "CMAP_Rail_nodes", crs = 26771)
 in_Raillinks <- read_sf(dsn = BASE_GDB, layer = "CMAP_Rail", crs = 26771) 
 in_mesozones <- read_sf(dsn=BASE_GDB, layer = "Meso_External_CMAP_Merge", crs = 26771)
 in_nodes <- data.frame(NODE_ID = c(133:150))
-in_newNodes <- read.xlsx(inFile)
+in_newNodes <- read.xlsx(IN_FILE)
 
 ##- UPDATE HIGHWAY AND RAIL FEATURE CLASSES --## 
 # Highway
