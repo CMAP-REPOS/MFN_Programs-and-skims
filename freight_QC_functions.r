@@ -1,5 +1,18 @@
 #-- QC FUNCTIONS
+'''
+Author: Tyler Huang
 
+Date: 9/21/2026
+
+Description:
+This file contains functions for the QC process that 
+
+Input Files: 
+
+
+Output Files:
+
+'''
 ### CHANGE FILES #####
 truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                      empUpdate = NA_character_, skLim = NA_real_, in_POE){
@@ -110,7 +123,7 @@ mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_characte
         qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%   #Merge current and new data
           mutate(Year = year,                                                         #Flag current year of data
                  Difference = newTime - currentTime,                                  #Calculate difference in skim time
-                 Percent = round(Difference/(newTime + currentTime),5)) %>%           #Calculate percent difference in skim time
+                 Percent = round(Difference/(newTime + currentTime),3)) %>%           #Calculate percent difference in skim time
           select(Year, Origin, Destination, currentTime, newTime, Difference, Percent) %>%   #Select column names of target dataframe
           filter(abs(Percent) >= skLim)%>%   #Filter to keep percent differences > |1%|
           arrange(Origin, Destination, Year)                                                  
@@ -183,19 +196,19 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
                  diff_PsRL = N_CmapPsRL-C_CmapPsRL, 
                  diff_RlTrnFr =N_RlTrnfr - C_RlTrnfr,                                      #Calculate change in rail transfer fraction
                  diff_RlDwlCode =N_RlDwlCode - C_RlDwlCode,                                #Calculate change in rail dwell code
-                 Perc_TotMi = round(diff_TotMi/(N_TotalNtwkMiles + C_TotalNtwkMiles),5),   #Calculate percent differences
-                 Perc_DmsLh = round(diff_DmsLh/(N_DmsLhMiles + C_DmsLhMiles),5),
-                 Perc_DmsDray = round(diff_DmsDray/(N_DmsDrayMiles + C_DmsDrayMiles),5),
-                 Perc_IntlShip = round(diff_IntlShip/(N_IntlShipMiles + C_IntlShipMiles),5),
-                 Perc_PsTR = round(diff_PsTR/(N_CmapPsTR + C_CmapPsTR),5),
-                 Perc_PsRL = round(diff_PsRL/(N_CmapPsRL + C_CmapPsRL),5),
-                 Perc_RlTrnFr = round(diff_RlTrnFr/(N_RlTrnfr + C_RlTrnfr),5),
-                 Perc_RlDwlCode = round(diff_RlDwlCode/(N_RlDwlCode + C_RlDwlCode),5),
+                 Perc_TotMi = round(diff_TotMi/(N_TotalNtwkMiles + C_TotalNtwkMiles),3),   #Calculate percent differences
+                 Perc_DmsLh = round(diff_DmsLh/(N_DmsLhMiles + C_DmsLhMiles),3),
+                 Perc_DmsDray = round(diff_DmsDray/(N_DmsDrayMiles + C_DmsDrayMiles),3),
+                 Perc_IntlShip = round(diff_IntlShip/(N_IntlShipMiles + C_IntlShipMiles),3),
+                 Perc_PsTR = round(diff_PsTR/(N_CmapPsTR + C_CmapPsTR),3),
+                 Perc_PsRL = round(diff_PsRL/(N_CmapPsRL + C_CmapPsRL),3),
+                 Perc_RlTrnFr = round(diff_RlTrnFr/(N_RlTrnfr + C_RlTrnfr),3),
+                 Perc_RlDwlCode = round(diff_RlDwlCode/(N_RlDwlCode + C_RlDwlCode),3),
                  Year = year,                                                               #Flag data year
                  Scenario = scen) %>%                                                       #Flag data scenario
           rowwise() %>%
           mutate(sumDiff = sum(c_across((Perc_TotMi:Perc_RlDwlCode)), na.rm = TRUE)) %>%     #Total all differences
-          filter(abs(sumDiff) > 0.00) %>%                                                    #Filter for total differences greater than |1%|
+          filter(abs(sumDiff) > 0.00) %>%           #Filter for total differences greater than |1%|
           select(Scenario, Year, Mode, LogNode, Perc_TotMi, Perc_DmsLh,
             Perc_DmsDray, Perc_IntlShip, Perc_PsTR, Perc_PsRL,
             Perc_RlDwlCode, Perc_RlTrnFr)                                                    #Select column names of target dataframe
@@ -299,8 +312,8 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
         qcOut <- full_join(T_inCurrent, T_inNew, by = join_by(Mode)) %>%
           mutate(diff_Time = N_Time - C_Time,                                   #Calculate time and cost differences
                  diff_Cost = N_Cost - C_Cost,
-                 perc_Time = round(diff_Time/(N_Time+C_Time),5),                #Calculate time and cost percent differences
-                 perc_Cost = round(diff_Cost/(N_Cost+C_Cost),5),
+                 perc_Time = round(diff_Time/(N_Time+C_Time),3),                #Calculate time and cost percent differences
+                 perc_Cost = round(diff_Cost/(N_Cost+C_Cost),3),
                  Scenario = scen, Year = year) %>%                              #Flag year and scenario in dataframe
           ungroup() %>%
           filter((abs(perc_Cost) > 0.00) | (abs(perc_Time) > 0.00)) %>%         #Filter to keep any differences in data
@@ -602,7 +615,8 @@ assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
   in_POE, in_modePath, in_ports, in_zones, report){
   #' docstring
   print('assembling QC function and arguments for file pair')
-  route <- identify_function_routing(parse_file_name(rel_path))
+  parsed_data <- parse_file_name(rel_path)
+  route <- identify_function_routing(parsed_data)
   arguments <- build_route_arguments(rel_path, parsed_data, route, pair_list, empUpdate, 
                                     skLim, in_POE, in_modePath, in_ports, in_zones, report)
   do.call(route$fn, arguments)
@@ -614,6 +628,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
 
   print("executing...")
 
+  # is having unmatched here correct? make sure from exec function run
   pair_list <- build_file_pairs(newDir, currentDir, unmatched)
   accumulators <- make_accumulators()
 
@@ -640,8 +655,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
       error = function(e) {
         msg <- paste0(
           "Error processing ", pair$rp, ": ",
-          conditionMessage(e), "\n"
-        )
+          conditionMessage(e), "\n")
         cat(msg, file = report, append = TRUE)
         NULL
       }

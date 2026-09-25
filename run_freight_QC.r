@@ -1,3 +1,17 @@
+'''
+Author: Tyler Huang
+
+Date: 9/21/2026
+
+Description:
+This file contains functions for the QC process that 
+
+Input Files: 
+
+
+Output Files:
+
+'''
 #--Load required packages
 packages <- c("tidyverse", "readxl", "openxlsx", "terra","stringr")
 package.check <- lapply(
@@ -13,7 +27,7 @@ TMPDIR='M:/proj1/kcc/FY27/freight_skim_output'
 terraOptions(tempdir = TMPDIR)  
 
 #-- Load functions file
-source("M:/proj1/th/update_freight_skim_qc/freight_QC_functions.r")
+source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/freight_QC_functions.r")
 
 #--Define paths and files
 # args = commandArgs(trailingOnly=T)
@@ -44,7 +58,7 @@ in_POE <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks
 in_zones <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "zones")
 
 #-- Execution of QC pipeline
-results <- execution(
+QC_results <- execution(
   newDir = newDir,
   currentDir = currentDir,
   empUpdate = empUpdate,         # can be manually set here, input as "yes" or "no"
@@ -54,7 +68,13 @@ results <- execution(
   in_ports = in_ports,           # crosswalk
   in_zones = in_zones,           # crosswalk
   unmatched = unmatched_path,    # report file
-  report = report                # report file
+  report = report,               # report file
+  selection = 'ALL'              # default selection is to run for all file types, but can choose to run for
+                                 # specific file types (can accept one or a list):
+                                 # use the following keys for argument(s), in quotes:
+                                 # truck_ee, zone_skims, mesozone_skims,
+                                 # zone_employment, truck_ie, mode_path_miles, mode_path_ports, mode_path_skims, staticFile
+                                 # for multiple, use selection = c('','')
 )
 
 #-- Write results to Excel
@@ -62,6 +82,6 @@ sheet_labels <- c(all_mesoSkim = "meso_skim", all_modeMi   = "mode_Mi",
                    all_modePort = "mode_Port", all_modeSkim = "mode_Skim",
                    all_znEmp    = "zn_Emp",    all_znSkim   = "zn_Skim",
                    all_TruckEE  = "truckEE",   all_TruckIE  = "truckIE")           
-names(results) <- sheet_labels[names(results)]
+names(QC_results) <- sheet_labels[names(QC_results)]
 
-write.xlsx(results, outXL)
+write.xlsx(QC_results, outXL)
