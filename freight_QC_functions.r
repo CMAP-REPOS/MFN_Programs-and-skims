@@ -622,14 +622,37 @@ assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
   do.call(route$fn, arguments)
 }
 
-#4. EXECUTION FUNCTION
 execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
-  in_ports, in_zones, report, unmatched){
+  in_ports, in_zones, report, unmatched, selection = 'ALL'){
 
   print("executing...")
 
   # is having unmatched here correct? make sure from exec function run
   pair_list <- build_file_pairs(newDir, currentDir, unmatched)
+  
+  if (!identical(selection, 'ALL')) {
+    valid_types <- names(routing_list)
+    invalid_types <- setdiff(selection, valid_types)
+
+    if (length(invalid_types) > 0) {
+      stop(
+        "Unknown QC selection: ",
+        paste(invalid_types, collapse = ", "),
+        ". Valid selections are: ",
+        paste(valid_types, collapse = ", ")
+      )
+    }
+
+    keep <- vapply(
+      pair_list,
+      function(pair) {
+        route_file(parse_file_name(pair$rp)) %in% selection
+      },
+      logical(1)
+    )
+
+    pair_list <- pair_list[keep]
+  }
   accumulators <- make_accumulators()
 
   for (pair in pair_list) {
