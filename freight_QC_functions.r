@@ -96,7 +96,7 @@ zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
         if(sum(qcOut$Difference) > 0 & empUpdate != "yes"){
           printOut = "ERROR: Employment unexpectedly changes!"
           cat(printOut, file =report,append=TRUE)
-          #stop()
+          # stop()
           }                
        
     return(qcOut)
@@ -477,6 +477,8 @@ staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 
       cat(paste(equ, collapse = "\n"), file = report, append = TRUE)
       cat("\n", file = report, append = TRUE)
+
+      # stop(paste("Static file mismatch:", rel_path))
     }
   return()
 }
@@ -925,11 +927,9 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
         report = report
       ),
       error = function(e) {
-        msg <- paste0(
-          "Error processing ", pair$rp, ": ",
-          conditionMessage(e), "\n")
+        msg <- paste0("Error processing ", pair$rp, ": ", conditionMessage(e), "\n")
         cat(msg, file = report, append = TRUE)
-        NULL
+        stop(e)
       }
     )
 
