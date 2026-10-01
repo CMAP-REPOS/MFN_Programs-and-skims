@@ -6,15 +6,26 @@ Date: 9/21/2026
 
 Description:
 This file contains functions for defining and executing QC for skim outputs based on file/skim type for the freight model.
+ALL execution will be done in run_freight_QC.r, which will call the functions defined in this file.
 
-Input Files: 
+This file is organized by the following sections:
+1. QC Functions: Functions that define the QC for each skim output type. 
+Each function will take in the current and new skim output file data, as well as any additional arguments needed for the QC, and return a data frame containing the QC results.
+2. File handling and QC routing functions: Functions that handle file pair matching, filename/year/scenario parsing, QC function identification,
+argument generation based on identified QC function, and QC function assembly.
+3. Execution function: A function that executes the QC for all skim output files through iteration over the 
+current and new directories, using the architecture defined in the file handling and QC routing functions.
+
+Input Files (via run_freight_QC.r): 
 2 file directories containing the current and new skim output files.
 MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
 
-Output Files:
+Output Files (via run_freight_QC.r):
 finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
 qc_CompareReport.txt: Text file containing the QC report for all skim output files.
 qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
+
+Adding New QC Functions:
 
 '''
 ### CHANGE FILES #####
@@ -119,7 +130,7 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
-     #Amend Current and New file column names
+    #Amend Current and New file column names
         inCurrent <- inCurrent %>% 
           rename(C_Peak = Peak, C_OffPeak = OffPeak, C_Miles = Miles)
         
@@ -174,7 +185,7 @@ mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_characte
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
-        #Amend Current and New file column names
+  #Amend Current and New file column names
         inCurrent <- inCurrent 
         colnames(inCurrent) <- c('Origin', 'Destination', 'currentTime') # added capitalization for origin and destination
         inNew <- inNew
@@ -258,7 +269,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
-    #Amend Column names of new and current file
+  #Amend Column names of new and current file
         inCurrent<- inCurrent %>%
           mutate(C_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0))%>%      #Flag if current rail transfer code is NA
           left_join(in_modePath, by = c("MinPath" = "Path"))%>%
@@ -321,7 +332,7 @@ mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
-          #Flag current and new data
+  #Flag current and new data
         inCurrent<- inCurrent %>% rename(C_mesoNB = Port_mesozoneNB, C_nameNB = Port_NameNB, C_mesoB = Port_mesozoneB, C_nameB = Port_NameB)
         inNew<- inNew %>% rename(N_mesoNB = Port_mesozoneNB, N_nameNB = Port_NameNB, N_mesoB = Port_mesozoneB, N_nameB = Port_NameB)
         #Join current and new data by all fields
@@ -464,7 +475,7 @@ staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
 
-    #Check static files not expected to change with udpate
+  #Check static files not expected to change with udpate
     printOut = paste("Checking static file: ", rel_path, sep = "")
     cat(printOut, file =report,append=TRUE)
     cat("\n", file =report,append=TRUE)

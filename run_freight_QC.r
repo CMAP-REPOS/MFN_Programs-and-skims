@@ -36,8 +36,8 @@ Set Up Instructions:
 
 Run Instructions:
 1. Update empUpdate if this is an employment update run.
-2. Adjust skLim if you want a different difference threshold.
-3. Within execution function, adjust selection if you want to run QC for specific file types.
+2. Adjust skLim if you want a different difference threshold for QC functions that use skLim.
+3. Within the execution function, adjust the selection argument if you want to run QC for specific file types.
 4. Run the script in RStudio or from an R command line:
 source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/run_freight_QC.r")
 
