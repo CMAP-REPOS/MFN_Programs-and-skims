@@ -5,18 +5,37 @@ Author: Tyler Huang
 Date: 9/21/2026
 
 Description:
-This file contains functions for the QC process that 
+This file contains functions for defining and executing QC for skim outputs based on file/skim type for the freight model.
 
 Input Files: 
-
+2 file directories containing the current and new skim output files.
+MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
 
 Output Files:
+finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
+qc_CompareReport.txt: Text file containing the QC report for all skim output files.
+qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
 
 '''
 ### CHANGE FILES #####
 truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                      empUpdate = NA_character_, skLim = NA_real_, in_POE){
-  #' docstring
+  #' This function: checks if all POE ID’s are in expected range, if not stops code; 
+  #' Also compares current vs new: merge on ‘production_zone’ and ‘consumption_zone’; using crosswalk, flags direction of POE; 
+  #' if POE directions from region are equal then data okay; filters to keep only differences; exports as supplemental data tab.
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_POE (data.frame): The data frame containing the crosswalk information.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+  
       inCurrent<- inCurrent %>% rename(C_poe = poe, C_poe2 = poe2)                                             #Load Current file and amend column names
       inNew<- inNew %>% rename(N_poe = poe, N_poe2 = poe2)                                                     #Load New file and amend column names
       qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%                #Join data
@@ -44,16 +63,31 @@ truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 return(qcOut)
 }
 
+# ask Karly how to handle 0.5 value (was .5 in code and was 0 in documentation and comments)
 zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, report){
-  #' docstring
+  #' This function: sets ‘empUpdate’ flag at beginning of script; Compares current vs new ‘totalEmp’; filters to keep any differences > skLim (used to be any differences i.e. 0); 
+  #' if empUpdate flag == ‘no’ but there are differences detected, stops code; otherwise, exports as supplemental data tab.
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  report (character): The path to the report file where any errors or messages will be logged.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+
     inCurrent<- inCurrent %>% rename(currentEmp = totalemp)                    #Amend Current file column names
     inNew<- inNew %>% rename(newEmp = totalemp)                                #Amed New file column names
         
         qcOut <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>%     #Merge new and current data
           mutate(Difference = newEmp-currentEmp,                                   #Calculate employment difference
                  Percent = round(Difference/(currentEmp),3)) %>%            #Calculate employment percent difference, round 3 decimal places
-          filter(abs(Percent) > 0.5)%>%                                     #Filter employment difference > 0
+          filter(abs(Percent) > skLim)%>%                                     #Filter employment difference > skLim (used to be 0)
           mutate(Year = year) %>%                                                  #Assign year variable to different data
           select(Year, Zone, mesozone, currentEmp, newEmp, Difference, Percent)     #Select template column names
         
@@ -68,9 +102,23 @@ zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
     return(qcOut)
 }
 
+# ask Karly how to handle skLim value (was .01 in code and was 0 in documentation and comments)
 zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                         empUpdate = NA_character_, skLim = NA_real_, in_zones){
-  #' docstring
+  #' This function: compares current vs new; filters to keep any differences > skLim (used to be 0 and 0.01); exports as supplemental data tab.
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_zones(data.frame): The data frame containing the crosswalk information.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+ 
      #Amend Current and New file column names
         inCurrent <- inCurrent %>% 
           rename(C_Peak = Peak, C_OffPeak = OffPeak, C_Miles = Miles)
@@ -101,8 +149,8 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
                  perc_OffPeak = round(diff_OffPeak/COffPeak, 3),
                  diff_Mi = NMiles - CMiles,
                  perc_Mi = round(diff_Mi/CMiles, 3),
-                 flagPeaks = ifelse(abs(perc_Peak) > .01 | abs(perc_OffPeak) > .01, 1, 0),
-                 flagMi = ifelse(abs(perc_Mi) > 0.01, 1, 0),
+                 flagPeaks = ifelse(abs(perc_Peak) > skLim | abs(perc_OffPeak) > skLim, 1, 0),
+                 flagMi = ifelse(abs(perc_Mi) > skLim, 1, 0),
                  Year = year) %>%       #Sum all differences
           filter(flagPeaks == 1 | flagMi == 1) %>%    #filter to keep only OD pairs with differences
           select(Year, OCounty, DCounty, flagPeaks, flagMi, CPeak, NPeak, perc_Peak, 
@@ -113,18 +161,30 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 
 mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_){
-  #' docstring
+  #' This function: compares current vs new; filters to keep any differences greater than skLim; exports as supplemental data tab. (Filter used to be |1%|, now set to skLim)
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+ 
         #Amend Current and New file column names
         inCurrent <- inCurrent 
-        colnames(inCurrent) <- c('Origin', 'Destination', 'currentTime')
+        colnames(inCurrent) <- c('Origin', 'Destination', 'currentTime') # added capitalization for origin and destination
         inNew <- inNew
-        colnames(inNew) <- c('Origin', 'Destination', 'newTime')
+        colnames(inNew) <- c('Origin', 'Destination', 'newTime') # added capitalization for origin and destination
         #Merge new and current data; calculate differencepercent difference in 
         qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%   #Merge current and new data
           mutate(Year = year,                                                         #Flag current year of data
                  Difference = newTime - currentTime,                                  #Calculate difference in skim time
                  Percent = round(Difference/(newTime + currentTime),3)) %>%           #Calculate percent difference in skim time
-          select(Year, Origin, Destination, currentTime, newTime, Difference, Percent) %>%   #Select column names of target dataframe
+          select(Year, Origin, Destination, currentTime, newTime, Difference, Percent) %>%   #Select column names of target dataframe # added capitalization for origin and destination
           filter(abs(Percent) >= skLim)%>%   #Filter to keep percent differences > |1%|
           arrange(Origin, Destination, Year)                                                  
   return(qcOut)
@@ -132,8 +192,22 @@ mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_characte
 
 truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                      empUpdate = NA_character_, skLim = NA_real_, in_POE){
-  #' docstring
-  
+  #' This function: checks all POE ID’s are in expected range, if not stop code; 
+  #' Also compares current vs new: merges on ‘production_zone’ and ‘consumption_zone’; filters to keep only differences; if difference is from switching to 
+  #' a nearby node (same state or same flagged direction in crosswalk), then filter out as this is no issue; exports as supplemental data tab. 
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_POE (data.frame): The data frame containing the crosswalk information.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+   
   # Amend column names
   inCurrent <- inCurrent %>% rename(C_poe = poe)
   inNew     <- inNew %>% rename(N_poe = poe)
@@ -166,9 +240,24 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
   return(qcOut)
 }
 
+# CHECK WITH KARLY IF WE WANT ONLY DIFFERENCES OR SET TO SKLIM (documentation doc said 0, code comment said 1%)
 mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, in_modePath){
-  #' docstring
+  #' This function: Attaches modepath crosswalk with ‘minpath’; Summarizes variables by ‘minpath’ and ‘lognode’ ID; Merges current and new data by ‘minpath’ 
+  #' and ‘lognode’ ID; compares miles by variable and flags for the rail dwell code and transfer fractions; filters to keep only differences; exports as supplemental data tab. 
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_modePath (data.frame): The data frame containing the crosswalk information.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+ 
     #Amend Column names of new and current file
         inCurrent<- inCurrent %>%
           mutate(C_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0))%>%      #Flag if current rail transfer code is NA
@@ -208,7 +297,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
                  Scenario = scen) %>%                                                       #Flag data scenario
           rowwise() %>%
           mutate(sumDiff = sum(c_across((Perc_TotMi:Perc_RlDwlCode)), na.rm = TRUE)) %>%     #Total all differences
-          filter(abs(sumDiff) > 0.00) %>%           #Filter for total differences greater than |1%|
+          filter(abs(sumDiff) > skLim) %>%           #Filter for total differences greater than |1%|
           select(Scenario, Year, Mode, LogNode, Perc_TotMi, Perc_DmsLh,
             Perc_DmsDray, Perc_IntlShip, Perc_PsTR, Perc_PsRL,
             Perc_RlDwlCode, Perc_RlTrnFr)                                                    #Select column names of target dataframe
@@ -217,7 +306,21 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
 
 mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, in_ports){
-  #' docstring
+  #' This function: merges current and new by production_zone and consumption_zone; keeps any differences where a port 
+  #' used for OD pair changes coasts; exports as supplemental dataset 
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_ports (data.frame): The data frame containing the crosswalk information.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+ 
           #Flag current and new data
         inCurrent<- inCurrent %>% rename(C_mesoNB = Port_mesozoneNB, C_nameNB = Port_NameNB, C_mesoB = Port_mesozoneB, C_nameB = Port_NameB)
         inNew<- inNew %>% rename(N_mesoNB = Port_mesozoneNB, N_nameNB = Port_NameNB, N_mesoB = Port_mesozoneB, N_nameB = Port_NameB)
@@ -246,8 +349,23 @@ mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
 
 mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, in_modePath, report){
-  #' docstring
-        #Check for 0 in 2022 and not in other years
+  #' This function: Checks cost49 and time49 ==0 in 2022 and !=0 other years; stops code if condition not met;
+  #' Also compares current vs new cost and times by mode path; filter to keep only differences > skLim. (Filter used to be |1%|, now set to skLim)
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  in_modePath (data.frame): The data frame containing the crosswalk information.
+  #'  report (character): The path to the report file where any errors or messages will be logged.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+
+  #Check for 0 in 2022 and not in other years
         ch140 <- inNew %>%
           select(origin, destination, time49, cost49) %>%
           filter(!is.na(time49) | !is.na(cost49))
@@ -316,7 +434,7 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
                  perc_Cost = round(diff_Cost/(N_Cost+C_Cost),3),
                  Scenario = scen, Year = year) %>%                              #Flag year and scenario in dataframe
           ungroup() %>%
-          filter((abs(perc_Cost) > 0.00) | (abs(perc_Time) > 0.00)) %>%         #Filter to keep any differences in data
+          filter((abs(perc_Cost) > skLim) | (abs(perc_Time) > skLim)) %>%         #Filter to keep any differences in data
           mutate(Path = as.numeric(Mode)) %>%
           select(-Mode) %>%
           left_join(in_modePath, by = c("Path")) %>%                            #Join mode path information for inclusion in export
@@ -330,6 +448,22 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
 
 staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                         empUpdate = NA_character_, skLim = NA_real_, report, rel_path){
+  #' This function: compares current vs new; stop code if difference detected. These files are not expected to change with updates, so any difference is flagged as an error.
+  #' These files are: zone centroids, mesozone centroids, mesozone GCD, mode path airports.
+  #' 
+  #' Args:
+  #'  inCurrent (data.frame): The data frame containing the current directory's file.
+  #'  inNew (data.frame): The data frame containing the new directory's file.
+  #'  year (numeric): The year associated with the skim output data. (as an optional argument depending on file type;NA_real_ if not applicable)
+  #'  scen (character): The scenario associated with the skim output data. (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  empUpdate (character): A flag indicating whether employment updates are expected ("yes") or not ("no"). (as an optional argument depending on file type; NA_character_ if not applicable)
+  #'  skLim (numeric): The threshold for percent difference in mesozone skims to trigger a printout. (as an optional argument depending on file type; NA_real_ if not applicable)
+  #'  report (character): The path to the report file where any errors or messages will be logged.
+  #'  rel_path (character): The relative path to the file being checked.
+  #' 
+  #' Returns:
+  #'  qcOut (data.frame): The data frame containing the QC output.
+
     #Check static files not expected to change with udpate
     printOut = paste("Checking static file: ", rel_path, sep = "")
     cat(printOut, file =report,append=TRUE)
@@ -352,11 +486,24 @@ staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 print("QA/QC COMPARING NEW DATA TO V DRIVE CURRENT DATA")
 
 build_file_pairs <- function(newDir, currentDir, unmatched_path){
-  #' docstring
+  #' This function builds a list of file pairs for comparison between the new and current skim output directories. 
+  #' It identifies common files and creates a list with matches. 
+  #' It logs any unmatched files as a .txt file to a specified path.
+  #' 
+  #' Note: In run_freight_QC.r, these arguments are pre-defined and then passed to the execution function.
+  #' 
+  #' Args: 
+  #'  newDir (character): Path to the new directory containing files to compare.
+  #'  currentDir (character): Path to the current directory containing files to compare.
+  #'  unmatched_path (character): Path to the file where unmatched files will be logged.
+  #' 
+  #' Returns:
+  #'  A list of lists, where each inner list contains the relative path (character), current file path (character), 
+  #'  and new file path (character) for each matched file.
+
   n <- list.files(newDir, recursive = TRUE, full.names = FALSE, include.dirs = FALSE)
   c <- list.files(currentDir, recursive = TRUE, full.names = FALSE,include.dirs = FALSE)
 
-  # maybe find another way to match common files that logs nonintersecting files
   common <- intersect(c, n)
 
   unmatched_files <- setdiff(union(c,n),intersect(c,n))
@@ -382,7 +529,18 @@ build_file_pairs <- function(newDir, currentDir, unmatched_path){
 }
 
 parse_file_name <- function(rel_path){
-  #' docstring
+  #' This function parses the relative file path to extract file name, year, and scenario information.
+  #' 
+  #' Note: if year or scenario change from the strict current naming convention in file names, this function may need to be 
+  #' updated to accommodate new regex patterns.
+  #' 
+  #' Args:
+  #'  rel_path (character): The relative path to a file.
+  #' 
+  #' Returns:
+  #'  A list containing the file name (character), year (numeric), and scenario (character). 
+  #'  If the year or scenario cannot be parsed, they will be returned as NA.
+  
   file_name <- basename(rel_path)
 
   # regex for parsing year in filenames
@@ -408,7 +566,17 @@ parse_file_name <- function(rel_path){
 }
 
 route_file <- function(parsed_data){
-  #' docstring
+  #' This function determines the appropriate QC function to route to based on the parsed file name.
+  #' 
+  #' Note: if file name formats change from the current naming conventions in file names, this function may need to be 
+  #' updated to accommodate new patterns in case_when().
+  #' 
+  #' Args:
+  #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
+  #' 
+  #' Returns:
+  #'  String indicating the type of QC function to route to. If no match is found, it defaults to "staticFile".
+  
   file_name = parsed_data$file_name
   case_when(
     str_detect(file_name, "^cmap_data_truck_EE_poe") ~ "truck_ee",
@@ -436,7 +604,15 @@ routing_list <- list(
 )
 
 identify_function_routing <- function(parsed_data){
-  #' docstring
+  #' This function determines the appropriate QC function to route to based on the parsed file name using the route_file function and
+  #' the routing_list.
+  #' 
+  #' Args:
+  #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
+  #' 
+  #' Returns:
+  #' A string containing the QC function to route to. 
+  
   kind <- route_file(parsed_data)
   route <- routing_list[[kind]]
   print('identified QC function to route to for file pair:')
@@ -446,7 +622,16 @@ identify_function_routing <- function(parsed_data){
 
 # helper function to be used within build_route arguments:
 read_file_pair <- function(pair_list, rel_path){
-  #' docstring
+  #' This function reads the current and new files for a given file pair from the specified relative path within the pair_list created in build_file_pairs().
+  #' 
+  #' Args:
+  #'  pair_list (list): A list of lists, where each inner list contains the relative path (character), current file path (character), 
+  #'  and new file path (character) for each matched file.
+  #'  rel_path (character): The relative path to the file pair.
+  #' 
+  #' Returns:
+  #' A list containing the full dataframes for the current file and the new file.
+  
   pair_args <- list(
     inCurrent = read.csv(pair_list[[rel_path]]$current),
     inNew = read.csv(pair_list[[rel_path]]$new)
@@ -456,7 +641,30 @@ read_file_pair <- function(pair_list, rel_path){
 
 build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUpdate, skLim, 
                                   in_POE, in_modePath, in_ports, in_zones, report){
-  #' docstring
+  #' This function builds the arguments to be passed to the QC function based on the parsed file name, the routing information, and the available inputs.
+  #' 
+  #' Note: The arguments from empUpdate and onwards are set to be defined in run_freight_QC.r. 
+  #' If additional inputs are needed for a specific QC function, they should be added to the available list within this function and
+  #  added to the function signature of the specific QC function. They should also be added as a parameter to this function, the assemble_QC() function, the execution() function,
+  #  and the run_freight_QC.r script.
+  #' 
+  #' Args:
+  #'  rel_path (character): The relative path to the file pair.
+  #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
+  #'  route (character): The QC function to route to.
+  #'  pair_list (list): A list of lists, where each inner list contains the relative path (character), current file path (character), 
+  #'    and new file path (character) for each matched file.
+  #'  empUpdate (character): 'Yes' or 'No' indicating change in employement data.
+  #'  skLim (numeric): The skLim numeric threshold for filtering differences in skims.
+  #'  in_POE (data.frame): The POE crosswalk data.
+  #'  in_modePath (data.frame): The mode path crosswalk data.
+  #'  in_ports (data.frame): The ports crosswalk data.
+  #'  in_zones (data.frame): The zones crosswalk data.
+  #'  report (character): The report file path for logging QC run and issues.
+  #' 
+  #' Returns:
+  #'  A list of arguments to be passed to the identified QC function, including the current and new dataframes, year, scenario, and any other relevant inputs.
+
   inputs <- read_file_pair(pair_list, rel_path)
 
   available <- list(year = parsed_data$year, scen = parsed_data$scen, empUpdate = empUpdate, skLim = skLim, in_POE = in_POE,
@@ -483,7 +691,7 @@ build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUp
   }
 
   print("ARGUMENTS:")
-  print(args)
+  print(names(args))
   return(args)
 }
 
@@ -500,7 +708,10 @@ mapping <- list(
 )
 
 make_accumulators <- function() {
-  #' docstring
+  #' This function creates a list of empty dataframes to accumulate QC results for each type of QC function within the execution function.
+  #' 
+  #' Returns:
+  #'  A list of empty dataframes, each corresponding to a specific QC function type, with predefined column names and types.
   list(
     all_TruckEE = data.frame(
       Production_zone = integer(),
@@ -574,6 +785,7 @@ make_accumulators <- function() {
       perc_Mi = numeric()
     ),
     all_mesoSkim = data.frame(
+      # added capitalization for origin and destination
       Year = numeric(),
       Origin = integer(),
       Destination = integer(),
@@ -613,7 +825,27 @@ make_accumulators <- function() {
 
 assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
   in_POE, in_modePath, in_ports, in_zones, report){
-  #' docstring
+  #' This function assembles the QC function and its arguments for a given file pair based on the relative path, the pair list, and the available inputs. 
+  #' 
+  #' Note: The arguments from empUpdate and onwards are set to be defined in run_freight_QC.r. 
+  #' If additional inputs are needed for a specific QC function, they should be added to the available list within this function and
+  #  added to the function signature of the specific QC function. They should also be added as a parameter to this function, the build_route_arguments() function, the execution() function,
+  #  and the run_freight_QC.r script.
+  #' 
+  #' Args:
+  #'  rel_path (character): The relative path to the file pair.
+  #'  pair_list (list): A list of lists, where each inner list contains the relative path (character), current file path (character), and new file path (character) for each matched file.
+  #'  empUpdate (character): 'Yes' or 'No' indicating change in employement data.
+  #'  skLim (numeric): The skLim numeric threshold for filtering differences in skims.
+  #'  in_POE (data.frame): The POE crosswalk data.
+  #'  in_modePath (data.frame): The mode path crosswalk data.
+  #'  in_ports (data.frame): The ports crosswalk data.
+  #'  in_zones (data.frame): The zones crosswalk data.
+  #'  report (character): The report file path for logging QC run and issues.
+  #' 
+  #' Returns:
+  #'  A data.frame result of the identified QC function for the given file pair
+
   print('assembling QC function and arguments for file pair')
   parsed_data <- parse_file_name(rel_path)
   route <- identify_function_routing(parsed_data)
@@ -624,7 +856,24 @@ assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
 
 execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   in_ports, in_zones, report, unmatched, selection = 'ALL'){
-
+  #' This function executes the QC process by building file pairs, routing to the appropriate QC functions, and accumulating results.
+  #' 
+  #' Args:
+  #'  newDir (character): Path to the new directory containing files to compare.
+  #'  currentDir (character): Path to the current directory containing files to compare.
+  #'  empUpdate (character): 'Yes' or 'No' indicating change in employment data.
+  #'  skLim (numeric): The skLim numeric threshold for filtering differences in skims.
+  #'  in_POE (data.frame): The POE crosswalk data.
+  #'  in_modePath (data.frame): The mode path crosswalk data.
+  #'  in_ports (data.frame): The ports crosswalk data.
+  #'  in_zones (data.frame): The zones crosswalk data.
+  #'  report (character): The report file path for logging QC run and issues.
+  #'  unmatched (logical): A logical vector indicating which files are unmatched.
+  #'  selection (character): A character or character vector specifying which QC functions to run, if specified using the keys from the routing list. Defaults to 'ALL'.
+  #' 
+  #' Returns:
+  #'  A list of data.frames containing the accumulated QC results for all matched files within both the new and current directories.
+  
   print("executing...")
 
   # is having unmatched here correct? make sure from exec function run
