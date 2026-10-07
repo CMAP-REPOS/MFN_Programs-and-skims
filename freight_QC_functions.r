@@ -1,33 +1,54 @@
+# Author: Tyler Huang
+
+# Date: 9/21/2026
+
+# Description:
+# This file contains functions for defining and executing QC for skim outputs based on file/skim type for the freight model.
+# ALL execution will be done in run_freight_QC.r, which will call the functions defined in this file.
+
+# This file is organized by the following sections:
+# 1. QC Functions: Functions that define the QC for each skim output type. 
+# Each function will take in the current and new skim output file data, as well as any additional arguments needed for the QC, and return a data frame containing the QC results.
+# 2. File handling and QC routing functions: Functions that handle file pair matching, filename/year/scenario parsing, QC function identification,
+# argument generation based on identified QC function, and QC function assembly.
+# 3. Execution function: A function that executes the QC for all skim output files through iteration over the 
+# current and new directories, using the architecture defined in the file handling and QC routing functions.
+
+# Input Files (via run_freight_QC.r): 
+# 2 file directories containing the current and new skim output files.
+# MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
+
+# Output Files (via run_freight_QC.r):
+# finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
+# qc_CompareReport.txt: Text file containing the QC report for all skim output files.
+# qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
+
+# Adding New QC Functions:
+# To add a new QC function (for a new file type), define the function in this file, following the structure of the existing QC functions. Each QC function should 
+# take in the current and new skim output file data, as well as any additional arguments needed for the QC, and return a data frame containing the QC results.
+# 
+# In addition, edit the route_file() function to include the new QC function in the routing logic, based on the file name pattern.
+# For example, if the new QC function is for a file type with a name pattern of "data_modepath_skims" in the directories and a QC function named "mode_path_skims", 
+# the following line should be added to the route_file() function:
+#     str_detect(file_name, "^data_modepath_skims") ~ "mode_path_skims",
+# If the new file type is a static file that does not require QC, the following line should be added instead:
+#     str_detect(file_name, "^new_static_file") ~ "staticFile",
+# 
+# Lastly, to work properly with the routing and execution pipeline for automated QC for the two directories, the new QC function 
+# should be added to the qc_registry list.
+# This qc_registry is a list of lists whose purpose is to create a centralized organized structure for executing the QC pipeline.
+# The following elements for a new QC function should be included, using the truck_ee skim as an example:
+#   truck_ee = list(
+#     fn = truck_ee, # function to call
+#     accumulator = "all_TruckEE", # accumulator name for the QC results
+#     sheet = "truckEE", # sheet name for the QC results in the output Excel file
+#     template = data.frame() # template data frame for the QC results, with the same column names as the QC function output
+#   )
+# NOTE: If the new file type is a static file, no new QC function or qc_registry entry is needed, 
+# but the new file type should be added to the route_file() function to be routed to "staticFile" for static file QC.
+
+
 #-- QC FUNCTIONS
-'''
-Author: Tyler Huang
-
-Date: 9/21/2026
-
-Description:
-This file contains functions for defining and executing QC for skim outputs based on file/skim type for the freight model.
-ALL execution will be done in run_freight_QC.r, which will call the functions defined in this file.
-
-This file is organized by the following sections:
-1. QC Functions: Functions that define the QC for each skim output type. 
-Each function will take in the current and new skim output file data, as well as any additional arguments needed for the QC, and return a data frame containing the QC results.
-2. File handling and QC routing functions: Functions that handle file pair matching, filename/year/scenario parsing, QC function identification,
-argument generation based on identified QC function, and QC function assembly.
-3. Execution function: A function that executes the QC for all skim output files through iteration over the 
-current and new directories, using the architecture defined in the file handling and QC routing functions.
-
-Input Files (via run_freight_QC.r): 
-2 file directories containing the current and new skim output files.
-MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
-
-Output Files (via run_freight_QC.r):
-finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
-qc_CompareReport.txt: Text file containing the QC report for all skim output files.
-qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
-
-Adding New QC Functions:
-
-'''
 ### CHANGE FILES #####
 truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                      empUpdate = NA_character_, skLim = NA_real_, in_POE){
@@ -59,8 +80,7 @@ truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
         left_join(in_POE, by = c("N_poe" = "POE")) %>%
         rename(NState = State, NDirection = Direction) %>%
         filter((NDirection != CDirection) | (NDirection2 != CDirection2)) %>%
-        select(Production_zone, Consumption_zone, C_poe2, C_poe, N_poe2, N_poe, CState, NState, 
-          CDirection, NDirection, CState2, NState2, CDirection2, NDirection2)
+        select(all_of(colnames(qc_registry[['truck_ee']]$template)))
       
       #Confirm all POE ID's are in expected range; if not stop code
       check <- qcOut %>%
@@ -100,7 +120,7 @@ zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
                  Percent = round(Difference/(currentEmp),3)) %>%            #Calculate employment percent difference, round 3 decimal places
           filter(abs(Percent) > skLim)%>%                                     #Filter employment difference > skLim (used to be 0)
           mutate(Year = year) %>%                                                  #Assign year variable to different data
-          select(Year, Zone, mesozone, currentEmp, newEmp, Difference, Percent)     #Select template column names
+          select(all_of(colnames(qc_registry[['zone_employment']]$template)))     #Select template column names
         
         #Employment only expected to change if update is associated with a plan update
         #If difference exists otherwise, stop code
@@ -164,8 +184,7 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
                  flagMi = ifelse(abs(perc_Mi) > skLim, 1, 0),
                  Year = year) %>%       #Sum all differences
           filter(flagPeaks == 1 | flagMi == 1) %>%    #filter to keep only OD pairs with differences
-          select(Year, OCounty, DCounty, flagPeaks, flagMi, CPeak, NPeak, perc_Peak, 
-            COffPeak, NOffPeak, perc_OffPeak, CMiles, NMiles, perc_Mi)   #Select column names from target dataframe
+          select(all_of(colnames(qc_registry[['zone_skims']]$template)))   #Select column names from target dataframe
         
     return(qcOut)
 }
@@ -195,7 +214,7 @@ mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_characte
           mutate(Year = year,                                                         #Flag current year of data
                  Difference = newTime - currentTime,                                  #Calculate difference in skim time
                  Percent = round(Difference/(newTime + currentTime),3)) %>%           #Calculate percent difference in skim time
-          select(Year, Origin, Destination, currentTime, newTime, Difference, Percent) %>%   #Select column names of target dataframe # added capitalization for origin and destination
+          select(all_of(colnames(qc_registry[['mesozone_skims']]$template))) %>%   #Select column names of target dataframe # added capitalization for origin and destination
           filter(abs(Percent) >= skLim)%>%   #Filter to keep percent differences > |1%|
           arrange(Origin, Destination, Year)                                                  
   return(qcOut)
@@ -235,10 +254,7 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
     mutate(Year = year, Scenario = scen) %>%
     # Explicitly select and order columns locally without 
     # calling all_truckIE to avoid potential issues with variable scope
-    select(
-      Scenario, Year, Production_zone, Consumption_zone, 
-      C_poe, N_poe, CState, NState, CDirection, NDirection
-    )
+    select(all_of(colnames(qc_registry[['truck_ie']]$template)))
   
   # Validate POE range
   check <- qcOut %>%
@@ -309,9 +325,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
           rowwise() %>%
           mutate(sumDiff = sum(c_across((Perc_TotMi:Perc_RlDwlCode)), na.rm = TRUE)) %>%     #Total all differences
           filter(abs(sumDiff) > skLim) %>%           #Filter for total differences greater than |1%|
-          select(Scenario, Year, Mode, LogNode, Perc_TotMi, Perc_DmsLh,
-            Perc_DmsDray, Perc_IntlShip, Perc_PsTR, Perc_PsRL,
-            Perc_RlDwlCode, Perc_RlTrnFr)                                                    #Select column names of target dataframe
+          select(all_of(colnames(qc_registry[['mode_path_miles']]$template)))                                                    #Select column names of target dataframe
     return(qcOut)
 }
 
@@ -351,10 +365,7 @@ mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
           left_join(in_ports, by = c("N_nameB" = "Port")) %>%                 #Merge 'NB' = nonbulk goods with port crosswalk
           rename(N_coastB = Coast) %>%
           filter((C_coastNB != N_coastNB) | (C_coastB != N_coastB)) %>%
-          select(Scenario, Year, Production_zone, Consumption_zone,
-            C_mesoNB, N_mesoNB, C_mesoB, N_mesoB,
-            C_nameNB, N_nameNB, C_nameB, N_nameB,
-            C_coastNB, N_coastNB, C_coastB, N_coastB)
+          select(all_of(colnames(qc_registry[['mode_path_ports']]$template)))
     return(qcOut)
 }
 
@@ -449,8 +460,7 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
           mutate(Path = as.numeric(Mode)) %>%
           select(-Mode) %>%
           left_join(in_modePath, by = c("Path")) %>%                            #Join mode path information for inclusion in export
-          select(Scenario, Year, Mode, LogNode, C_Time, C_Cost,
-            N_Time, N_Cost, perc_Time, perc_Cost)                                        #Select column names of target dataframe
+          select(all_of(colnames(qc_registry[['mode_path_skims']]$template)))                                        #Select column names of target dataframe
         
   return(qcOut)
 }
@@ -496,7 +506,168 @@ staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 
 #-- QC ROUTING FUNCTIONS
 
-print("QA/QC COMPARING NEW DATA TO V DRIVE CURRENT DATA")
+qc_registry <- list(
+  truck_ee = list(
+    fn = truck_ee,
+    accumulator = "all_TruckEE",
+    sheet = "truckEE",
+    template = data.frame(
+      Production_zone = integer(),
+      Consumption_zone = integer(),
+      C_poe2 = integer(),
+      C_poe = integer(),
+      N_poe2 = integer(),
+      N_poe = integer(),
+      CState = character(),
+      NState = character(),
+      CDirection = character(),
+      NDirection = character(),
+      CState2 = character(),
+      NState2 = character(),
+      CDirection2 = character(),
+      NDirection2 = character()
+    )
+  ),
+
+  zone_employment = list(
+    fn = zone_employment,
+    accumulator = "all_znEmp",
+    sheet = "zn_Emp",
+    template = data.frame(
+      Year = numeric(),
+      Zone = integer(),
+      mesozone = integer(),
+      currentEmp = integer(),
+      newEmp = integer(),
+      Difference = integer(),
+      Percent = numeric()
+    )
+  ),
+
+  zone_skims = list(
+    fn = zone_skims,
+    accumulator = "all_znSkim",
+    sheet = "zn_Skim",
+    template = data.frame(
+      Year = numeric(),
+      OCounty = character(),
+      DCounty = character(),
+      flagPeaks = numeric(),
+      flagMi = numeric(),
+      CPeak = numeric(),
+      NPeak = numeric(),
+      perc_Peak = numeric(),
+      COffPeak = numeric(),
+      NOffPeak = numeric(),
+      perc_OffPeak = numeric(),
+      CMiles = numeric(),
+      NMiles = numeric(),
+      perc_Mi = numeric()
+    )
+  ),
+
+  mesozone_skims = list(
+    fn = mesozone_skims,
+    accumulator = "all_mesoSkim",
+    sheet = "meso_skim",
+    template = data.frame(
+      Year = numeric(),
+      Origin = integer(),
+      Destination = integer(),
+      currentTime = numeric(),
+      newTime = numeric(),
+      Difference = numeric(),
+      Percent = numeric()
+    )
+  ),
+
+  truck_ie = list(
+    fn = truck_ie,
+    accumulator = "all_TruckIE",
+    sheet = "truckIE",
+    template = data.frame(
+      Scenario = character(),
+      Year = numeric(),
+      Production_zone = integer(),
+      Consumption_zone = integer(),
+      C_poe = integer(),
+      N_poe = integer(),
+      CState = character(),
+      NState = character(),
+      CDirection = character(),
+      NDirection = character()
+    )
+  ),
+
+  mode_path_miles = list(
+    fn = mode_path_miles,
+    accumulator = "all_modeMi",
+    sheet = "mode_Mi",
+    template = data.frame(
+      Scenario = character(),
+      Year = numeric(),
+      Mode = character(),
+      LogNode = numeric(),
+      Perc_TotMi = numeric(),
+      Perc_DmsLh = numeric(),
+      Perc_DmsDray = numeric(),
+      Perc_IntlShip = numeric(),
+      Perc_PsTR = numeric(),
+      Perc_PsRL = numeric(),
+      Perc_RlDwlCode = numeric(),
+      Perc_RlTrnFr = numeric()
+    )
+  ),
+
+  mode_path_ports = list(
+    fn = mode_path_ports,
+    accumulator = "all_modePort",
+    sheet = "mode_Port",
+    template = data.frame(
+      Scenario = character(),
+      Year = numeric(),
+      Production_zone = integer(),
+      Consumption_zone = integer(),
+      C_mesoNB = integer(),
+      N_mesoNB = integer(),
+      C_mesoB = integer(),
+      N_mesoB = integer(),
+      C_nameNB = character(),
+      N_nameNB = character(),
+      C_nameB = character(),
+      N_nameB = character(),
+      C_coastNB = character(),
+      N_coastNB = character(),
+      C_coastB = character(),
+      N_coastB = character()
+    )
+  ),
+
+  mode_path_skims = list(
+    fn = mode_path_skims,
+    accumulator = "all_modeSkim",
+    sheet = "mode_Skim",
+    template = data.frame(
+      Scenario = character(),
+      Year = numeric(),
+      Mode = character(),
+      LogNode = numeric(),
+      C_Time = numeric(),
+      C_Cost = numeric(),
+      N_Time = numeric(),
+      N_Cost = numeric(),
+      perc_Time = numeric(),
+      perc_Cost = numeric()
+    )
+  ),
+
+  staticFile = list(
+    fn = staticFile,
+    accumulator = NULL,
+    sheet = NULL,
+    template = NULL
+  )
+)
 
 build_file_pairs <- function(newDir, currentDir, unmatched_path){
   #' This function builds a list of file pairs for comparison between the new and current skim output directories. 
@@ -588,7 +759,7 @@ route_file <- function(parsed_data){
   #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
   #' 
   #' Returns:
-  #'  String indicating the type of QC function to route to. If no match is found, it defaults to "staticFile".
+  #'  String indicating the type of QC function to route to. If no match is found, it defaults to NA_character_.
   
   file_name = parsed_data$file_name
   case_when(
@@ -600,21 +771,13 @@ route_file <- function(parsed_data){
     str_detect(file_name, "^data_modepath_miles") ~ "mode_path_miles", #update
     str_detect(file_name, "^data_modepath_ports") ~ "mode_path_ports",
     str_detect(file_name, "^data_modepath_skims") ~ "mode_path_skims",
-    TRUE ~ "staticFile"
+    str_detect(file_name, "^data_modepath_airports") ~ "staticFile",
+    str_detect(file_name, "^data_mesozone_centroids") ~ "staticFile",
+    str_detect(file_name, "^data_mesozone_gcd") ~ "staticFile",
+    str_detect(file_name, "^cmap_data_zone_centroids") ~ "staticFile",
+    TRUE ~ NA_character_
   )
 }
-
-routing_list <- list(
-  truck_ee = list(fn = truck_ee),
-  zone_skims = list(fn = zone_skims),
-  mesozone_skims = list(fn = mesozone_skims),
-  zone_employment = list( fn = zone_employment),
-  truck_ie = list(fn = truck_ie),
-  mode_path_miles = list(fn = mode_path_miles),
-  mode_path_ports = list(fn = mode_path_ports),
-  mode_path_skims = list(fn = mode_path_skims),
-  staticFile = list(fn = staticFile)
-)
 
 identify_function_routing <- function(parsed_data){
   #' This function determines the appropriate QC function to route to based on the parsed file name using the route_file function and
@@ -624,11 +787,16 @@ identify_function_routing <- function(parsed_data){
   #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
   #' 
   #' Returns:
-  #' A string containing the QC function to route to. 
+  #' The identified file type's list from qc_registry (containing the QC function, accumulator, sheet, and data.frame template.). 
+  #' If no match is found for a file, it stops execution and returns an error message.
   
   kind <- route_file(parsed_data)
-  route <- routing_list[[kind]]
-  print('identified QC function to route to for file pair:')
+
+  if (is.na(kind) || !kind %in% names(qc_registry)) {
+    stop("No QC route configured for file: ", parsed_data$file_name)
+  }
+
+  route <- qc_registry[[kind]]
   print(kind)
   return(route)
 }
@@ -664,7 +832,7 @@ build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUp
   #' Args:
   #'  rel_path (character): The relative path to the file pair.
   #'  parsed_data (list): A list containing the parsed file name (character), year (numeric), and scenario (character).
-  #'  route (character): The QC function to route to.
+  #'  route (list): The identified file type's list from qc_registry, containing the QC function, accumulator, sheet, and template.
   #'  pair_list (list): A list of lists, where each inner list contains the relative path (character), current file path (character), 
   #'    and new file path (character) for each matched file.
   #'  empUpdate (character): 'Yes' or 'No' indicating change in employement data.
@@ -708,132 +876,16 @@ build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUp
   return(args)
 }
 
-# handle local/global stuff
-mapping <- list(
-  truck_ee = "all_TruckEE",
-  zone_employment = "all_znEmp",
-  zone_skims = "all_znSkim",
-  mesozone_skims = "all_mesoSkim",
-  truck_ie = "all_TruckIE",
-  mode_path_miles = "all_modeMi",
-  mode_path_ports = "all_modePort",
-  mode_path_skims = "all_modeSkim"
-)
-
 make_accumulators <- function() {
-  #' This function creates a list of empty dataframes to accumulate QC results for each type of QC function within the execution function.
-  #' 
-  #' Returns:
-  #'  A list of empty dataframes, each corresponding to a specific QC function type, with predefined column names and types.
-  list(
-    all_TruckEE = data.frame(
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_poe2 = integer(),
-      C_poe = integer(),
-      N_poe2 = integer(),
-      N_poe = integer(),
-      CState = character(),
-      NState = character(),
-      CDirection = character(),
-      NDirection = character(),
-      CState2 = character(),
-      NState2 = character(),
-      CDirection2 = character(),
-      NDirection2 = character()
-    ),
-    all_TruckIE = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_poe = integer(),
-      N_poe = integer(),
-      CState = character(),
-      NState = character(),
-      CDirection = character(),
-      NDirection = character()
-    ),
-    all_znEmp = data.frame(
-      Year = numeric(),
-      Zone = integer(),
-      mesozone = integer(),
-      currentEmp = integer(),
-      newEmp = integer(),
-      Difference = integer(),
-      Percent = numeric()
-    ),
-    all_modePort = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_mesoNB = integer(),
-      N_mesoNB = integer(),
-      C_mesoB = integer(),
-      N_mesoB = integer(),
-      C_nameNB = character(),
-      N_nameNB = character(),
-      C_nameB = character(),
-      N_nameB = character(),
-      C_coastNB = character(),
-      N_coastNB = character(),
-      C_coastB = character(),
-      N_coastB = character()
-    ),
-    all_znSkim = data.frame(
-      Year = numeric(),
-      OCounty = character(),
-      DCounty = character(),
-      flagPeaks = numeric(),
-      flagMi = numeric(),
-      CPeak = numeric(),
-      NPeak = numeric(),
-      perc_Peak = numeric(),
-      COffPeak = numeric(),
-      NOffPeak = numeric(),
-      perc_OffPeak = numeric(),
-      CMiles = numeric(),
-      NMiles = numeric(),
-      perc_Mi = numeric()
-    ),
-    all_mesoSkim = data.frame(
-      # added capitalization for origin and destination
-      Year = numeric(),
-      Origin = integer(),
-      Destination = integer(),
-      currentTime = numeric(),
-      newTime = numeric(),
-      Difference = numeric(),
-      Percent = numeric()
-    ),
-    all_modeMi = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Mode = character(),
-      LogNode = numeric(),
-      Perc_TotMi = numeric(),
-      Perc_DmsLh = numeric(),
-      Perc_DmsDray = numeric(),
-      Perc_IntlShip = numeric(),
-      Perc_PsTR = numeric(),
-      Perc_PsRL = numeric(),
-      Perc_RlDwlCode = numeric(),
-      Perc_RlTrnFr = numeric()
-    ),
-    all_modeSkim = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Mode = character(),
-      LogNode = numeric(),
-      C_Time = numeric(),
-      C_Cost = numeric(),
-      N_Time = numeric(),
-      N_Cost = numeric(),
-      perc_Time = numeric(),
-      perc_Cost = numeric()
-    )
-  )
+  accumulators <- list()
+
+  for (entry in qc_registry) {
+    if (!is.null(entry$accumulator)) {
+      accumulators[[entry$accumulator]] <- entry$template
+    }
+  }
+
+  return(accumulators)
 }
 
 assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
@@ -893,7 +945,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   pair_list <- build_file_pairs(newDir, currentDir, unmatched)
   
   if (!identical(selection, 'ALL')) {
-    valid_types <- names(routing_list)
+    valid_types <- names(qc_registry)
     invalid_types <- setdiff(selection, valid_types)
 
     if (length(invalid_types) > 0) {
@@ -916,6 +968,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
     pair_list <- pair_list[keep]
   }
   accumulators <- make_accumulators()
+  result_chunks <- lapply(accumulators, function(template) list())
 
   for (pair in pair_list) {
     print(paste("NOW PROCESSING:", pair$rp))
@@ -949,15 +1002,19 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
     }
 
     kind <- route_file(parse_file_name(pair$rp)) # identify the appropriate function
-    accumulator_name <- mapping[[kind]] # identify appropriate dataframe to populate
+    accumulator_name <- qc_registry[[kind]]$accumulator # identify appropriate dataframe to populate
 
     if (!is.null(accumulator_name)) {
       print('APPENDING:')
       print(pair$rp)
-      accumulators[[accumulator_name]] <- dplyr::bind_rows(accumulators[[accumulator_name]], res)
+      result_chunks[[accumulator_name]][[length(result_chunks[[accumulator_name]]) + 1L]] <- res
     }
     print(paste("FINISHED PROCESSING:", pair$rp))
   }
+
+  for (accumulator_name in names(accumulators)) {
+  accumulators[[accumulator_name]] <- dplyr::bind_rows(c(list(accumulators[[accumulator_name]]), result_chunks[[accumulator_name]]))
+}
 
   print("finished running all files")
 

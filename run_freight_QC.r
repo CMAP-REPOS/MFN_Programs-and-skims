@@ -1,52 +1,50 @@
-'''
-Author: Tyler Huang
+# Author: Tyler Huang
 
-Date: 9/21/2026
+# Date: 9/21/2026
 
-Description:
-This file is the main script to run the freight skim QC pipeline. 
-It will load required packages and dependencies, load QC and execution functions from freight_QC_functions.r, set up input and output paths,
-execute the QC of new and current freight skim outputs, and finally export the QC results to an Excel file.
+# Description:
+# This file is the main script to run the freight skim QC pipeline. 
+# It will load required packages and dependencies, load QC and execution functions from freight_QC_functions.r, set up input and output paths,
+# execute the QC of new and current freight skim outputs, and finally export the QC results to an Excel file.
 
-Input Files: 
-2 file directories containing the current and new skim output files (currentDir and newDir).
-  Expected directory structure:
-  - currentDir/
-    - Subfolder: LogNode140
-    - Subfolder: No_LogNode140
-    - non-scenario files
-  - newDir/
-    - Subfolder: LogNode140
-    - Subfolder: No_LogNode140
-    - non-scenario files
-MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
-freight_QC_functions.r: R script containing the QC and execution functions in order to fun the freight skim QC.
+# Input Files: 
+# 2 file directories containing the current and new skim output files (currentDir and newDir).
+#   Expected directory structure:
+#   - currentDir/
+#     - Subfolder: LogNode140
+#     - Subfolder: No_LogNode140
+#     - non-scenario files
+#   - newDir/
+#     - Subfolder: LogNode140
+#     - Subfolder: No_LogNode140
+#     - non-scenario files
+# MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
+# freight_QC_functions.r: R script containing the QC and execution functions in order to fun the freight skim QC.
 
-Output Files:
-finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
-qc_CompareReport.txt: Text file containing the QC report for all skim output files.
-qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
+# Output Files:
+# finalSkim_compareQC.xlsx: Excel file containing the QC compare results for all freight input files.
+# qc_CompareReport.txt: Text file containing the QC report for all skim output files.
+# qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
 
-Set Up Instructions:
-1. Ensure that the required packages are installed and available in your R environment.
-2. Update the newDir and currentDir variables to point to the directories containing the new and current skim output files, respectively.
-3. Identify desired output file path and update the rpDir variable accordingly.
-4. Ensure that the crosswalks file (MFN_crosswalks.xlsx) is available in the specified path.
-5. Ensure that the freight_QC_functions.r script is available in the specified path.
+# Set Up Instructions:
+# 1. Ensure that the required packages are installed and available in your R environment.
+# 2. Update the newDir and currentDir variables to point to the directories containing the new and current skim output files, respectively.
+# 3. Identify desired output file path and update the rpDir variable accordingly.
+# 4. Ensure that the crosswalks file (MFN_crosswalks.xlsx) is available in the specified path.
+# 5. Ensure that the freight_QC_functions.r script is available in the specified path.
 
-Run Instructions:
-1. Update empUpdate if this is an employment update run.
-2. Adjust skLim if you want a different difference threshold for QC functions that use skLim.
-3. Within the execution function, adjust the selection argument if you want to run QC for specific file types.
-4. Run the script in RStudio or from an R command line:
-source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/run_freight_QC.r")
+# Run Instructions:
+# 1. Update empUpdate if this is an employment update run.
+# 2. Adjust skLim if you want a different difference threshold for QC functions that use skLim.
+# 3. Within the execution function, adjust the selection argument if you want to run QC for specific file types.
+# 4. Run the script in RStudio or from an R command line:
+# source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/run_freight_QC.r")
 
-Adding New QC Functions:
-Adding new QC functions or modifying existing ones should be done in freight_QC_functions.r. If doing so, modify
-the execution function arguments to accomodate the new QC function(s), dependenices, and update the execution function call in this script accordingly.
-Documentation on how to add a new QC function can be found in freight_QC_functions.r.
+# Adding New QC Functions:
+# Adding new QC functions or modifying existing ones should be done in freight_QC_functions.r. If doing so, modify
+# the execution function arguments to accomodate the new QC function(s), dependenices, and update the execution function call in this script accordingly.
+# Documentation on how to add a new QC function can be found in freight_QC_functions.r.
 
-'''
 # SET UP
 #--Load required packages
 packages <- c("tidyverse", "readxl", "openxlsx", "terra","stringr")
@@ -84,14 +82,14 @@ in_ports <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswal
 in_POE <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "POE")
 in_zones <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "zones")
 
-#--Manual variable definitions for QC
-empUpdate = "yes"
-skLim = 0.05 
-
 #--Delete report if exists
 if(file.exists(outXL) == TRUE){unlink(outXL, recursive = TRUE)}
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 if(file.exists(unmatched_path) == TRUE){unlink(unmatched_path, recursive =TRUE)}
+
+#--Manual variable definitions for QC
+empUpdate = "yes"
+skLim = 0.05 
 
 # EXECUTION
 #-- Execution of QC pipeline
@@ -115,10 +113,6 @@ QC_results <- execution(
 )
 
 #-- Write results to Excel
-sheet_labels <- c(all_mesoSkim = "meso_skim", all_modeMi   = "mode_Mi",
-                   all_modePort = "mode_Port", all_modeSkim = "mode_Skim",
-                   all_znEmp    = "zn_Emp",    all_znSkim   = "zn_Skim",
-                   all_TruckEE  = "truckEE",   all_TruckIE  = "truckIE")           
-names(QC_results) <- sheet_labels[names(QC_results)]
+names(QC_results) <- unname(unlist(lapply(qc_registry, function(x) x[["sheet"]])))
 
 write.xlsx(QC_results, outXL)
