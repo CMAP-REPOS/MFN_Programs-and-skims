@@ -24,17 +24,19 @@
 # qc_unmatched.txt: Text file containing the list of unmatched files between the current and new skim output directories.
 
 # Adding New QC Functions:
-# To add a new QC function (for a new file type), define the function in this file, following the structure of the existing QC functions. Each QC function should 
+# 1. To add a new QC function (for a new file type), define the function in this file, following the structure of the existing QC functions. Each QC function should 
 # take in the current and new skim output file data, as well as any additional arguments needed for the QC, and return a data frame containing the QC results.
 # 
-# In addition, edit the route_file() function to include the new QC function in the routing logic, based on the file name pattern.
+# 2. In addition, edit the route_file() function to include the new QC function in the routing logic, based on the file name pattern.
 # For example, if the new QC function is for a file type with a name pattern of "data_modepath_skims" in the directories and a QC function named "mode_path_skims", 
 # the following line should be added to the route_file() function:
-#     str_detect(file_name, "^data_modepath_skims") ~ "mode_path_skims",
+#     str_detect(file_name, "^data_truck_EE") ~ "truck_ee",
+# NOTE: the key after ~ MUST match the name of the QC list in the qc_registry list. e.g. "truck_ee" corresponds to the qc_registry list name as shown in step 3.
+# 
 # If the new file type is a static file that does not require QC, the following line should be added instead:
 #     str_detect(file_name, "^new_static_file") ~ "staticFile",
 # 
-# Lastly, to work properly with the routing and execution pipeline for automated QC for the two directories, the new QC function 
+# 3. Lastly, to work properly with the routing and execution pipeline for automated QC for the two directories, the new QC function 
 # should be added to the qc_registry list.
 # This qc_registry is a list of lists whose purpose is to create a centralized organized structure for executing the QC pipeline.
 # The following elements for a new QC function should be included, using the truck_ee skim as an example:
@@ -42,7 +44,7 @@
 #     fn = truck_ee, # function to call
 #     accumulator = "all_TruckEE", # accumulator name for the QC results
 #     sheet = "truckEE", # sheet name for the QC results in the output Excel file
-#     template = data.frame() # template data frame for the QC results, with the same column names as the QC function output
+#     template = data.frame() # empty/template data frame for the QC results, with the same column names as the QC function output
 #   )
 # NOTE: If the new file type is a static file, no new QC function or qc_registry entry is needed, 
 # but the new file type should be added to the route_file() function to be routed to "staticFile" for static file QC.
