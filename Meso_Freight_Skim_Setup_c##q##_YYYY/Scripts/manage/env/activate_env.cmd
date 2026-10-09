@@ -14,7 +14,7 @@ if [%~1] == [emme] (set EMME_ENV=y) else (set EMME_ENV=n)
 set PDIR=%~dp0
 
 rem Define here the name of the TBM environment to be used.
-set MFN_ENVNAME=MFN_env
+set MFN_ENVNAME=CMAP-TRIP2
 rem Define here the name of the custom Emme environment to be used.
 set EMME_ENVNAME=emme-plus
 
