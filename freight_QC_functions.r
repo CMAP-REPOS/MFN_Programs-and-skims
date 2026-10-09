@@ -935,7 +935,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   #'  in_ports (data.frame): The ports crosswalk data.
   #'  in_zones (data.frame): The zones crosswalk data.
   #'  report (character): The report file path for logging QC run and issues.
-  #'  unmatched (logical): A logical vector indicating which files are unmatched.
+  #'  unmatched (character): Path to the report file where filenames found in only one directory are appended.
   #'  selection (character): A character or character vector specifying which QC functions to run, if specified using the keys from the routing list. Defaults to 'ALL'.
   #' 
   #' Returns:
@@ -999,9 +999,9 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
       }
     )
 
-    if (is.null(res)) {
+    if (is.null(res)) { # handling expected NULL returns from staticFile QC 
       next
-    }
+    } 
 
     kind <- route_file(parse_file_name(pair$rp)) # identify the appropriate function
     accumulator_name <- qc_registry[[kind]]$accumulator # identify appropriate dataframe to populate
