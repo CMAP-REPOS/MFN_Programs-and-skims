@@ -49,7 +49,7 @@
 # NOTE: If the new file type is a static file, no new QC function or qc_registry entry is needed, 
 # but the new file type should be added to the route_file() function to be routed to "staticFile" for static file QC.
 
-
+ 
 #-- QC FUNCTIONS
 ### CHANGE FILES #####
 truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
