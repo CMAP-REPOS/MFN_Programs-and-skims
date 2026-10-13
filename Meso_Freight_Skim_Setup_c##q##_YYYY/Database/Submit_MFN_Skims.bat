@@ -9,33 +9,42 @@ rem Karly Cazzato, CMAP
 rem =========================================================================================
 rem =========================================================================================
 REM USER INPUT
-set choiceYR=%1
+@echo Enter last two digits of year to run skims: 
+set /p year=
 
-if "%choiceYR%"=="2022" (
-	set /A flag143=0
+@echo Enter 1 to run model WITHOUT logistics node 140 connected
+@echo Enter 2 to run model WITH logistics node 140 connected
+set /p in_scenario=
+
+set /a scenario = %year%%in_scenario%
+
+@echo Run analyze_mode_access ('y' or 'no'; note, this will take at least an hour)
+set /p flagAccess="[RUN analyze_mode_access? (y/n)] "
+
+if "%year%"=="22" (
+	set flag143="---> NOTE: Node 143 not active"
 	goto proceed143)
-if NOT "%choiceYR%" == "2022" (
-	set /A flag143=1
+if NOT "%year%" == "22" (
+	set flag143="---> NOTE: Node 143 active"
 	goto proceed143)
 :proceed143
 
-set choice=%2
-if "%choice%"=="200" (
-	set /A scenario=200
-	set /A flag140=1
+
+if "%in_scenario%"=="2" (
+	set flag140="---> NOTE: Node 140 active"
 	goto proceed140)
 
-if "%choice%"=="100" (
-	set /A scenario=100
-	set /A flag140=0
+if "%in_scenario%"=="1" (
+	set flag140="---> NOTE: Node 140 not active"
 	goto proceed140)
-
 :proceed140
-pause
-@echo Model run year: %choiceYR%
+
+@echo Model run year: %year%
 @echo Model run scenario: %scenario%
+@echo %flag143%
 @echo Model Node 140 Flag: %flag140%
-@echo.
+@echo %flag140%
+@echo. Press enter to run ------------------------------------------------------------------------------
 pause
 
 rem =========================================================================================
@@ -55,14 +64,11 @@ call :CheckEmpty %infile%
 if exist %infile% (del %infile% /Q)
 cd Database
 
-@echo Run analyze_mode_access ('y' or 'no'; note, this will take at least an hour)
-set /p flagAccess="[RUN analyze_mode_access? (y/n)] "
-@echo.
-@echo conf %conf%
-set conf2=%conf%
-@echo conf2 %conf2%
-pause
-rem goto skip1
+@echo CLEANING UP OUTPUT FOLDERS
+rmdir /s /q reports\%scenario%\
+mkdir reports\%scenario%\
+@echo CLEANUP COMPLETE
+
 @echo ==================================================================
 @ECHO.
 @ECHO Start Time: %date% %time% 
@@ -71,59 +77,64 @@ rem goto skip1
 @ECHO -- Running Scenario %scenario% --
 @ECHO.
 @ECHO %CD%
-set /a scenMax = 212
 @Echo RUNNING 1_remove_old_scenarios
-call emme -ng 000 -m macros\1_remove_old_scenarios.mac %scenario% %scenMax%
+call python macros\1_remove_old_scenarios.py %scenario% >>reports\%scenario%\remove_scenarios_%scenario%.rpt
 @Echo RUNNING 2_build_network
-call emme -ng 000 -m macros\2_build_network.mac %scenario% %flag140% %flag143% 
+call python macros\2_build_network.py %scenario% %in_scenario% %year% >>reports\%scenario%\build_network_%scenario%.rpt
+pause
 @Echo RUNNING 3_run_skims
-call emme -ng 000 -m macros\3_run_skims.mac %scenario% %flag140% 
+call emme -ng 000 -m macros\3_run_skims.mac %scenario%
 
 if "%flagAccess%" == "y"(call emme -ng 000 -m macros\analyze_mode_access.mac %scenario%) 
-rem :skip1
-rem verify rail service
-@echo Scenario = %scenario%, Flag140 = %flag140%, Flag143 = %flag143%
+
+@echo Skims Complete
+@echo --- Model run year: %year%
+@echo --- Model run scenario: %scenario%
+@echo %flag143%
+@echo %flag140%
 
 REM ======================================================================
 @echo
-@echo RUNNING sas batch processing
+@echo RUNNING Post-Processing Procedures
 @echo
+call %~dp0..\Scripts\manage\env\activate_env.cmd MFN_ENVNAME
+@echo CURRENT DIRECTORY:
+@echo %cd%
 
-REM ======================================================================
-set /A counter=1
-REM ======================================================================
-cd SAS
-:while
-if %counter% GTR 5 (goto loopend)
+@Echo RUNNING Step1_Create_GCD_file.py
+call python post_processing\Step1_Create_GCD_file.py %year% %scenario%
 
-if %counter% EQU 1 (set script=Step1_Create_GCD_file)
-if %counter% EQU 2 (set script=Step2_Create_ModePath_Skim_file)
-if %counter% EQU 3 (set script=Step3_Verify_Costs_Times)
-if %counter% EQU 4 (set script=Step4_Create_Zonal_Truck_Tour_files)
-if %counter% EQU 5 (set script=Step5_determine_pipeline_costs.R)
+@Echo RUNNING Step2_1_formatSkims
+call python post_processing\Step2_1_formatSkims.py %year% %scenario%
 
-if exist %script%.lst (del %script%.lst /Q)
-if exist Step3_Verify_Costs_Times.lst (del Step3_Verify_Costs_Times.lst /Q)
-@ECHO.
-@ECHO   - Running Script %counter%.
-if %counter% EQU 1 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR%")
-if %counter% EQU 2 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag140% %flag143% %choiceYR%")
-if %counter% EQU 3 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %flag143%")
-if %counter% EQU 4 ("C:/Program Files/SASHome/SASFoundation/9.4/sas.exe" %script% -sysparm "%scenario% %choiceYR% %conf2%")
-if %counter% EQU 5 (%rpath% %script% %scenario% %choiceYr%)
-@ECHO.
-@echo ran step %counter%
+@Echo RUNNING Step2_2_format_O-L-D
+call python post_processing\Step2_2_format_O-L-D.py %year% %scenario%
 
-if %ERRORLEVEL% GTR 1 (goto saserr)
-if exist Step3_Verify_Costs_Times.lst (goto mode_err)
-@ECHO   - Script %counter% (%script%) completed successfully.
+@Echo RUNNING Step2_3_format_Airport_Trips
+call python post_processing\Step2_3_format_Airport_Trips.py %year% %scenario%
 
-set /A counter=counter+1
-goto while
-REM ======================================================================
+@Echo RUNNING Step2_4_format_waterport_trips
+call python post_processing\Step2_4_format_waterport_trips.py %year% %scenario%
+
+@Echo RUNNING Step2_5_finalize_skims
+call python post_processing\Step2_5_finalize_skims.py %year% %scenario%
+
+@Echo RUNNING Step3_1_Verify_Costs_Times
+call python post_processing\Step3_1_Verify_Costs_Times.py %year% %scenario%
+
+@Echo RUNNING Step3_2_port_summary
+call python post_processing\Step3_2_port_summary.py %year% %scenario%
+
+@Echo RUNNING Step4_create_zonal_truck_tour_files
+call python post_processing\Step4_create_zonal_truck_tour_files.py %year% %scenario%
+
+@echo DELETING TEMPORARY FILES
+rmdir /S /Q "output_data\post_processing_%scenario%\tempOut\"
+
 goto end
 
-
+REM ======================================================================
+REM ======================================================================
 :CheckEmpty2
 if %~z1 == 0 (goto badR)
 goto Rpass
@@ -196,6 +207,6 @@ goto end
 
 :end
 
-echo. done
+echo. All done, see output_data/post_processing for final outputs
 pause
-exit /B 0
+exit
