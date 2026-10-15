@@ -61,13 +61,13 @@ TMPDIR='M:/proj1/kcc/FY27/freight_skim_output'
 terraOptions(tempdir = TMPDIR)  
 
 #-- Load functions file
-source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/freight_QC_functions.r")
+source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/99_QC/freight_QC_functions.r")
 
 #--Define paths and files
 # args = commandArgs(trailingOnly=T)
 oldConf = 'c25q2'
 
-newDir = "M:/proj1/kcc/FY27/freight_skim_output/Skim_Output_c26q2_07222026"
+newDir = "M:/proj1/kcc/FY27/freight_skim_output/Skim_Output_c26q2_10062026"
 currentDir = "M:/proj1/kcc/FY27/freight_skim_output/Skim_Out_c25q2"
 
 # Output file paths
@@ -104,7 +104,7 @@ QC_results <- execution(
   in_zones = in_zones,           # crosswalk
   unmatched = unmatched_path,    # report file
   report = report,               # report file
-  selection = 'ALL'              # default selection is to run for all file types, but can choose to run for
+  selection = 'mode_path_miles'              # default selection is to run for all file types, but can choose to run for
                                  # specific file types (can accept one or a list):
                                  # use the following keys for argument(s), in quotes:
                                  # truck_ee, zone_skims, mesozone_skims,
@@ -113,6 +113,13 @@ QC_results <- execution(
 )
 
 #-- Write results to Excel
-names(QC_results) <- unname(unlist(lapply(qc_registry, function(x) x[["sheet"]])))
+sheet_names <- unlist(lapply(qc_registry, function(entry) {
+  if (!is.null(entry$outputs)) {
+    vapply(entry$outputs, function(output) output$sheet, character(1))
+  } else {
+    entry$sheet
+  }
+}), use.names = FALSE)
 
+names(QC_results) <- sheet_names
 write.xlsx(QC_results, outXL)
