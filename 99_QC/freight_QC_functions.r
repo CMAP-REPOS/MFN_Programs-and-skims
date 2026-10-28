@@ -286,137 +286,19 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 #   #' 
 #   #' Returns:
 #   #'  qcOut (data.frame): The data frame containing the QC output.
- 
-#   #Amend Column names of new and current file
-#         inCurrent<- inCurrent %>%
-#           mutate(C_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0))%>%      #Flag if current rail transfer code is NA
-#           left_join(in_modePath, by = c("MinPath" = "Path"))%>%
-#           summarize(C_TotalNtwkMiles=sum(TotalNtwkMiles), C_DmsLhMiles=sum(DmsLhMiles), C_DmsDrayMiles=sum(DmsDrayMiles), 
-#                     C_IntlShipMiles=sum(IntlShipMiles), C_CmapPsTR=sum(CmapPsTR), C_CmapPsRL=sum(CmapPsRL), 
-#                     C_RlDwlCode=mean(RlDwlCode), C_RlTrnfr=sum(C_NATrnFr),
-#                     .by = c("Mode", "LogNode"))
-        
-#         inNew<- inNew %>%
-#           mutate(N_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0))%>%      #Flag if new rail transfer code is NA
-#           left_join(in_modePath, by = c("MinPath" = "Path"))%>%
-#           summarize(N_TotalNtwkMiles=sum(TotalNtwkMiles), N_DmsLhMiles=sum(DmsLhMiles), N_DmsDrayMiles=sum(DmsDrayMiles), 
-#                     N_IntlShipMiles=sum(IntlShipMiles), N_CmapPsTR=sum(CmapPsTR), N_CmapPsRL=sum(CmapPsRL), 
-#                     N_RlDwlCode=mean(RlDwlCode), N_RlTrnfr=sum(N_NATrnFr),
-#                     .by = c("Mode", "LogNode"))
-        
-#         #Merge and compare current and new data
-#         qcOut <- full_join(inCurrent, inNew, by = join_by(Mode, LogNode)) %>%
-#           mutate(diff_TotMi = N_TotalNtwkMiles - C_TotalNtwkMiles,                       #Calculate differences in distances
-#                  diff_DmsLh = N_DmsLhMiles - C_DmsLhMiles,
-#                  diff_DmsDray = N_DmsDrayMiles- C_DmsDrayMiles,
-#                  diff_IntlShip = N_IntlShipMiles- C_IntlShipMiles,
-#                  diff_PsTR = N_CmapPsTR-C_CmapPsTR, 
-#                  diff_PsRL = N_CmapPsRL-C_CmapPsRL, 
-#                  diff_RlTrnFr =N_RlTrnfr - C_RlTrnfr,                                      #Calculate change in rail transfer fraction
-#                  diff_RlDwlCode =N_RlDwlCode - C_RlDwlCode,                                #Calculate change in rail dwell code
-#                  Perc_TotMi = round(diff_TotMi/(N_TotalNtwkMiles + C_TotalNtwkMiles),3),   #Calculate percent differences
-#                  Perc_DmsLh = round(diff_DmsLh/(N_DmsLhMiles + C_DmsLhMiles),3),
-#                  Perc_DmsDray = round(diff_DmsDray/(N_DmsDrayMiles + C_DmsDrayMiles),3),
-#                  Perc_IntlShip = round(diff_IntlShip/(N_IntlShipMiles + C_IntlShipMiles),3),
-#                  Perc_PsTR = round(diff_PsTR/(N_CmapPsTR + C_CmapPsTR),3),
-#                  Perc_PsRL = round(diff_PsRL/(N_CmapPsRL + C_CmapPsRL),3),
-#                  Perc_RlTrnFr = round(diff_RlTrnFr/(N_RlTrnfr + C_RlTrnfr),3),
-#                  Perc_RlDwlCode = round(diff_RlDwlCode/(N_RlDwlCode + C_RlDwlCode),3),
-#                  Year = year,                                                               #Flag data year
-#                  Scenario = scen) %>%                                                       #Flag data scenario
-#           rowwise() %>%
-#           mutate(sumDiff = sum(c_across((Perc_TotMi:Perc_RlDwlCode)), na.rm = TRUE)) %>%     #Total all differences
-#           filter(abs(sumDiff) > skLim) %>%           #Filter for total differences greater than |1%|
-#           select(all_of(colnames(qc_registry[['mode_path_miles']]$template)))                                                    #Select column names of target dataframe
-#     return(qcOut)
-# }
-
-# mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
-#                             empUpdate = NA_character_, skLim = NA_real_, in_modePath) {
-#   compare_by <- function(group, template) {
-#     current <- inCurrent %>%
-#       mutate(C_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0)) %>%
-#       left_join(in_modePath, by = c("MinPath" = "Path")) %>%
-#       summarize(
-#         C_TotalNtwkMiles = sum(TotalNtwkMiles),
-#         C_DmsLhMiles = sum(DmsLhMiles),
-#         C_DmsDrayMiles = sum(DmsDrayMiles),
-#         C_IntlShipMiles = sum(IntlShipMiles),
-#         C_CmapPsTR = sum(CmapPsTR),
-#         C_CmapPsRL = sum(CmapPsRL),
-#         C_RlDwlCode = mean(RlDwlCode),
-#         C_RlTrnfr = sum(C_NATrnFr),
-#         .by = all_of(group)
-#       )
-
-#     new <- inNew %>%
-#       mutate(N_NATrnFr = ifelse(is.na(RlTrnfr), 1, 0)) %>%
-#       left_join(in_modePath, by = c("MinPath" = "Path")) %>%
-#       summarize(
-#         N_TotalNtwkMiles = sum(TotalNtwkMiles),
-#         N_DmsLhMiles = sum(DmsLhMiles),
-#         N_DmsDrayMiles = sum(DmsDrayMiles),
-#         N_IntlShipMiles = sum(IntlShipMiles),
-#         N_CmapPsTR = sum(CmapPsTR),
-#         N_CmapPsRL = sum(CmapPsRL),
-#         N_RlDwlCode = mean(RlDwlCode),
-#         N_RlTrnfr = sum(N_NATrnFr),
-#         .by = all_of(group)
-#       )
-
-#     qcOut <-full_join(current, new, by = group) %>%
-#       mutate(
-#         diff_TotMi = N_TotalNtwkMiles - C_TotalNtwkMiles,
-#         diff_DmsLh = N_DmsLhMiles - C_DmsLhMiles,
-#         diff_DmsDray = N_DmsDrayMiles - C_DmsDrayMiles,
-#         diff_IntlShip = N_IntlShipMiles - C_IntlShipMiles,
-#         diff_PsTR = N_CmapPsTR - C_CmapPsTR,
-#         diff_PsRL = N_CmapPsRL - C_CmapPsRL,
-#         diff_RlTrnFr = N_RlTrnfr - C_RlTrnfr,
-#         diff_RlDwlCode = N_RlDwlCode - C_RlDwlCode,
-#         Perc_TotMi = round(diff_TotMi / (N_TotalNtwkMiles + C_TotalNtwkMiles), 3),
-#         Perc_DmsLh = round(diff_DmsLh / (N_DmsLhMiles + C_DmsLhMiles), 3),
-#         Perc_DmsDray = round(diff_DmsDray / (N_DmsDrayMiles + C_DmsDrayMiles), 3),
-#         Perc_IntlShip = round(diff_IntlShip / (N_IntlShipMiles + C_IntlShipMiles), 3),
-#         Sum_TotMi = N_TotalNtwkMiles + C_TotalNtwkMiles,
-#         Sum_DmsLh = N_DmsLhMiles + C_DmsLhMiles,
-#         Sum_DmsDray = N_DmsDrayMiles + C_DmsDrayMiles,
-#         Sum_IntlShip = N_IntlShipMiles + C_IntlShipMiles,
-#         Sum_PsTR = N_CmapPsTR + C_CmapPsTR,
-#         Sum_PsRL = N_CmapPsRL + C_CmapPsRL,
-#         Perc_PsTR = round(diff_PsTR / (N_CmapPsTR + C_CmapPsTR), 3),
-#         Perc_PsRL = round(diff_PsRL / (N_CmapPsRL + C_CmapPsRL), 3),
-#         Perc_RlTrnFr = round(diff_RlTrnFr / (N_RlTrnfr + C_RlTrnfr), 3),
-#         Perc_RlDwlCode = round(diff_RlDwlCode / (N_RlDwlCode + C_RlDwlCode), 3),
-#         Year = year,
-#         Scenario = scen
-#       ) %>%
-#       rowwise() %>%
-#       mutate(sumDiff = sum(c_across(Perc_TotMi:Perc_RlDwlCode), na.rm = TRUE)) %>%
-#       ungroup() %>%
-#       filter(abs(sumDiff) > skLim) %>%
-#       select(all_of(names(template)))
-
-#     return(qcOut)
-#   }
-
-#   return(list(
-#     by_mode = compare_by("Mode", qc_registry$mode_path_miles$outputs$by_mode$template),
-#     by_log_node = compare_by("LogNode", qc_registry$mode_path_miles$outputs$by_log_node$template)
-#   ))
-# }
 
 mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
                             empUpdate = NA_character_, skLim = NA_real_, in_modePath) {
+  #' docstring
   compare_by <- function(group) {
     bind_rows(
       Current = inCurrent,
       New = inNew,
       .id = "Version"
     ) %>%
-      mutate(RlTrnfr = ifelse(is.na(RlTrnfr), 1, 0)) %>% # not changing dwell stuff yet 
-      left_join(in_modePath, by = c("MinPath" = "Path")) %>%
-      pivot_longer(
+    mutate(RlTrnfr = ifelse(is.na(RlTrnfr), 1, 0)) %>% # not changing dwell stuff yet 
+    left_join(in_modePath, by = c("MinPath" = "Path")) %>%
+    pivot_longer(
         cols = all_of(c(
           "TotalNtwkMiles", 'DmsLhMiles', "DmsDrayMiles", "IntlShipMiles",
           "CmapPsTR", "CmapPsRL", "RlDwlCode", "RlTrnfr"
@@ -424,34 +306,116 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
         names_to = 'Attribute',
         values_to = "Value"
       ) %>%
-      summarize(
+    summarize(
         Sum = sum(Value, na.rm = TRUE),
         .by = c(all_of(group), Version, Attribute)
       ) %>%
-      pivot_wider(names_from = Version, values_from = Sum, names_glue = "{Version}Sum") %>%
-      mutate(
+    pivot_wider(names_from = Version, values_from = Sum, names_glue = "{Version}Sum") %>%
+    mutate(
         Difference = NewSum - CurrentSum,
         PercentChange = round(Difference / (CurrentSum), 3),
         Year = year,
-        Scenario = scen
+        Scenario = scen,
+        QCvalue = case_when(
+          Attribute %in% c("TotalNtwkMiles", "DmsLhMiles", "DmsDrayMiles", "IntlShipMiles") ~ PercentChange,
+          TRUE ~ Difference
+        )
       ) %>%
-      pivot_longer(cols = all_of(c('CurrentSum','NewSum','Difference', 'PercentChange')),
-        names_to = 'QCoperation',
-        values_to = 'QCvalue') %>%
-      filter((QCoperation == 'PercentChange' & abs(QCvalue) > skLim) | 
-      (QCoperation == 'Difference') |
-      (QCoperation == 'CurrentSum') |
-      (QCoperation == 'NewSum')
-      ) %>%
-      # filter(abs(PercentDifference) > skLim) %>%
-      select(all_of(names(
+    pivot_wider(id_cols = c(Scenario, Year, all_of(group)), names_from = Attribute,
+        values_from = QCvalue) %>%
+      # pivot_longer(cols = all_of(c('CurrentSum','NewSum','Difference', 'PercentChange')),
+      #   names_to = 'QCoperation',
+      #   values_to = 'QCvalue') %>%
+      # filter((QCoperation == 'PercentChange' & abs(QCvalue) > skLim) | 
+      # (QCoperation == 'Difference') |
+      # (QCoperation == 'CurrentSum') |
+      # (QCoperation == 'NewSum')
+      # ) %>%
+      # # filter(abs(PercentDifference) > skLim) %>%
+    select(all_of(names(
         qc_registry[["mode_path_miles"]]$outputs[[if (group == "Mode") "by_mode" else "by_log_node"]]$template
       )))
   }
 
+  RlDwlCode_qc <- function(){
+    qc <- bind_rows(
+        Current = inCurrent,
+        New = inNew,
+        .id = "Version"
+      ) %>%
+      left_join(in_modePath, by = c("MinPath" = "Path")) %>%
+      mutate(
+        rail_interchange = case_when(
+          is.na(RlDwlCode) ~ NA_character_,
+          RlDwlCode == 0 ~ "No passthrough",
+          RlDwlCode > 0 & RlDwlCode <= 1 ~ "Memphis",
+          RlDwlCode > 1 & RlDwlCode <= 2 ~ "New Orleans",
+          RlDwlCode > 2 & RlDwlCode <= 3 ~ "St Louis",
+          RlDwlCode > 3 & RlDwlCode <= 4 ~ "Kansas City",
+          TRUE ~ "No match"
+        ),
+        rail_interchange = if_else(
+          !is.na(RlDwlCode) & !near(RlDwlCode, round(RlDwlCode)),
+          paste0(rail_interchange, " (", format(RlDwlCode, trim = TRUE), ")"),
+          rail_interchange
+        )
+      ) %>%
+      filter(!is.na(rail_interchange)) %>%
+      summarize(
+          Count = n(), # count
+          .by = c(Mode, Version, rail_interchange)
+        ) %>%
+      pivot_wider(names_from = Version, values_from = Count, names_glue = "{Version}Count") %>% 
+      # what to do about mismatch if current or new dont have a value
+      mutate(
+          CurrentCount = coalesce(CurrentCount, 0L),
+          NewCount = coalesce(NewCount, 0L),
+          Difference = NewCount - CurrentCount,
+          PercentChange = round(Difference / CurrentCount, 3),
+          Year = year,
+          Scenario = scen
+        )
+    qc
+  }
+
+  cmap_qc <- function(col){ #col = CmapPsRL or CmapPsTR
+    current <- inCurrent %>%
+      select(Origin, Destination, MinPath, all_of(col)) %>%
+      rename(Path = MinPath, current = all_of(col)) %>%
+      left_join(in_modePath, by = join_by(Path)) %>%
+      summarize(count_current = sum(current),
+                .by = c('Path', 'Mode')) %>%
+      filter(count_current != 0)
+    
+    new <- inNew %>%
+      select(Origin, Destination, MinPath, all_of(col))%>%
+      rename(Path = MinPath, new = all_of(col)) %>%
+      left_join(in_modePath, by = join_by(Path)) %>%
+      filter(!is.na(new)) %>%
+      summarize(count_new = sum(new),
+                .by = c('Path', 'Mode')) %>%
+      filter(count_new != 0)
+  
+    compare <- current %>%
+      full_join(new, by = join_by(Path, Mode)) %>%
+      mutate(
+        count_current = coalesce(count_current, 0),
+        count_new = coalesce(count_new, 0),
+        Difference = count_new - count_current,
+        PercDiff = round(Difference / (count_current), 3),
+        Year = year,
+        Scenario = scen
+      )
+    
+    compare
+  }
+
   return(list(
     by_mode = compare_by("Mode"),
-    by_log_node = compare_by("LogNode")
+    by_log_node = compare_by("LogNode"),
+    RlDwlCode_sheet = RlDwlCode_qc(),
+    CmapPsTR_sheet = cmap_qc("CmapPsTR"),
+    CmapPsRL_sheet = cmap_qc("CmapPsRL")
   ))
 }
 
@@ -759,27 +723,84 @@ qc_registry <- list(
       by_mode = list(
           accumulator = "all_modeMi_byMode",
           sheet = "mode_Mi_byMode",
+          arrange_by = c("Scenario", "Year", "Mode"),
           template = data.frame(
             Scenario = character(),
             Year = numeric(),
             Mode = character(),
-            Attribute = character(),
-            QCoperation = character(), 
-            QCvalue = numeric()
+            TotalNtwkMiles = numeric(),
+            DmsLhMiles = numeric(),
+            DmsDrayMiles = numeric(),
+            IntlShipMiles = numeric()
+            # CmapPsTR = numeric(),
+            # CmapPsRL = numeric(),
+            # RlDwlCode = numeric(),
+            # RlTrnfr = numeric()
           )
       ),
         by_log_node = list(
           accumulator = "all_modeMi_byLogNode",
           sheet = "mode_Mi_byLogNode",
+          arrange_by = c("Scenario", "Year", "LogNode"),
           template = data.frame(
             Scenario = character(),
             Year = numeric(),
             LogNode = numeric(),
-            Attribute = character(),
-            QCoperation = character(), 
-            QCvalue = numeric()
+            TotalNtwkMiles = numeric(),
+            DmsLhMiles = numeric(),
+            DmsDrayMiles = numeric(),
+            IntlShipMiles = numeric()
+            # CmapPsTR = numeric(),
+            # CmapPsRL = numeric(),
+            # RlDwlCode = numeric(),
+            # RlTrnfr = numeric()
           )
-      )
+        ),
+          RlDwlCode_sheet = list(
+          accumulator = "all_modeMi_RlDwlCode",
+          sheet = "RlDwlCode",
+          arrange_by = "rail_interchange",
+          template = data.frame(
+            Scenario = character(),
+            Year = numeric(),
+            Mode = character(),
+            rail_interchange = character(),
+            CurrentCount = numeric(),
+            NewCount = numeric(),
+            Difference = numeric(),
+            PercentChange = numeric()
+          )
+        ),
+        CmapPsTR_sheet = list(
+          accumulator = "all_modeMi_CmapPsTR",
+          sheet = "CmapPsTR",
+          arrange_by = c("Path", "Mode"),
+          template = data.frame(
+            Scenario = character(),
+            Year = numeric(),
+            Path = numeric(),
+            Mode = character(),
+            count_current = numeric(),
+            count_new = numeric(),
+            Difference = numeric(),
+            PercDiff = numeric()
+          )
+        ),
+        CmapPsRL_sheet = list(
+          accumulator = "all_modeMi_CmapPsRL",
+          sheet = "CmapPsRL",
+          arrange_by = c("Path", "Mode"),
+          template = data.frame(
+            Scenario = character(),
+            Year = numeric(),
+            Path = numeric(),
+            Mode = character(),
+            count_current = numeric(),
+            count_new = numeric(),
+            Difference = numeric(),
+            PercDiff = numeric()
+          )
+        )
     )
 ),
 
@@ -1189,8 +1210,24 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   }
 
   for (accumulator_name in names(accumulators)) {
-  accumulators[[accumulator_name]] <- dplyr::bind_rows(c(list(accumulators[[accumulator_name]]), result_chunks[[accumulator_name]]))
+  accumulators[[accumulator_name]] <- bind_rows(c(list(accumulators[[accumulator_name]]), result_chunks[[accumulator_name]]))
 }
+
+  for (entry in qc_registry) {
+  if (is.null(entry$outputs)) {
+    next
+  }
+
+  for (output in entry$outputs) {
+    if (is.null(output$arrange_by)) {next}
+
+    accumulator_name <- output$accumulator
+    accumulators[[accumulator_name]] <- arrange(
+      accumulators[[accumulator_name]],
+      !!!syms(output$arrange_by)
+      )
+    }
+  }
 
   print("finished running all files")
 

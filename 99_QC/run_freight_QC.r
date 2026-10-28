@@ -47,7 +47,7 @@
 
 # SET UP
 #--Load required packages
-packages <- c("tidyverse", "readxl", "openxlsx", "terra","stringr")
+packages <- c("tidyverse", "readxl", "openxlsx", "terra","stringr","yaml12")
 package.check <- lapply(
   packages,
   FUN = function(x) {
@@ -82,6 +82,8 @@ in_ports <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswal
 in_POE <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "POE")
 in_zones <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "zones")
 
+# speedstime <- read_yaml("V:/SecureMaster_Freight/Processing_Data/Skim_input_data/Static/constants/speeds_and_time.yaml")
+
 #--Delete report if exists
 if(file.exists(outXL) == TRUE){unlink(outXL, recursive = TRUE)}
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
@@ -113,13 +115,4 @@ QC_results <- execution(
 )
 
 #-- Write results to Excel
-sheet_names <- unlist(lapply(qc_registry, function(entry) {
-  if (!is.null(entry$outputs)) {
-    vapply(entry$outputs, function(output) output$sheet, character(1))
-  } else {
-    entry$sheet
-  }
-}), use.names = FALSE)
-
-names(QC_results) <- sheet_names
 write.xlsx(QC_results, outXL)
