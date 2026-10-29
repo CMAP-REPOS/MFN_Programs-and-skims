@@ -290,7 +290,7 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
                             empUpdate = NA_character_, skLim = NA_real_, in_modePath) {
   #' docstring
-  compare_by <- function(group) {
+  milescols_qc <- function(group) {
     bind_rows(
       Current = inCurrent,
       New = inNew,
@@ -337,7 +337,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
       )))
   }
 
-  RlDwlCode_qc <- function(){
+  dwellcode_qc <- function(){
     qc <- bind_rows(
         Current = inCurrent,
         New = inNew,
@@ -378,7 +378,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
     qc
   }
 
-  cmap_qc <- function(col){ #col = CmapPsRL or CmapPsTR
+  cmapcols_qc <- function(col){ #col = CmapPsRL or CmapPsTR
     current <- inCurrent %>%
       select(Origin, Destination, MinPath, all_of(col)) %>%
       rename(Path = MinPath, current = all_of(col)) %>%
@@ -411,11 +411,11 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
   }
 
   return(list(
-    by_mode = compare_by("Mode"),
-    by_log_node = compare_by("LogNode"),
-    RlDwlCode_sheet = RlDwlCode_qc(),
-    CmapPsTR_sheet = cmap_qc("CmapPsTR"),
-    CmapPsRL_sheet = cmap_qc("CmapPsRL")
+    by_mode = miles_cols_qc("Mode"),
+    by_log_node = milescols_qc("LogNode"),
+    RlDwlCode_sheet = dwellcode_qc(),
+    CmapPsTR_sheet = cmapcols_qc("CmapPsTR"),
+    CmapPsRL_sheet = cmapcols_qc("CmapPsRL")
   ))
 }
 
