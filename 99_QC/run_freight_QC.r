@@ -65,15 +65,15 @@ source("M:/proj1/th/update_freight_skim_qc/MFN_Programs-and-skims/99_QC/freight_
 
 #--Define paths and files
 # args = commandArgs(trailingOnly=T)
-oldConf = 'c25q2'
+oldConf  <- 'c25q2'
 
-newDir = "M:/proj1/kcc/FY27/freight_skim_output/Skim_Output_c26q2_10062026"
-currentDir = "M:/proj1/kcc/FY27/freight_skim_output/Skim_Out_c25q2"
+newDir  <- "M:/proj1/kcc/FY27/freight_skim_output/Skim_Output_c26q2_11122026"
+currentDir <- "M:/proj1/kcc/FY27/freight_skim_output/Skim_Out_c25q2"
 
 # Output file paths
-rpDir = "M:/proj1/th/update_freight_skim_qc/Skim_Output/" 
-outXL = paste(rpDir, "finalSkim_compareQC.xlsx", sep = "")
-report = paste(rpDir, "qc_CompareReport.txt", sep = "")
+rpDir  <- "M:/proj1/th/update_freight_skim_qc/Skim_Output/" 
+outXL <- file.path(rpDir, paste0("finalSkim_compareQC", format(Sys.Date(), "%Y%m%d"), ".xlsx"))
+report <- paste(rpDir, "qc_CompareReport.txt", sep = "")
 unmatched_path <- paste(rpDir, "qc_unmatched.txt", sep = "")
 
 #--Import crosswalks
@@ -81,6 +81,8 @@ in_modePath <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_cross
 in_ports <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "Ports")
 in_POE <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "POE")
 in_zones <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "zones")
+in_mesozones <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "mesozones")
+in_lognodes <- read_xlsx("M:/proj1/kcc/FY27/freight_skim_output/Inputs/MFN_crosswalks.xlsx", sheet = "Logistics_Nodes")
 
 # speedstime <- read_yaml("V:/SecureMaster_Freight/Processing_Data/Skim_input_data/Static/constants/speeds_and_time.yaml")
 
@@ -90,8 +92,8 @@ if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
 if(file.exists(unmatched_path) == TRUE){unlink(unmatched_path, recursive =TRUE)}
 
 #--Manual variable definitions for QC
-empUpdate = "yes"
-skLim = 0.05 
+empUpdate  <- "yes"
+skLim <- 0.05 
 
 # EXECUTION
 #-- Execution of QC pipeline
@@ -104,13 +106,17 @@ QC_results <- execution(
   in_modePath = in_modePath,     # crosswalk
   in_ports = in_ports,           # crosswalk
   in_zones = in_zones,           # crosswalk
+  in_mesozones = in_mesozones,   # crosswalk
+  in_lognodes = in_lognodes,     # crosswalk
   unmatched = unmatched_path,    # report file
   report = report,               # report file
-  selection = 'mode_path_miles'              # default selection is to run for all file types, but can choose to run for
+  selection = 'ALL'              
+                                 # default selection is to run for all file types (type 'ALL'), but can choose to run for
                                  # specific file types (can accept one or a list):
                                  # use the following keys for argument(s), in quotes:
                                  # truck_ee, zone_skims, mesozone_skims,
-                                 # zone_employment, truck_ie, mode_path_miles, mode_path_ports, mode_path_skims, staticFile
+                                 # zone_employment, truck_ie, mode_path_miles, 
+                                 # mode_path_ports, mode_path_skims, staticFile
                                  # for multiple, use selection = c('','')
 )
 

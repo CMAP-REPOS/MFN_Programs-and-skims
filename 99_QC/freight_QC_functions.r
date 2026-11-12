@@ -14,6 +14,43 @@
 # 3. Execution function: A function that executes the QC for all skim output files through iteration over the 
 # current and new directories, using the architecture defined in the file handling and QC routing functions.
 
+# run_freight_QC.r
+# |
+# +-- Load required R packages
+# +-- Set input, output, and report paths
+# +-- Source freight_QC_functions.r
+# +-- Read crosswalk sheets
+# +-- Clear existing output files
+# +-- Set QC options (empUpdate, skLim, selection)
+# |
+# +-- Call execution(...)
+#     |
+#     +-- List files recursively in currentDir and newDir
+#     +-- Match files by relative path
+#     +-- Write unmatched file paths to qc_unmatched.txt
+#     +-- Keep only file types included in selection
+#     |
+#     +-- For each matched file pair
+#     |   |
+#     |   +-- Parse filename and relative path
+#     |   |   +-- Extract filename
+#     |   |   +-- Extract year, if present
+#     |   |   +-- Extract scenario folder, if present
+#     |   |
+#     |   +-- Route filename to a QC type using route_file()
+#     |   +-- Look up QC function and output definitions in qc_registry
+#     |   +-- Read current and new CSV files
+#     |   +-- Pass only the arguments required by that QC function
+#     |   +-- Run the QC function
+#     |   +-- Log processing/errors to qc_CompareReport.txt
+#     |   +-- Add returned result(s) to the appropriate output sheet(s)
+#     |
+#     +-- Combine results for each sheet
+#     +-- Sort sheets that define arrange_by columns
+#     +-- Return QC results
+# |
+# +-- Write returned results to the dated Excel file (outXL)
+
 # Input Files (via run_freight_QC.r): 
 # 2 file directories containing the current and new skim output files.
 # MFN_crosswalks.xlsx: crosswalk  document for POE, mode path, ports, and zones.
@@ -82,7 +119,12 @@ truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
         left_join(in_POE, by = c("N_poe" = "POE")) %>%
         rename(NState = State, NDirection = Direction) %>%
         filter((NDirection != CDirection) | (NDirection2 != CDirection2)) %>%
-        select(all_of(colnames(qc_registry[['truck_ee']]$template)))
+        select(
+          Production_zone, Consumption_zone,
+          C_poe2, C_poe, N_poe2, N_poe,
+          CState, NState, CDirection, NDirection,
+          CState2, NState2, CDirection2, NDirection2
+        )
       
       #Confirm all POE ID's are in expected range; if not stop code
       check <- qcOut %>%
@@ -98,7 +140,7 @@ return(qcOut)
 
 # ask Karly how to handle 0.5 value (was .5 in code and was 0 in documentation and comments)
 zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
-                            empUpdate = NA_character_, skLim = NA_real_, report){
+                            empUpdate = NA_character_, skLim = NA_real_, report, in_mesozones){
   #' This function: sets ‘empUpdate’ flag at beginning of script; Compares current vs new ‘totalEmp’; filters to keep any differences > skLim (used to be any differences i.e. 0); 
   #' if empUpdate flag == ‘no’ but there are differences detected, stops code; otherwise, exports as supplemental data tab.
   #' 
@@ -114,23 +156,41 @@ zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
 
-    inCurrent<- inCurrent %>% rename(currentEmp = totalemp)                    #Amend Current file column names
-    inNew<- inNew %>% rename(newEmp = totalemp)                                #Amed New file column names
+    inCurrent<- inCurrent %>% rename(currentEmp = totalemp) %>% mutate(current_present = TRUE) #Amend Current file column names
+    inNew<- inNew %>% rename(newEmp = totalemp) %>% mutate(new_present = TRUE)    #Amend New file column names
         
-        qcOut <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>%     #Merge new and current data
-          mutate(Difference = newEmp-currentEmp,                                   #Calculate employment difference
-                 Percent = round(Difference/(currentEmp),3)) %>%            #Calculate employment percent difference, round 3 decimal places
-          filter(abs(Percent) > skLim)%>%                                     #Filter employment difference > skLim (used to be 0)
+        join <- full_join(inCurrent, inNew, by = join_by(Zone, mesozone)) %>% #Merge new and current data
+          mutate(
+              currentEmp = if_else(is.na(current_present), 0, currentEmp),
+              newEmp = if_else(is.na(new_present), 0, newEmp)
+            )
+
+        qcOut <- join %>% 
+          left_join(in_mesozones, by = join_by(mesozone == Mesozone)) %>%                      #Bind crosswalk
+          summarize(
+            currentEmpSum = sum(currentEmp),
+            newEmpSum = sum(newEmp),
+            .by = 'County'
+          ) %>%
+          mutate(Difference = newEmpSum - currentEmpSum,                           #Calculate employment difference
+                 Percent = round(Difference/(currentEmpSum),3)) %>%          #Calculate employment percent difference, round 3 decimal places
+          # filter(abs(Percent) > skLim)%>%                                     #Filter employment difference > skLim (used to be 0)
           mutate(Year = year) %>%                                                  #Assign year variable to different data
-          select(all_of(colnames(qc_registry[['zone_employment']]$template)))     #Select template column names
+          select(Year, County, currentEmpSum, newEmpSum, Difference, Percent)     #Select template column names
         
         #Employment only expected to change if update is associated with a plan update
         #If difference exists otherwise, stop code
-        if(sum(qcOut$Difference) > 0 & empUpdate != "yes"){
-          printOut = "ERROR: Employment unexpectedly changes!"
-          cat(printOut, file =report,append=TRUE)
+        # if(sum(qcOut$Difference) > 0 & empUpdate != "yes"){
+        #   printOut = "ERROR: Employment unexpectedly changes!"
+        #   cat(printOut, file=report, append=TRUE)
+        #   # stop()
+        #   }    
+        employment_check <- join %>%    
+          mutate(Difference = newEmp - currentEmp)
+        if (any(abs(employment_check$Difference) > 0) && empUpdate != "yes") {
+          cat("ERROR: Employment unexpectedly changes!\n", file = report, append = TRUE)
           # stop()
-          }                
+        }           
        
     return(qcOut)
 }
@@ -152,20 +212,28 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
+    od_qc <- function(od_county){ # function arguments will be either 'OCounty' or 'DCounty'
     #Amend Current and New file column names
         inCurrent <- inCurrent %>% 
-          rename(C_Peak = Peak, C_OffPeak = OffPeak, C_Miles = Miles)
+          rename(C_Peak = Peak, C_OffPeak = OffPeak, C_Miles = Miles) %>% mutate(current_present = TRUE)
         
         inNew <- inNew %>%
-          rename(N_Peak = Peak, N_OffPeak = OffPeak, N_Miles = Miles)
+          rename(N_Peak = Peak, N_OffPeak = OffPeak, N_Miles = Miles) %>% mutate(new_present = TRUE)
         
         #Merge data, calculate differences
         #Peak and OffPeak Times; ussume time difference of 1 minute is okay
         #Distance
         qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%
-          left_join(in_zones, by = join_by("Origin" == 'Zone17')) %>%
+          mutate(
+                C_Peak    = if_else(is.na(current_present), 0, C_Peak),
+                C_OffPeak = if_else(is.na(current_present), 0, C_OffPeak),
+                C_Miles   = if_else(is.na(current_present), 0, C_Miles),
+                N_Peak    = if_else(is.na(new_present), 0, N_Peak),
+                N_OffPeak = if_else(is.na(new_present), 0, N_OffPeak),
+                N_Miles   = if_else(is.na(new_present), 0, N_Miles)) %>%
+          left_join(in_zones, by = join_by(Origin == Zone17)) %>%
           rename(OCounty = County) %>%
-          left_join(in_zones, by = join_by("Destination" == 'Zone17')) %>%
+          left_join(in_zones, by = join_by(Destination == Zone17)) %>%
           rename(DCounty = County)%>%
           mutate(OCounty = ifelse(is.na(OCounty), "POE", OCounty),
                  DCounty = ifelse(is.na(DCounty), "POE", DCounty)) %>%
@@ -175,20 +243,30 @@ zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
                     NOffPeak = sum(N_OffPeak),
                     CMiles = sum(C_Miles),
                     NMiles= sum(N_Miles),
-                    .by = c("OCounty", "DCounty")) %>%
-          mutate(diff_Peak = NPeak - CPeak,
+                    .by = all_of(od_county)) %>%
+          mutate(Year = year,
+                 diff_Peak = NPeak - CPeak,
                  perc_Peak = round(diff_Peak/CPeak,3),
                  diff_OffPeak = NOffPeak - COffPeak,
                  perc_OffPeak = round(diff_OffPeak/COffPeak, 3),
                  diff_Mi = NMiles - CMiles,
                  perc_Mi = round(diff_Mi/CMiles, 3),
                  flagPeaks = ifelse(abs(perc_Peak) > skLim | abs(perc_OffPeak) > skLim, 1, 0),
-                 flagMi = ifelse(abs(perc_Mi) > skLim, 1, 0),
-                 Year = year) %>%       #Sum all differences
-          filter(flagPeaks == 1 | flagMi == 1) %>%    #filter to keep only OD pairs with differences
-          select(all_of(colnames(qc_registry[['zone_skims']]$template)))   #Select column names from target dataframe
+                 flagMi = ifelse(abs(perc_Mi) > skLim, 1, 0)) %>% 
+          # filter(flagPeaks == 1 | flagMi == 1) %>%    #filter to keep only OD pairs with differences
+          select(
+            Year, all_of(od_county),
+            CPeak, NPeak, diff_Peak, perc_Peak,
+            COffPeak, NOffPeak, diff_OffPeak, perc_OffPeak,
+            CMiles, NMiles, diff_Mi, perc_Mi, flagPeaks, flagMi
+          )   # to hardcode columns we want 
         
     return(qcOut)
+  }
+  return(list(
+    by_origin = od_qc("OCounty"),
+    by_destination = od_qc("DCounty")
+  ))
 }
 
 mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
@@ -205,21 +283,43 @@ mesozone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_characte
   #' 
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
- 
-  #Amend Current and New file column names
-        inCurrent <- inCurrent 
-        colnames(inCurrent) <- c('Origin', 'Destination', 'currentTime') # added capitalization for origin and destination
-        inNew <- inNew
-        colnames(inNew) <- c('Origin', 'Destination', 'newTime') # added capitalization for origin and destination
-        #Merge new and current data; calculate differencepercent difference in 
-        qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%   #Merge current and new data
+   
+  mz_qc <- function(od_county){ # function arguments will be either 'OCounty' or 'DCounty'
+    inCurrent <- inCurrent %>% set_names(c("Origin", "Destination", "currentTime")) %>%
+      mutate(current_present = TRUE) # added capitalization for origin and destination for consistency
+
+    inNew <- inNew %>%
+      set_names(c("Origin", "Destination", "newTime")) %>%
+      mutate(new_present = TRUE)
+
+    #Merge new and current data; calculate summary stats
+    qcOut <- full_join(inCurrent, inNew, by = join_by(Origin, Destination)) %>%   #Merge current and new data
+          mutate(currentTime = if_else(is.na(current_present), 0, currentTime),
+               newTime = if_else(is.na(new_present), 0, newTime)) %>%
+          left_join(in_mesozones, by = join_by(Origin == Mesozone)) %>%
+          rename(OCounty = County, ORegion = Region) %>%
+          left_join(in_mesozones, by = join_by(Destination == Mesozone)) %>%
+          rename(DCounty = County, DRegion = Region)%>%
+          summarize(
+            currentTime = sum(currentTime), 
+            newTime = sum(newTime), 
+            .by = all_of(od_county)) %>%  #Sum all differences
           mutate(Year = year,                                                         #Flag current year of data
+                 currentTime = currentTime,
+                 newTime = newTime,
                  Difference = newTime - currentTime,                                  #Calculate difference in skim time
-                 Percent = round(Difference/(newTime + currentTime),3)) %>%           #Calculate percent difference in skim time
-          select(all_of(colnames(qc_registry[['mesozone_skims']]$template))) %>%   #Select column names of target dataframe # added capitalization for origin and destination
-          filter(abs(Percent) >= skLim)%>%   #Filter to keep percent differences > |1%|
-          arrange(Origin, Destination, Year)                                                  
-  return(qcOut)
+                 Percent = round(Difference/(currentTime),7)) %>%           #Calculate percent difference in skim time
+          select(Year, all_of(od_county),
+            currentTime, newTime, Difference, Percent)   #Select column names of target dataframe # added capitalization for origin and destination
+          # filter(abs(Percent) >= skLim)%>%   #Filter to keep percent differences > |1%|
+          # arrange(Origin, Destination, Year)                                                  
+    return(qcOut)
+    }
+
+  return(list(
+    by_origin = mz_qc("OCounty"),
+    by_destination = mz_qc("DCounty")
+  ))
 }
 
 truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
@@ -256,7 +356,10 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
     mutate(Year = year, Scenario = scen) %>%
     # Explicitly select and order columns locally without 
     # calling all_truckIE to avoid potential issues with variable scope
-    select(all_of(colnames(qc_registry[['truck_ie']]$template)))
+    select(
+      Scenario, Year, Production_zone, Consumption_zone,
+      C_poe, N_poe, CState, NState, CDirection, NDirection
+    )
   
   # Validate POE range
   check <- qcOut %>%
@@ -404,14 +507,14 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
         Difference = count_new - count_current,
         PercDiff = round(Difference / (count_current), 3),
         Year = year,
-        Scenario = scen
-      )
+        Scenario = scen) %>%
+      filter(Difference != 0)
     
     compare
   }
 
   return(list(
-    by_mode = miles_cols_qc("Mode"),
+    by_mode = milescols_qc("Mode"),
     by_log_node = milescols_qc("LogNode"),
     RlDwlCode_sheet = dwellcode_qc(),
     CmapPsTR_sheet = cmapcols_qc("CmapPsTR"),
@@ -436,28 +539,56 @@ mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
   #' Returns:
   #'  qcOut (data.frame): The data frame containing the QC output.
  
-  #Flag current and new data
-        inCurrent<- inCurrent %>% rename(C_mesoNB = Port_mesozoneNB, C_nameNB = Port_NameNB, C_mesoB = Port_mesozoneB, C_nameB = Port_NameB)
-        inNew<- inNew %>% rename(N_mesoNB = Port_mesozoneNB, N_nameNB = Port_NameNB, N_mesoB = Port_mesozoneB, N_nameB = Port_NameB)
-        #Join current and new data by all fields
-        qcOut <- full_join(inCurrent, inNew, by = join_by(Production_zone, Consumption_zone)) %>%
-          mutate(flagB = ifelse(N_mesoB == C_mesoB, 1, 0),
-                 flagNB = ifelse(N_mesoNB == C_mesoNB, 1, 0),
-                 flagSum = flagB + flagNB,
-                 Scenario = scen, Year = year) %>%        #Sum flags and flag scenario and year
-          filter(flagSum != 2) %>%                                  #Filter to keep differences
-          left_join(in_ports, by = c("C_nameNB" = "Port")) %>%                #Merge 'B' = bulk goods port name with port crosswalk
-          rename(C_coastNB = Coast) %>%
-          left_join(in_ports, by = c("N_nameNB" = "Port")) %>%                 #Merge 'NB' = nonbulk goods with port crosswalk
-          rename(N_coastNB = Coast) %>%
-          left_join(in_ports, by = c("C_nameB" = "Port")) %>%                #Merge 'B' = bulk goods port name with port crosswalk
-          rename(C_coastB = Coast) %>%
-          left_join(in_ports, by = c("N_nameB" = "Port")) %>%                 #Merge 'NB' = nonbulk goods with port crosswalk
-          rename(N_coastB = Coast) %>%
-          filter((C_coastNB != N_coastNB) | (C_coastB != N_coastB)) %>%
-          select(all_of(colnames(qc_registry[['mode_path_ports']]$template)))
-    return(qcOut)
+    pivbybulkstatus <-function(df){
+      output <- df %>% pivot_longer(cols=c('Port_NameB','Port_NameNB'), names_to='Bulk_Status', names_prefix='Port_Name', values_to='Port_Name')
+      return(output)
+    }
+
+    qcOut <- bind_rows(
+      Current = pivbybulkstatus(inCurrent),
+      New = pivbybulkstatus(inNew),
+      .id = "Version"
+    ) %>% 
+    mutate(
+      Year = year,
+      Scenario = scen
+    ) %>%
+    summarize(
+      Count = n(),
+      .by = c('Year','Scenario','Version','Port_Name','Bulk_Status')
+    ) %>%
+    pivot_wider(names_from = Version, values_from = Count, names_glue = "{Version}Count", values_fill = 0) %>%
+    select(Year, Scenario, Port_Name, Bulk_Status, CurrentCount, NewCount)
+
+  return(qcOut)
 }
+
+mode_path_airports <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
+                            empUpdate = NA_character_, skLim = NA_real_){
+    
+    pivbybulkstatus <-function(df){
+      output <- df %>% pivot_longer(cols=c('Port_NameB','Port_NameNB'), names_to='Bulk_Status', names_prefix='Port_Name', values_to='Port_Name')
+      return(output)
+    }
+
+    qcOut <- bind_rows(
+      Current = pivbybulkstatus(inCurrent),
+      New = pivbybulkstatus(inNew),
+      .id = "Version"
+    ) %>%
+    mutate(
+      Year = year,
+      Scenario = scen
+    ) %>%
+    summarize(
+      Count = n(),
+      .by = c('Year','Scenario','Version','Port_Name','Bulk_Status')
+    ) %>%
+    pivot_wider(names_from = Version, values_from = Count, names_glue = "{Version}Count", values_fill = 0) %>%
+    select(Year, Scenario, Port_Name, Bulk_Status, CurrentCount, NewCount)
+
+  return(qcOut)
+}                      
 
 mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, in_modePath, report){
@@ -550,7 +681,10 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
           mutate(Path = as.numeric(Mode)) %>%
           select(-Mode) %>%
           left_join(in_modePath, by = c("Path")) %>%                            #Join mode path information for inclusion in export
-          select(all_of(colnames(qc_registry[['mode_path_skims']]$template)))                                        #Select column names of target dataframe
+          select(
+            Scenario, Year, Mode, LogNode,
+            C_Time, C_Cost, N_Time, N_Cost, perc_Time, perc_Cost
+          )                                      #Select column names of target dataframe
         
   return(qcOut)
 }
@@ -601,128 +735,147 @@ staticFile <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 qc_registry <- list(
   truck_ee = list(
     fn = truck_ee,
-    accumulator = "all_TruckEE",
-    sheet = "truckEE",
-    template = data.frame(
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_poe2 = integer(),
-      C_poe = integer(),
-      N_poe2 = integer(),
-      N_poe = integer(),
-      CState = character(),
-      NState = character(),
-      CDirection = character(),
-      NDirection = character(),
-      CState2 = character(),
-      NState2 = character(),
-      CDirection2 = character(),
-      NDirection2 = character()
+    outputs = list(
+      sheet = "truckEE",
+      template = data.frame(
+        Production_zone = integer(),
+        Consumption_zone = integer(),
+        C_poe2 = integer(),
+        C_poe = integer(),
+        N_poe2 = integer(),
+        N_poe = integer(),
+        CState = character(),
+        NState = character(),
+        CDirection = character(),
+        NDirection = character(),
+        CState2 = character(),
+        NState2 = character(),
+        CDirection2 = character(),
+        NDirection2 = character()
+      )
     )
   ),
 
   zone_employment = list(
     fn = zone_employment,
-    accumulator = "all_znEmp",
-    sheet = "zn_Emp",
-    template = data.frame(
-      Year = numeric(),
-      Zone = integer(),
-      mesozone = integer(),
-      currentEmp = integer(),
-      newEmp = integer(),
-      Difference = integer(),
-      Percent = numeric()
+    outputs = list(
+      sheet = "zn_Emp",
+      arrange_by = c("County",'Year'),
+      template = data.frame(
+        Year = numeric(),
+        County = character(),
+        currentEmpSum = integer(),
+        newEmpSum = integer(),
+        Difference = integer(),
+        Percent = numeric()
+      )
     )
   ),
 
   zone_skims = list(
     fn = zone_skims,
-    accumulator = "all_znSkim",
-    sheet = "zn_Skim",
-    template = data.frame(
-      Year = numeric(),
-      OCounty = character(),
-      DCounty = character(),
-      flagPeaks = numeric(),
-      flagMi = numeric(),
-      CPeak = numeric(),
-      NPeak = numeric(),
-      perc_Peak = numeric(),
-      COffPeak = numeric(),
-      NOffPeak = numeric(),
-      perc_OffPeak = numeric(),
-      CMiles = numeric(),
-      NMiles = numeric(),
-      perc_Mi = numeric()
+    outputs = list(
+      by_origin = list(
+        sheet = "zn_Skim_byOriginCounty",
+        arrange_by = c("OCounty",'Year'),
+        template = data.frame(
+          Year = numeric(),
+          OCounty = character(),
+          CPeak = numeric(),
+          NPeak = numeric(),
+          diff_Peak = numeric(),
+          perc_Peak = numeric(),
+          COffPeak = numeric(),
+          NOffPeak = numeric(),
+          diff_OffPeak = numeric(),
+          perc_OffPeak = numeric(),
+          CMiles = numeric(),
+          NMiles= numeric(),
+          diff_Mi = numeric(),
+          perc_Mi = numeric(),
+          flagPeaks = integer(),
+          flagMi = integer()
+        )
+      ),
+      by_destination = list(
+        sheet = "zn_Skim_byDestinationCounty",
+        arrange_by = c("DCounty",'Year'),
+        template = data.frame(
+          Year = numeric(),
+          DCounty = character(),
+          CPeak = numeric(),
+          NPeak = numeric(),
+          diff_Peak = numeric(),
+          perc_Peak = numeric(),
+          COffPeak = numeric(),
+          NOffPeak = numeric(),
+          diff_OffPeak = numeric(),
+          perc_OffPeak = numeric(),
+          CMiles = numeric(),
+          NMiles= numeric(),
+          diff_Mi = numeric(),
+          perc_Mi = numeric(),
+          flagPeaks = integer(),
+          flagMi = integer()
+        )
+      )
     )
   ),
 
   mesozone_skims = list(
     fn = mesozone_skims,
-    accumulator = "all_mesoSkim",
-    sheet = "meso_skim",
-    template = data.frame(
-      Year = numeric(),
-      Origin = integer(),
-      Destination = integer(),
-      currentTime = numeric(),
-      newTime = numeric(),
-      Difference = numeric(),
-      Percent = numeric()
+    outputs = list(
+      by_origin = list(
+        sheet = "meso_skim_byOriginCounty",
+        arrange_by = c("OCounty",'Year'),
+        template = data.frame(
+          Year = numeric(),
+          OCounty = character(),
+          currentTime = numeric(),
+          newTime = numeric(), 
+          Difference = numeric(),
+          Percent = numeric()
+        )
+      ),
+      by_destination = list(
+        sheet = "meso_skim_byDestinationCounty",
+        arrange_by = c("DCounty",'Year'),
+        template = data.frame(
+          Year = numeric(),
+          DCounty = character(),
+          currentTime = numeric(),
+          newTime = numeric(),
+          Difference = numeric(),
+          Percent = numeric()
+        )
+      )
     )
   ),
 
   truck_ie = list(
     fn = truck_ie,
-    accumulator = "all_TruckIE",
-    sheet = "truckIE",
-    template = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_poe = integer(),
-      N_poe = integer(),
-      CState = character(),
-      NState = character(),
-      CDirection = character(),
-      NDirection = character()
+    outputs = list(
+      sheet = "truckIE",
+      template = data.frame(
+        Scenario = character(),
+        Year = numeric(),
+        Production_zone = integer(),
+        Consumption_zone = integer(),
+        C_poe = integer(),
+        N_poe = integer(),
+        CState = character(),
+        NState = character(),
+        CDirection = character(),
+        NDirection = character()
+      )
     )
   ),
-
-  # mode_path_miles = list(
-  #   fn = mode_path_miles,
-  #   accumulator = "all_modeMi",
-  #   sheet = "mode_Mi",
-  #   template = data.frame(
-  #     Scenario = character(),
-  #     Year = numeric(),
-  #     Mode = character(),
-  #     LogNode = numeric(),
-  #     diff_TotMi = numeric(),
-  #     diff_DmsLh = numeric(),
-  #     diff_DmsDray = numeric(),
-  #     diff_IntlShip = numeric(),
-  #     Perc_TotMi = numeric(),
-  #     Perc_DmsLh = numeric(),
-  #     Perc_DmsDray = numeric(),
-  #     Perc_IntlShip = numeric(),
-  #     # Perc_PsTR = numeric(),
-  #     # Perc_PsRL = numeric(),
-  #     Sum_PsTR = numeric(),
-  #     Sum_PsRL = numeric(),
-  #     Perc_RlDwlCode = numeric(),
-  #     Perc_RlTrnFr = numeric()
-  #   )
-  # ),
 
   mode_path_miles = list(
     fn = mode_path_miles,
     outputs = list(
       by_mode = list(
-          accumulator = "all_modeMi_byMode",
-          sheet = "mode_Mi_byMode",
+          sheet = "modeMi_byMode",
           arrange_by = c("Scenario", "Year", "Mode"),
           template = data.frame(
             Scenario = character(),
@@ -739,8 +892,7 @@ qc_registry <- list(
           )
       ),
         by_log_node = list(
-          accumulator = "all_modeMi_byLogNode",
-          sheet = "mode_Mi_byLogNode",
+          sheet = "modeMi_byLogNode",
           arrange_by = c("Scenario", "Year", "LogNode"),
           template = data.frame(
             Scenario = character(),
@@ -757,8 +909,7 @@ qc_registry <- list(
           )
         ),
           RlDwlCode_sheet = list(
-          accumulator = "all_modeMi_RlDwlCode",
-          sheet = "RlDwlCode",
+          sheet = "modeMi_RlDwlCode",
           arrange_by = "rail_interchange",
           template = data.frame(
             Scenario = character(),
@@ -772,8 +923,7 @@ qc_registry <- list(
           )
         ),
         CmapPsTR_sheet = list(
-          accumulator = "all_modeMi_CmapPsTR",
-          sheet = "CmapPsTR",
+          sheet = "modeMi_CmapPsTR",
           arrange_by = c("Path", "Mode"),
           template = data.frame(
             Scenario = character(),
@@ -787,8 +937,7 @@ qc_registry <- list(
           )
         ),
         CmapPsRL_sheet = list(
-          accumulator = "all_modeMi_CmapPsRL",
-          sheet = "CmapPsRL",
+          sheet = "modeMi_CmapPsRL",
           arrange_by = c("Path", "Mode"),
           template = data.frame(
             Scenario = character(),
@@ -806,43 +955,50 @@ qc_registry <- list(
 
   mode_path_ports = list(
     fn = mode_path_ports,
-    accumulator = "all_modePort",
-    sheet = "mode_Port",
-    template = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Production_zone = integer(),
-      Consumption_zone = integer(),
-      C_mesoNB = integer(),
-      N_mesoNB = integer(),
-      C_mesoB = integer(),
-      N_mesoB = integer(),
-      C_nameNB = character(),
-      N_nameNB = character(),
-      C_nameB = character(),
-      N_nameB = character(),
-      C_coastNB = character(),
-      N_coastNB = character(),
-      C_coastB = character(),
-      N_coastB = character()
+    outputs = list(
+      sheet = "mode_Port",
+      template = data.frame(
+        Scenario = character(),
+        Year = numeric(),
+        Port_Name = character(),
+        Bulk_Status = character(),
+        CurrentCount = numeric(),
+        NewCount = numeric()
+      )
+    )
+  ),
+
+  mode_path_airports = list( 
+    fn = mode_path_airports,
+    outputs = list(
+      sheet = "mode_Airport",
+      template = data.frame(
+        Scenario = character(),
+        Year = numeric(),
+        Port_Name = character(),
+        Bulk_Status = character(),
+        CurrentCount = numeric(),
+        NewCount = numeric()
+      )
     )
   ),
 
   mode_path_skims = list(
     fn = mode_path_skims,
-    accumulator = "all_modeSkim",
-    sheet = "mode_Skim",
-    template = data.frame(
-      Scenario = character(),
-      Year = numeric(),
-      Mode = character(),
-      LogNode = numeric(),
-      C_Time = numeric(),
-      C_Cost = numeric(),
-      N_Time = numeric(),
-      N_Cost = numeric(),
-      perc_Time = numeric(),
-      perc_Cost = numeric()
+    outputs = list(
+      sheet = "mode_Skim",
+      template = data.frame(
+        Scenario = character(),
+        Year = numeric(),
+        Mode = character(),
+        LogNode = numeric(),
+        C_Time = numeric(),
+        C_Cost = numeric(),
+        N_Time = numeric(),
+        N_Cost = numeric(),
+        perc_Time = numeric(),
+        perc_Cost = numeric()
+      )
     )
   ),
 
@@ -953,10 +1109,10 @@ route_file <- function(parsed_data){
     str_detect(file_name, "^cmap_data_zone_skims") ~ "zone_skims",
     str_detect(file_name, "^data_mesozone_skims") ~ "mesozone_skims",
     str_detect(file_name, "^cmap_data_truck_IE_poe") ~ "truck_ie",
-    str_detect(file_name, "^data_modepath_miles") ~ "mode_path_miles", #update
+    str_detect(file_name, "^data_modepath_miles") ~ "mode_path_miles",
     str_detect(file_name, "^data_modepath_ports") ~ "mode_path_ports",
     str_detect(file_name, "^data_modepath_skims") ~ "mode_path_skims",
-    str_detect(file_name, "^data_modepath_airports") ~ "staticFile",
+    str_detect(file_name, "^data_modepath_airports") ~ "mode_path_airports",
     str_detect(file_name, "^data_mesozone_centroids") ~ "staticFile",
     str_detect(file_name, "^data_mesozone_gcd") ~ "staticFile",
     str_detect(file_name, "^cmap_data_zone_centroids") ~ "staticFile",
@@ -1006,7 +1162,8 @@ read_file_pair <- function(pair_list, rel_path){
 }
 
 build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUpdate, skLim, 
-                                  in_POE, in_modePath, in_ports, in_zones, report){
+                                  in_POE, in_modePath, in_ports, in_zones,
+                                  in_lognodes, in_mesozones, report) {
   #' This function builds the arguments to be passed to the QC function based on the parsed file name, the routing information, and the available inputs.
   #' 
   #' Note: The arguments from empUpdate and onwards are set to be defined in run_freight_QC.r. 
@@ -1034,7 +1191,8 @@ build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUp
   inputs <- read_file_pair(pair_list, rel_path)
 
   available <- list(year = parsed_data$year, scen = parsed_data$scen, empUpdate = empUpdate, skLim = skLim, in_POE = in_POE,
-                    in_modePath = in_modePath, in_ports = in_ports, in_zones = in_zones, report = report, rel_path = rel_path)
+                    in_modePath = in_modePath, in_ports = in_ports, in_zones = in_zones, 
+                    in_lognodes = in_lognodes, in_mesozones = in_mesozones, report = report, rel_path = rel_path)
 
   fn_params <- names(formals(route$fn))
 
@@ -1061,24 +1219,41 @@ build_route_arguments <- function(rel_path, parsed_data, route, pair_list, empUp
   return(args)
 }
 
+registry_outputs <- function(entry) {
+  outputs <- entry$outputs
+
+  if (is.null(outputs)) {
+    return(list())
+  }
+
+  # Normalize a single-sheet output to the same shape as multi-sheet outputs.
+  if (!is.null(outputs$sheet) && !is.null(outputs$template)) {
+    return(list(result = outputs))
+  }
+
+  outputs
+}
+
 make_accumulators <- function() {
   accumulators <- list()
 
   for (entry in qc_registry) {
-    if (!is.null(entry$outputs)) {
-      for (output in entry$outputs) {
-        accumulators[[output$accumulator]] <- output$template
+    outputs <- registry_outputs(entry)
+
+    if (length(outputs) > 0) {
+      for (output in outputs) {
+        accumulators[[output$sheet]] <- output$template
       }
-    } else if (!is.null(entry$accumulator)) {
-      accumulators[[entry$accumulator]] <- entry$template
+    } else if (!is.null(entry$sheet)) {
+      accumulators[[entry$sheet]] <- entry$template
     }
   }
 
-  return(accumulators)
+  accumulators
 }
 
 assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
-  in_POE, in_modePath, in_ports, in_zones, report){
+  in_POE, in_modePath, in_ports, in_zones, in_lognodes, in_mesozones, report){
   #' This function assembles the QC function and its arguments for a given file pair based on the relative path, the pair list, and the available inputs. 
   #' 
   #' Note: The arguments from empUpdate and onwards are set to be defined in run_freight_QC.r. 
@@ -1095,6 +1270,8 @@ assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
   #'  in_modePath (data.frame): The mode path crosswalk data.
   #'  in_ports (data.frame): The ports crosswalk data.
   #'  in_zones (data.frame): The zones crosswalk data.
+  #'  in_lognodes (data.frame): The lognodes crosswalk data.
+  #'  in_mesozones (data.frame): The mesozones crosswalk data.
   #'  report (character): The report file path for logging QC run and issues.
   #' 
   #' Returns:
@@ -1104,12 +1281,12 @@ assemble_QC <- function(rel_path, pair_list, empUpdate, skLim,
   parsed_data <- parse_file_name(rel_path)
   route <- identify_function_routing(parsed_data)
   arguments <- build_route_arguments(rel_path, parsed_data, route, pair_list, empUpdate, 
-                                    skLim, in_POE, in_modePath, in_ports, in_zones, report)
+                                    skLim, in_POE, in_modePath, in_ports, in_zones, in_lognodes, in_mesozones, report)
   do.call(route$fn, arguments)
 }
 
 execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
-  in_ports, in_zones, report, unmatched, selection = 'ALL'){
+  in_ports, in_zones, in_lognodes, in_mesozones, report, unmatched, selection = 'ALL'){
   #' This function executes the QC process by building file pairs, routing to the appropriate QC functions, and accumulating results.
   #' 
   #' Args:
@@ -1121,6 +1298,8 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   #'  in_modePath (data.frame): The mode path crosswalk data.
   #'  in_ports (data.frame): The ports crosswalk data.
   #'  in_zones (data.frame): The zones crosswalk data.
+  #'  in_lognodes (data.frame): The lognodes crosswalk data.
+  #'  in_mesozones (data.frame): The mesozones crosswalk data.
   #'  report (character): The report file path for logging QC run and issues.
   #'  unmatched (character): Path to the report file where filenames found in only one directory are appended.
   #'  selection (character): A character or character vector specifying which QC functions to run, if specified using the keys from the routing list. Defaults to 'ALL'.
@@ -1133,31 +1312,28 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
   # is having unmatched here correct? make sure from exec function run
   pair_list <- build_file_pairs(newDir, currentDir, unmatched)
   
-  if (!identical(selection, 'ALL')) {
+  if (!identical(selection, 'ALL')) { # code to allow for running for file types based on user selection
     valid_types <- names(qc_registry)
     invalid_types <- setdiff(selection, valid_types)
 
     if (length(invalid_types) > 0) {
       stop(
-        "Unknown QC selection: ",
-        paste(invalid_types, collapse = ", "),
-        ". Valid selections are: ",
-        paste(valid_types, collapse = ", ")
+        "Unknown QC selection: ", paste(invalid_types, collapse = ", "),
+        ". Valid selections are: ", paste(valid_types, collapse = ", ")
       )
     }
 
     keep <- vapply(
       pair_list,
-      function(pair) {
-        route_file(parse_file_name(pair$rp)) %in% selection
-      },
+      function(pair) {route_file(parse_file_name(pair$rp)) %in% selection},
       logical(1)
     )
 
     pair_list <- pair_list[keep]
   }
-  accumulators <- make_accumulators()
-  result_chunks <- lapply(accumulators, function(template) list())
+
+  sheets <- make_accumulators()
+  result_chunks <- lapply(sheets, function(template) list())
 
   for (pair in pair_list) {
     print(paste("NOW PROCESSING:", pair$rp))
@@ -1177,6 +1353,8 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
         in_modePath = in_modePath,
         in_ports = in_ports,
         in_zones = in_zones,
+        in_lognodes = in_lognodes,
+        in_mesozones = in_mesozones,
         report = report
       ),
       error = function(e) {
@@ -1193,43 +1371,42 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
     kind <- route_file(parse_file_name(pair$rp))
     route <- qc_registry[[kind]]
 
-    if (!is.null(route$outputs)) {
-      for (output_name in names(route$outputs)) {
-        accumulator_name <- route$outputs[[output_name]]$accumulator
-        result_chunks[[accumulator_name]][[
-          length(result_chunks[[accumulator_name]]) + 1L
-        ]] <- res[[output_name]]
+    outputs <- registry_outputs(route)
+
+    if (length(outputs) > 0) {
+      for (output_name in names(outputs)) {
+        sheet_name <- outputs[[output_name]]$sheet
+        output_result <- if (is.data.frame(res)) res else res[[output_name]]
+
+        result_chunks[[sheet_name]][[length(result_chunks[[sheet_name]]) + 1L]] <-
+          output_result
       }
-    } else if (!is.null(route$accumulator)) {
-      accumulator_name <- route$accumulator
-      result_chunks[[accumulator_name]][[
-        length(result_chunks[[accumulator_name]]) + 1L
-      ]] <- res
+    } else if (!is.null(route$sheet)) {
+      sheet_name <- route$sheet
+      result_chunks[[sheet_name]][[length(result_chunks[[sheet_name]]) + 1L]] <- res
     }
+
     print(paste("FINISHED PROCESSING:", pair$rp))
+    cat("\n")
   }
 
-  for (accumulator_name in names(accumulators)) {
-  accumulators[[accumulator_name]] <- bind_rows(c(list(accumulators[[accumulator_name]]), result_chunks[[accumulator_name]]))
-}
+  for (sheet_name in names(sheets)) {
+  sheets[[sheet_name]] <- bind_rows(c(list(sheets[[sheet_name]]), result_chunks[[sheet_name]]))
+  }
 
   for (entry in qc_registry) {
-  if (is.null(entry$outputs)) {
-    next
-  }
+    for (output in registry_outputs(entry)) {
+      if (is.null(output$arrange_by)) {next}
 
-  for (output in entry$outputs) {
-    if (is.null(output$arrange_by)) {next}
-
-    accumulator_name <- output$accumulator
-    accumulators[[accumulator_name]] <- arrange(
-      accumulators[[accumulator_name]],
-      !!!syms(output$arrange_by)
+      sheet_name <- output$sheet
+      sheets[[sheet_name]] <- arrange(
+        sheets[[sheet_name]],
+        !!!syms(output$arrange_by)
       )
     }
   }
 
   print("finished running all files")
 
-  return(accumulators)
+  return(sheets)
 }
