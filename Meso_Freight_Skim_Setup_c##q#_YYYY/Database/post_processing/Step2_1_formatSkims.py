@@ -86,7 +86,6 @@ print("---> Processing Matrices")
 while i < numMats:
     matID = matNames['mf'].loc[matNames.index[i]]
     m1 = ".....Processing mf" + str(matID)
-    print(m1)
     pth_mat= os.path.join(inDir2 + "/mf" + str(matNames['mf'].loc[matNames.index[i]]) + ".in" )           ##-- AM Peak skimmed miles 
     in_mat = pd.read_csv(pth_mat, sep = '\s+', skiprows = 4, header=None, engine='python')           ##-- AM Peak skimmed miles 
     mat_in = in_mat.copy()
@@ -149,14 +148,13 @@ rail = pd.merge(tmp, mf64, how='outer', on=['origin','destination'])  ##-- Merge
 rail['Rivtt'] = np.where(rail['Rivtt'].isnull(), ((rail['Rtt']*2)*0.8), rail['Rivtt'])   # If Rivtt is NA, set = to 80% of doubled in-vehicle time
 
 #- Redefine the rail poe column meaning in combined rail df
-railPOE=pd.merge(rail, rpass, how='left', left_on='Rpoe', right_on='poeCode')
-railPOE['Rpoe']=np.where((railPOE['Rpoe']==railPOE['poeCode']) | (railPOE['Rpoe'].isnull()), 0, 1)
-railPOE=railPOE[['origin', 'destination', 'Rtt', 'Rivtt', 'Rpoe']]
+railPOE=rail.copy()
+railPOE['Rpoe']=np.where((railPOE['Rpoe'].isin(rpass['poeCode']))| (railPOE['Rpoe'].isnull()), 0, 1)
+railPOE=railPOE[['origin', 'destination', 'Rtt', 'Rivtt', 'Rpoe']].copy()
 
 #- Redefine truck poe column meaning in mf40
-truckPOE=pd.merge(mf40, tpass, how='left', left_on='Tpoe', right_on='poeCode')
-truckPOE['CmapPsTR']=np.where((truckPOE['Tpoe']==truckPOE['poeCode'])| (truckPOE['Tpoe'].isnull()), 0, 1)
-truckPOE=truckPOE[['origin', 'destination','CmapPsTR']]
+mf40['CmapPsTR']=np.where((mf40['Tpoe'].isin(tpass['poeCode']))| (mf40['Tpoe'].isnull()), 0, 1)
+truckPOE=mf40[['origin', 'destination','CmapPsTR']].copy()
 
 ##-- Merge all skims
 inMats=[mf31, mf32, mf33, mf34, truckPOE, mf41, railPOE, mf63, mf65, mf66, mf80]
@@ -171,7 +169,7 @@ skims=skims.drop('A', axis=1)
 
 ##-- Create composite of node 140 if active
 if scenario == '200':
-    print('SCENARIO == 200')
+    print('SCENARIO == 200, creating composit of node 140')
     ##-- Reassign origin and destination node ID
     skim140=skims.loc[(skims['origin']==in_nodeznmeso['NewRT']) | (skims['destination']==in_nodeznmeso['NewRT'])].copy() 
     skim140['originF']=np.where(skim140['origin'] == in_nodeznmeso['NewRT'], in_nodeznmeso['comboRT'], skim140['origin'])         ##-- If origin==140, change to 149, otherwise no change
@@ -198,9 +196,11 @@ if scenario == '200':
     allSkim['f_Rdsml']=np.where((allSkim['Rdsml'] <= allSkim['Rdsml_newRT']) | (allSkim['Rdsml_newRT'].isnull()), allSkim['Rdsml'], allSkim['Rdsml_newRT'])
     allSkim['f_Rpoe']=np.where((allSkim['Rpoe'] >= allSkim['Rpoe_newRT']) | (allSkim['Rpoe_newRT'].isnull()), allSkim['Rpoe'], allSkim['Rpoe_newRT'])
     allSkim['f_Rdwl']=np.where((allSkim['Rdwl'] >= allSkim['Rdwl_newRT']) | (allSkim['Rdwl_newRT'].isnull()), allSkim['Rdwl'], allSkim['Rdwl_newRT'])
+    allSkim['f_CmapPsTR']=np.where((allSkim['CmapPsTR'] >= allSkim['CmapPsTR_newRT']) | (allSkim['CmapPsTR_newRT'].isnull()), allSkim['CmapPsTR'], allSkim['CmapPsTR_newRT'])
+    allSkim['f_Rtrnf']=np.where((allSkim['Rtrnf'] >= allSkim['Rtrnf_newRT']) | (allSkim['Rtrnf_newRT'].isnull()), allSkim['Rtrnf'], allSkim['Rtrnf_newRT'])
 
     t=allSkim.copy()
-    allSkim=allSkim[['origin', 'destination', 'f_Ttt', 'f_Wtt', 'f_Tivtt', 'f_Wivtt', 'CmapPsTR',	'f_Tdsml', 'f_Rtt', 'f_Rivtt', 'f_Rpoe',	'f_Rdwl', 'Rtrnf', 'f_Rdsml', 'Rintyrd']]
+    allSkim=allSkim[['origin', 'destination', 'f_Ttt', 'f_Wtt', 'f_Tivtt', 'f_Wivtt', 'f_CmapPsTR',	'f_Tdsml', 'f_Rtt', 'f_Rivtt', 'f_Rpoe',	'f_Rdwl', 'f_Rtrnf', 'f_Rdsml', 'Rintyrd']]
     allSkim.columns=['origin', 'destination', 'Ttt',	'Wtt', 'Tivtt', 'Wivtt', 'CmapPsTR', 'Tdsml', 'Rtt', 'Rivtt', 'Rpoe', 'Rdwl', 'Rtrnf', 'Rdsml', 'Rintyrd']
 else:
     allSkim=skims.copy()

@@ -221,15 +221,20 @@ temp = temp[temp.groupby(['origin','destination'])['GenCostAir'].rank() <= 5].re
 
 # Define function to select path by based on probability
 def pps_sample(group):
+    origin, destination = group.name
     probs = group['FrgnAirTons'] / group['FrgnAirTons'].sum()       ##-- Normalize FrgnAirTons to sum to 1 to get sampling probabilities  
     sampled_index = np.random.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
-    return group.loc[sampled_index]
-print("---> Selecting the best airport path by OD")
-air1 = temp.groupby(['origin', 'destination'], group_keys=False).apply(pps_sample).copy()  ##-- Perform stratified PPS sampling: group by (o, dest) and sample 1 row per group
-view=air1.copy()
-air1.reset_index(drop=True, inplace=True)
-air1=air1.drop(['FAF4_Rank', 'AirFrgnTime', 'AirFrgnCost', 'adjAir', 'GenCostAir', 'FrgnAirTons'], axis=1)
+    
+    result = group.loc[sampled_index].copy()
+    result['origin'] = origin
+    result['destination'] = destination
 
+    return result
+
+print("---> Selecting the best airport path by OD")
+air1 = temp.groupby(['origin', 'destination'], group_keys=False, as_index=False).apply(pps_sample).copy()  ##-- Perform stratified PPS sampling: group by (o, dest) and sample 1 row per group
+#air1.reset_index(drop=True, inplace=True)
+air1=air1.drop(['FAF4_Rank', 'AirFrgnTime', 'AirFrgnCost', 'adjAir', 'GenCostAir', 'FrgnAirTons'], axis=1)
 #- 7. Merge Best airport with data
 finAir = pd.merge(allAir, air1, on=['origin', 'destination'], how='left', suffixes=('', '_test1'))
 

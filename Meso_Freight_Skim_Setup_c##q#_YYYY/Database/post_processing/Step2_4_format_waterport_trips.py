@@ -313,9 +313,15 @@ allWater=pd.concat([allWater, rallWater])
 
 #- Select best choice based on probability 
 def pps_sample(group):
+    origin, destination = group.name
     probs = group['FrgnTons'] / group['FrgnTons'].sum()       ##-- Normalize FrgnTons to sum to 1 to get sampling probabilities  
     sampled_index = np.random.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
-    return group.loc[sampled_index]
+
+    result = group.loc[sampled_index].copy()
+    result['origin'] = origin
+    result['destination'] = destination
+
+    return result
 
 # NonBulk Goods
 nonBulk = allWater.copy()
