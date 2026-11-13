@@ -210,7 +210,7 @@ len               / Additional auxiliary transit attribute
 ~#    -- A third skim to flag non-CMAP dwell time routes --
 ~+|5.11|2|~?q=2|2|mf29||||||| 
 ~+|%t3%|1|1|%r2%|1|1|%r1%||
-~+|y||@rdwell|||1|.max.|||%t6%|n|
+~+|y||@rdwell|||1|.max.|.max.||%t6%|n|
 ~+|5.31|2
 ~#
 ~t8=mf66

@@ -111,7 +111,7 @@ IELN1=pd.merge(IElogI, IElogE, how='outer', on=['LogNode'])
 # outside = all OD trips outside CMAP region
 # directII_IE = all trips that do not stop at logicstics node
 # collectivley, allGroups1 should be all OD trips with special info if there's a logistics pass through
-allODL = pd.concat([IELN1, outside, directII_IE])                  ##-- Combine 
+allODL = pd.concat([IELN1, outside, directII_IE], ignore_index=True)                  ##-- Combine 
 allODL['ChosCarr']=1
 allODL['Carr']='R'
 allODL['ChRtt']=allODL['Rtt']

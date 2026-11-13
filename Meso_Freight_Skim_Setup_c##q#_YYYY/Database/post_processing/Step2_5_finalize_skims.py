@@ -125,11 +125,10 @@ allData['Tdist00']=np.where( (allData['Tdist00'].isnull()) & (allData['EmDist'] 
 allData['Tdsml00']=np.where( (allData['Tdsml00'].isnull()) & 
                             ((allData['origin'] <= in_nodeznmeso['LEZ']) & (allData['destination'] <= in_nodeznmeso['LEZ'])), allData['EmDist'], allData['Tdsml00'])
 
-allData['zero'] = 0
-allData['CmapPsRL']=allData[['CmapPsRL', 'zero']].max(axis=1) 
-allData['CmapPsTR']=allData[['CmapPsTR', 'zero']].max(axis=1) 
-allData['Rtrnf']=allData[['Rtrnf', 'zero']].max(axis=1) 
-allData['Rdwl']=allData[['Rdwl', 'zero']].max(axis=1) 
+allData['CmapPsRL'] = allData['CmapPsRL'].fillna(0).clip(lower=0)
+allData['CmapPsTR'] = allData['CmapPsTR'].fillna(0).clip(lower=0)
+allData['Rtrnf'] = allData['Rtrnf'].fillna(0).clip(lower=0)
+allData['Rdwl'] = allData['Rdwl'].fillna(0).clip(lower=0)
 
 # Merge with rail and water GCD
 allData = pd.merge(allData, in_railGCD, how='left', on = 'destination')
@@ -141,6 +140,8 @@ allData = pd.merge(allData, in_railGCD, how='left', on = 'destination')
 # only keep intermediate rail yard for actual pass-through routes or those beginning/ending in CMAP 08-11-2017
 allData['Rintyrd']=np.where((allData['CmapPsRL'] == 0) & ((allData['origin'] > in_nodeznmeso['LIZ']) & (allData['destination'] > in_nodeznmeso['LIZ'])), 0, allData['Rintyrd']) 
 allData['CngHours']=in_sptime['OtherCong']
+allData['trnfFlag']=np.where((allData['CmapPsRL'] == 0) & (allData['Rdwl'] == 0) & (allData['Rtrnf'] > 0) &
+                             ((allData['origin'] > in_nodeznmeso['LIZ']) & (allData['destination'] > in_nodeznmeso['LIZ'])), 1, 0) 
 
 #- Adjust rail dwell hours for logistics nodes
 cond_1 = (
@@ -942,13 +943,13 @@ outTimeCosts.to_csv(pth_outTimeCosts, index=False)
 # CREATE A FILE OF MODAL DISTANCES CONSISTENT WITH TIME/COST CALCULATIONS
 # ---------------------------------------------------------------------------
 # Initialize columns
-icolumns = ['i', 'Origin', 'Destination', 'MinPath', 'TotalNtwkMiles', 'DmsLhMiles', 'DmsDrayMiles', 'IntlShipMiles', 'CmapPsRL', 'CmapPsTR', 'RlDwlCode', 'RlTrnfr']
+icolumns = ['i', 'origin', 'destination', 'MinPath', 'TotalNtwkMiles', 'DmsLhMiles', 'DmsDrayMiles', 'IntlShipMiles', 'CmapPsRL', 'CmapPsTR', 'RlDwlCode', 'RlTrnfr']
 
 modeDist = outModepaths.copy()
 for col in icolumns:
     if col not in modeDist.columns:
         modeDist[col]=np.nan
-    
+
 oRows_modeDist = []
 counter = 1
 print("---> PROCESSING MODAL DISTANCE DATA")
@@ -996,8 +997,7 @@ for _, row in modeDist.iterrows():
                 "CmapPsRL": row["CmapPsRL"],
                 "CmapPsTR": row["CmapPsTR"],
                 "RlDwlCode": row["Rdwl"],
-                "RlTrnfr": np.nan,
-                "Carrier": Carrier
+                "RlTrnfr": row['trnfFlag']
             }
             oRows_modeDist.append(record)        
         
@@ -1005,22 +1005,28 @@ for _, row in modeDist.iterrows():
     timelapse_records(startTime, counter, remainingRows)
     counter = counter+1
     
-outModeDist = pd.DataFrame.from_records(oRows_modeDist)
+outModeDist = (
+    pd.DataFrame.from_records(oRows_modeDist)
+      .drop_duplicates(
+          subset=["origin", "destination", "MinPath"],
+          keep="first"
+      )
+)
 
 # Filter out duplicate origin-destination-minpath rows
 outModeDist = outModeDist.groupby(['origin', 'destination', 'MinPath']).nth(0).reset_index()
 
 outModeDist2 = outModeDist.copy()
-outModeDist2['CmapPsTR'] = np.where((row['i'] < 36) | (row['i'] > 46), 0, outModeDist2['CmapPsTR'])
-outModeDist2['CmapPsRL'] = np.where((row['i'] < 3) | (row['i'] > 30), 0, outModeDist2['CmapPsRL'])
-outModeDist2['RlDwlCode'] = np.where((row['i'] < 3) | (row['i'] > 30), 0, outModeDist2['RlDwlCode'])
-outModeDist2['RlTrnfr'] = np.where((row['i'] < 3) | (row['i'] > 30), 0, outModeDist2['RlTrnfr'])
+outModeDist2['CmapPsTR'] = np.where((outModeDist['i'] < 31) | (outModeDist['i'] > 46), 0, outModeDist2['CmapPsTR'])
+outModeDist2['CmapPsRL'] = np.where((outModeDist['i'] < 3) | (outModeDist['i'] > 30), 0, outModeDist2['CmapPsRL'])
+outModeDist2['RlDwlCode'] = np.where((outModeDist['i'] < 3) | (outModeDist['i'] > 30), 0, outModeDist2['RlDwlCode'])
+outModeDist2['RlTrnfr'] = np.where((outModeDist['i'] < 3) | (outModeDist['i'] > 30), 0, outModeDist2['RlTrnfr'])
 
 # adjust CMAP intrazonal truck modes
 condDMS = ((outModeDist2['origin'] == outModeDist2['destination']) & 
            ((outModeDist2['origin'] <= in_nodeznmeso['LIZ']) & 
            (outModeDist2['MinPath'].isin([31, 46]))))
-outModeDist2['DmsLhMiles'] = np.where(condDMS, outModeDist2['TotalNtwkMiles'], outModeDist2['RlTrnfr'])
+outModeDist2['DmsLhMiles'] = np.where(condDMS, outModeDist2['TotalNtwkMiles'], outModeDist2['DmsLhMiles'])
 
 # address errors due to rounding
 outModeDist2['checkSum'] = outModeDist2['DmsLhMiles'] + outModeDist2['DmsDrayMiles'] + outModeDist2['IntlShipMiles']
@@ -1076,7 +1082,7 @@ port.to_csv(pth_outPorts, index=False)
 # CREATE AIRPORTS FILES FOR MESO MODEL
 # -----------------------------------------------------------------------------
 airport = outModepaths.loc[outModepaths['FrAir_mesozone'].notnull()].copy()
-airport=airport[['origin', 'destination', 'Port_mesozoneNB', 'Port_NameNB', 'Port_mesozoneB', 'Port_NameB']]
+airport=airport[['origin', 'destination', 'FrAir_mesozone', 'FrAirport_name']]
 
 airport = airport.groupby(['origin', 'destination']).nth(0).reset_index()
 airport.rename(columns={'destination':'Consumption_zone', 'origin':'Production_zone'}, inplace=True)
