@@ -25,7 +25,7 @@
 # |
 # +-- Call execution(...)
 #     |
-#     +-- List files recursively in currentDir and newDir
+#     +-- List files in currentDir and newDir
 #     +-- Match files by relative path
 #     +-- Write unmatched file paths to qc_unmatched.txt
 #     +-- Keep only file types included in selection
@@ -76,16 +76,9 @@
 # 3. Lastly, to work properly with the routing and execution pipeline for automated QC for the two directories, the new QC function 
 # should be added to the qc_registry list.
 # This qc_registry is a list of lists whose purpose is to create a centralized organized structure for executing the QC pipeline.
-# The following elements for a new QC function should be included, using the truck_ee skim as an example:
-#   truck_ee = list(
-#     fn = truck_ee, # function to call
-#     accumulator = "all_TruckEE", # accumulator name for the QC results
-#     sheet = "truckEE", # sheet name for the QC results in the output Excel file
-#     template = data.frame() # empty/template data frame for the QC results, with the same column names as the QC function output
-#   )
+
 # NOTE: If the new file type is a static file, no new QC function or qc_registry entry is needed, 
 # but the new file type should be added to the route_file() function to be routed to "staticFile" for static file QC.
-
  
 #-- QC FUNCTIONS
 ### CHANGE FILES #####
@@ -138,7 +131,6 @@ truck_ee <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
 return(qcOut)
 }
 
-# ask Karly how to handle 0.5 value (was .5 in code and was 0 in documentation and comments)
 zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, report, in_mesozones){
   #' This function: sets ‘empUpdate’ flag at beginning of script; Compares current vs new ‘totalEmp’; filters to keep any differences > skLim (used to be any differences i.e. 0); 
@@ -195,7 +187,6 @@ zone_employment <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
     return(qcOut)
 }
 
-# ask Karly how to handle skLim value (was .01 in code and was 0 in documentation and comments)
 zone_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                         empUpdate = NA_character_, skLim = NA_real_, in_zones){
   #' This function: compares current vs new; filters to keep any differences > skLim (used to be 0 and 0.01); exports as supplemental data tab.
@@ -372,7 +363,6 @@ truck_ie <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_,
   return(qcOut)
 }
 
-# CHECK WITH KARLY IF WE WANT ONLY DIFFERENCES OR SET TO SKLIM (documentation doc said 0, code comment said 1%)
 # mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
 #                             empUpdate = NA_character_, skLim = NA_real_, in_modePath){
 #   #' This function: Attaches modepath crosswalk with ‘minpath’; Summarizes variables by ‘minpath’ and ‘lognode’ ID; Merges current and new data by ‘minpath’ 
@@ -502,8 +492,8 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
     compare <- current %>%
       full_join(new, by = join_by(Path, Mode)) %>%
       mutate(
-        count_current = coalesce(count_current, 0),
-        count_new = coalesce(count_new, 0),
+        count_current = count_current, # took out coalesce function
+        count_new = count_new, # took out coalesce function
         Difference = count_new - count_current,
         PercDiff = round(Difference / (count_current), 3),
         Year = year,
@@ -524,8 +514,7 @@ mode_path_miles <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
 
 mode_path_ports <- function(inCurrent, inNew, year = NA_real_, scen = NA_character_, 
                             empUpdate = NA_character_, skLim = NA_real_, in_ports){
-  #' This function: merges current and new by production_zone and consumption_zone; keeps any differences where a port 
-  #' used for OD pair changes coasts; exports as supplemental dataset 
+  #' This function: compares current vs new; filters to keep any differences greater than skLim; exports as supplemental data tab.
   #' 
   #' Args:
   #'  inCurrent (data.frame): The data frame containing the current directory's file.
@@ -681,10 +670,8 @@ mode_path_skims <- function(inCurrent, inNew, year = NA_real_, scen = NA_charact
           mutate(Path = as.numeric(Mode)) %>%
           select(-Mode) %>%
           left_join(in_modePath, by = c("Path")) %>%                            #Join mode path information for inclusion in export
-          select(
-            Scenario, Year, Mode, LogNode,
-            C_Time, C_Cost, N_Time, N_Cost, perc_Time, perc_Cost
-          )                                      #Select column names of target dataframe
+          select(Scenario, Year, Mode, LogNode,
+            C_Time, C_Cost, N_Time, N_Cost, perc_Time, perc_Cost)         #Select column names of target dataframe
         
   return(qcOut)
 }
@@ -1328,7 +1315,6 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
       function(pair) {route_file(parse_file_name(pair$rp)) %in% selection},
       logical(1)
     )
-
     pair_list <- pair_list[keep]
   }
 
@@ -1399,10 +1385,7 @@ execution <- function(newDir, currentDir, empUpdate, skLim, in_POE, in_modePath,
       if (is.null(output$arrange_by)) {next}
 
       sheet_name <- output$sheet
-      sheets[[sheet_name]] <- arrange(
-        sheets[[sheet_name]],
-        !!!syms(output$arrange_by)
-      )
+      sheets[[sheet_name]] <- arrange(sheets[[sheet_name]], !!!syms(output$arrange_by))
     }
   }
 

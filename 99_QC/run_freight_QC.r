@@ -93,7 +93,7 @@ if(file.exists(unmatched_path) == TRUE){unlink(unmatched_path, recursive =TRUE)}
 
 #--Manual variable definitions for QC
 empUpdate  <- "yes"
-skLim <- 0.05 
+skLim <- 0.05
 
 # EXECUTION
 #-- Execution of QC pipeline
@@ -114,7 +114,7 @@ QC_results <- execution(
                                  # default selection is to run for all file types (type 'ALL'), but can choose to run for
                                  # specific file types (can accept one or a list):
                                  # use the following keys for argument(s), in quotes:
-                                 # truck_ee, zone_skims, mesozone_skims,
+                                 # truck_ee, zone_skims, mesozone_skims, mode_path_airports,
                                  # zone_employment, truck_ie, mode_path_miles, 
                                  # mode_path_ports, mode_path_skims, staticFile
                                  # for multiple, use selection = c('','')
