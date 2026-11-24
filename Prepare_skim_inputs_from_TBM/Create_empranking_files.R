@@ -10,7 +10,7 @@
 
 # =======================================================================
 	## --> Update this information <-- ##
-conformity = 'c26q2'                                      ##-- Conformity
+conformity = 'c26q4'                                      ##-- Conformity
 factor2060 = 0.99                                   ##-- 2060 employment factor (in lieu of a formal process)
 scenario_list = list(
   '100'= '2019',
@@ -22,13 +22,18 @@ scenario_list = list(
 )
   
 # Input paths
-tbmFolder = paste0("M:/catslib/modelprod/",	conformity)												##-- folder containing Conformity runs
+tryFolder = paste0("M:/catslib/modelprod/",	conformity)												##-- folder containing Conformity runs
+if(dir.exists(tryFolder)){
+  tbmFolder = tryFolder
+}else{
+  tbmFolder = paste0('M:/proj1/nrf/Conformity/', conformity)
+}
+
 szmeso = "V:/Secure/Master_Freight/Processing_Data/NetworkUpdate/MFN_crosswalks.xlsx"   ##-- subzone-zone-mesozone correspondence
 
 # Create list of conformity folders
-conformityDir = paste0('M:/catslib/modelprod/', conformity)
 conformityFolders <- list.dirs(
-  conformityDir,
+  tbmFolder,
   recursive = FALSE,
   full.names = FALSE
 )
