@@ -20,12 +20,12 @@ DirPath = getwd()
 scenario = args[1]
 year = args[2]
 InDir1 = file.path(DirPath, "emmemat")
-InDir2 = file.path(DirPath, paste0("output_data/post_processing_", scenario, "/"))
-infile1 = paste0("data_mesozone_gcd_",year, ".csv", sep = "")
-infile2 = paste0("tempOut/data_modepath_miles1_",year, ".csv", sep = "")
-infile3 = paste0("tempOut/data_modepath_skim1_",year, ".csv", sep = "")
-outfile1 = paste0("data_modepath_miles_",year, ".csv", sep = "")	
-outfile2 = paste0("data_modepath_skims_",year, ".csv", sep = "")
+InDir2 = file.path(DirPath, paste0("output_data/post_processing_", scenario, "_", year, "/"))
+infile1 = paste0("data_mesozone_gcd.csv", sep = "")
+infile2 = paste0("tempOut/data_modepath_miles1.csv", sep = "")
+infile3 = paste0("tempOut/data_modepath_skim1.csv", sep = "")
+outfile1 = paste0("data_modepath_miles.csv", sep = "")	
+outfile2 = paste0("data_modepath_skims.csv", sep = "")
 
 maxZn <- 300					## -- number of zones Emmebank is dimensioned for
 maxOb <- maxZn * maxZn

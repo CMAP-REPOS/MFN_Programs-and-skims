@@ -46,14 +46,14 @@ import pandas as pd, numpy as np
 # Define paths and variables
 # ---------------------------------------------------------------
 ##-- System inputs
-year = sys.argv[1]       ##-- Model run year, used to label output files
-scenario = sys.argv[2]
+YEAR = sys.argv[1]       ##-- Model run year, used to label output files
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()   ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data')                ##-- Database/input_data
-inDir2 = os.path.join(databaseDir + '/output_data/'+ scenario)              ##-- Database/output_data/skims
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+inDir2 = os.path.join(databaseDir + f'/output_data/'+ SCENARIO)              ##-- Database/output_data/skims
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + "_" + YEAR)        ##-- Database/output_data/post_processing
 
 # Delete output folder if it exists
 if os.path.exists(outDir):
@@ -70,10 +70,10 @@ pth_poe= os.path.join(inDir + "/poe.in" )                                      #
 pth_mf40= os.path.join(inDir2 + "/mf40.in" )                              ##-- Emme skim file containing POEs used 
 
 ##-- Outputs
-outMesoGCD= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")                 ##-- Outpath for mesozone GCD file
-outMesoCentroids= os.path.join(outDir + "/data_mesozone_centroids_" + year + ".csv")     ##-- Outpath for mesozone centroid file
-outTruckIE= os.path.join(outDir + "/cmap_data_truck_IE_poe_" + year + ".csv")            ##-- Outpath for truck internal-external trips POE used
-outTruckEE= os.path.join(outDir + "/cmap_data_truck_EE_poe_" + year + ".csv")            ##-- Outpath for truck internal-external trips POE used
+outMesoGCD= os.path.join(outDir + "/data_mesozone_gcd.csv")                 ##-- Outpath for mesozone GCD file
+outMesoCentroids= os.path.join(outDir + "/data_mesozone_centroids.csv")     ##-- Outpath for mesozone centroid file
+outTruckIE= os.path.join(outDir + "/cmap_data_truck_IE_poe.csv")            ##-- Outpath for truck internal-external trips POE used
+outTruckEE= os.path.join(outDir + "/cmap_data_truck_EE_poe.csv")            ##-- Outpath for truck internal-external trips POE used
 
 ##-- Variables
 maxMeso=273          ##-- Maximum U.S. mesozone number   

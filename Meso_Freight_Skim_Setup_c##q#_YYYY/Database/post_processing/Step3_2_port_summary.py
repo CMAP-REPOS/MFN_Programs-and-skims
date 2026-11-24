@@ -33,20 +33,20 @@ import pandas as pd, numpy as np
 # Define paths
 # ---------------------------------------------------------------
 ##-- System inputs
-year = sys.argv[1]       ##-- Model run year, used to label output files
-scenario = sys.argv[2]
+YEAR = sys.argv[1]       ##-- Model run year, used to label output files
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()          ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')          ##-- Database/input_data/post_processing
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + "_" + YEAR)        ##-- Database/output_data/post_processing
 
 ##-- Inputs 
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
-pth_modepathcosts = os.path.join(outDir + "/data_all_modepath_costs_" + year + ".csv")
+pth_modepathcosts = os.path.join(outDir + "/data_all_modepath_costs.csv")
 
 ##-- Outputs
-outPortSummary= os.path.join(outDir + "/port_summary_review_" + year + ".csv")   ##-- Outpath for port summary file
+outPortSummary= os.path.join(outDir + "/port_summary_review.csv")   ##-- Outpath for port summary file
 
 # ---------------------------------------------------------------
 # Import Data

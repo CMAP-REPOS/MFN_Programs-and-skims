@@ -8,8 +8,8 @@ import inro.modeller as _m
 import pandas as pd
     
 def main():
-    scenario = sys.argv[1]
-    output_dir = os.getcwd() + f"\\output_data\\{scenario}"
+    SCENARIO = sys.argv[1]
+    output_dir = os.getcwd() + f"\\output_data\\{SCENARIO}"
 
     # Define the path to the Emme project (.emp file)
     empFl = 'MesoFreightNetwork.emp'

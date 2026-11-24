@@ -11,35 +11,35 @@ import pandas as pd, numpy as np
 # SET PATHS
 # ---------------------------------------------------------------
 ##-- System inputs
-year= sys.argv[1]     ##-- Skim year
-scenario = sys.argv[2]
+YEAR= sys.argv[1]     ##-- Skim year
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()      ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')    ##-- Database/input_data/post_processing
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)      ##-- Database/output_data/post_processing
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + "_" + YEAR)      ##-- Database/output_data/post_processing
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
-pth_rlyard = os.path.join(outTempDir + "/rlyard_" + year + ".csv") 
-pth_emskim = os.path.join(outTempDir + "/emskim_" + year + ".csv") 
-pth_railGCD = os.path.join(outTempDir + "/railGCD_" + year + ".csv") 
-pth_waterI = os.path.join(outTempDir + "/skims_adjWater_" + year + ".csv") 
-pth_intdr = os.path.join(outTempDir + "/outWaterintdr_" + year + ".csv") 
-pth_inland = os.path.join(outTempDir + "/waterInland_" + year + ".csv") 
-pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
-pth_mf31=os.path.join(outTempDir + "/mf31_formatted_" + year+".csv")
+pth_rlyard = os.path.join(outTempDir + "/rlyard.csv") 
+pth_emskim = os.path.join(outTempDir + "/emskim.csv") 
+pth_railGCD = os.path.join(outTempDir + "/railGCD.csv") 
+pth_waterI = os.path.join(outTempDir + "/skims_adjWater.csv") 
+pth_intdr = os.path.join(outTempDir + "/outWaterintdr.csv") 
+pth_inland = os.path.join(outTempDir + "/waterInland.csv") 
+pth_gcd= os.path.join(outDir + "/data_mesozone_gcd.csv")              ##-- GCD file created during STEP1
+pth_mf31=os.path.join(outTempDir + "/mf31_formatted.csv")
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")           ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
 pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
 
 ##-- Outputs
-pth_outTimeCosts= os.path.join(outTempDir + "/data_modepath_skim1_"+year + ".csv")         ##-- New output file of modepath skim costs and times 
-pth_outModeDist= os.path.join(outTempDir + "/data_modepath_miles1_"+year + ".csv")     
-pth_outPorts= os.path.join(outDir + "/data_modepath_ports_"+year + ".csv")     
-pth_outAirports= os.path.join(outDir + "/data_modepath_airports_"+year + ".csv")     
-pth_outMesoSkim= os.path.join(outDir + "/data_mesozone_skims_"+year + ".csv")    
-pth_outModeCosts = os.path.join(outDir + "/data_all_modepath_costs_" + year + ".csv")
+pth_outTimeCosts= os.path.join(outTempDir + "/data_modepath_skim1.csv")         ##-- New output file of modepath skim costs and times 
+pth_outModeDist= os.path.join(outTempDir + "/data_modepath_miles1.csv")     
+pth_outPorts= os.path.join(outDir + "/data_modepath_ports.csv")     
+pth_outAirports= os.path.join(outDir + "/data_modepath_airports.csv")     
+pth_outMesoSkim= os.path.join(outDir + "/data_mesozone_skims.csv")    
+pth_outModeCosts = os.path.join(outDir + "/data_all_modepath_costs.csv")
 
 ##-- Constants
 rlLogos = [147, 148, 149, 150]
@@ -808,7 +808,7 @@ DRmile = {idx: np.nan for idx in range(1,55)}
 
 # modepath, cost, time, mile, lhmile, drmile
 allOutData['NA'] = np.nan
-if int(year) < 2035: 
+if int(YEAR) < 2035: 
     cost49 = 'NA'
     time49 = 'NA'
     mile49 = 'NA'

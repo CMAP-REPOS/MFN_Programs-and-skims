@@ -10,14 +10,14 @@ import pandas as pd, numpy as np
 # Define Paths and Variables
 # ---------------------------------------------------------------
 ##-- System inputs
-year= sys.argv[1]      ##-- Skim year
-scenario = sys.argv[2]
+YEAR= sys.argv[1]      ##-- Skim year
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()       ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/')    ##-- Database/input_data/post_processing
-inDir2 = os.path.join(databaseDir + '/output_data/'+ scenario)             ##-- Database/output_data/skim
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+inDir2 = os.path.join(databaseDir + '/output_data/'+ SCENARIO)             ##-- Database/output_data/skim
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + "_" + YEAR)        ##-- Database/output_data/post_processing
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 # Create temp output folder
@@ -28,10 +28,10 @@ inMatNames = os.path.join(inDir, "matrix.in")
 pth_nodeznmeso= os.path.join(inDir + "/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 
 ##-- Outputs
-outskims= os.path.join(outTempDir + "/allSkims_" + year + ".csv")        ##-- New output file of modepath skim costs and times 
-outMF31=os.path.join(outTempDir + "/mf31_formatted_" + year + ".csv")
-outMF32=os.path.join(outTempDir + "/mf32_formatted_" + year + ".csv")
-outRlyard=os.path.join(outTempDir + "/rlyard_" + year + ".csv")
+outskims= os.path.join(outTempDir + "/allSkims.csv")        ##-- New output file of modepath skim costs and times 
+outMF31=os.path.join(outTempDir + "/mf31_formatted.csv")
+outMF32=os.path.join(outTempDir + "/mf32_formatted.csv")
+outRlyard=os.path.join(outTempDir + "/rlyard.csv")
 
 ##-- Constants
 minMat = 31
@@ -168,7 +168,7 @@ skims=skims.drop('A', axis=1)
 
 
 ##-- Create composite of node 140 if active
-if scenario == '200':
+if SCENARIO == '200':
     print('SCENARIO == 200, creating composit of node 140')
     ##-- Reassign origin and destination node ID
     skim140=skims.loc[(skims['origin']==in_nodeznmeso['NewRT']) | (skims['destination']==in_nodeznmeso['NewRT'])].copy() 

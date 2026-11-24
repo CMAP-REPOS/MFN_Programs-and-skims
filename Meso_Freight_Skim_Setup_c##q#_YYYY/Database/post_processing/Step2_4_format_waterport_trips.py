@@ -10,14 +10,14 @@ import pandas as pd, numpy as np
 # SET PATHS
 # ---------------------------------------------------------------
 ##-- System inputs
-year=sys.argv[1]     ##-- Skim year
-scenario = sys.argv[2]
+YEAR=sys.argv[1]     ##-- Skim year
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()       ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')    ##-- Database/input_data/post_processing
-inDir2 = os.path.join(databaseDir + '/output_data/' + scenario)             ##-- Database/output_data/skim
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+inDir2 = os.path.join(databaseDir + '/output_data/' + SCENARIO)             ##-- Database/output_data/skim
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + '_' + YEAR)        ##-- Database/output_data/post_processing
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
@@ -26,23 +26,23 @@ pth_fports= os.path.join(inDir + "/foreign_ports.csv")         ##-- Ocean used f
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
 pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
-pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
-pth_mf32=os.path.join(outTempDir + "/mf32_formatted_" + year+".csv")
-pth_OLD= os.path.join(outTempDir + "/all_O-L-D_" + year + ".csv")        ##-- New output file of modepath skim costs and times 
-pth_airSkims=os.path.join(outTempDir+ "/skims_adjAir_" + year + ".csv")
+pth_gcd= os.path.join(outDir + "/data_mesozone_gcd.csv")              ##-- GCD file created during STEP1
+pth_mf32=os.path.join(outTempDir + "/mf32_formatted.csv")
+pth_OLD= os.path.join(outTempDir + "/all_O-L-D.csv")        ##-- New output file of modepath skim costs and times 
+pth_airSkims=os.path.join(outTempDir+ "/skims_adjAir.csv")
 pth_waterlinks=os.path.join(inDir2 + "/waterlinks.txt")
 
 ##-- Outputs
-outI= os.path.join(outTempDir + "/skims_adjWater_"+year + ".csv")        ##-- New output file of modepath skim costs and times 
-outIntdr = os.path.join(outTempDir + "/outWaterintdr_"+year + ".csv")  
-outInland= os.path.join(outTempDir + "/waterInland_" +year+ ".csv")        ##-- New output file of modepath skim costs and times 
+outI= os.path.join(outTempDir + "/skims_adjWater.csv")        ##-- New output file of modepath skim costs and times 
+outIntdr = os.path.join(outTempDir + "/outWaterintdr.csv")  
+outInland= os.path.join(outTempDir + "/waterInland.csv")        ##-- New output file of modepath skim costs and times 
 
 ##-- Constants
 ExtDrayFor=100     ##-- Assume fixed drayage at each foreign destination country 
 seed=8768          ##-- Seed value for random function to choose best port 
 
 ##-- Set Seed
-random.seed(seed) 
+rng = np.random.default_rng(42)
 
 # ---------------------------------------------------------------
 # IMPORT DATA
@@ -315,7 +315,7 @@ allWater=pd.concat([allWater, rallWater])
 def pps_sample(group):
     origin, destination = group.name
     probs = group['FrgnTons'] / group['FrgnTons'].sum()       ##-- Normalize FrgnTons to sum to 1 to get sampling probabilities  
-    sampled_index = np.random.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
+    sampled_index = rng.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
 
     result = group.loc[sampled_index].copy()
     result['origin'] = origin

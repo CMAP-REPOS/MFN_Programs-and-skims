@@ -20,8 +20,6 @@ setupName = "Model_Setups/Meso_Freight_Skim_Setup_"
 newFolName = paste(setupName,newConf, "_", sep = "")
 
 outDir = "Skim_Output"
-out100 = paste(outDir, "/No_LogNode140", sep = "")
-out200 = paste(outDir, "/LogNode140", sep = "")
 report = paste(outDir, "/qc_finalSkimReport.txt", sep = "")
 
 #--Delete Output Folder if it exists
@@ -29,8 +27,6 @@ if(file.exists(outDir) == TRUE){unlink(outDir, recursive = TRUE)}
 
 #--Create Folders
 dir.create(outDir)
-dir.create(out100)
-dir.create(out200)
 
 #--Delete report if exists
 if(file.exists(report) == TRUE){unlink(report, recursive = TRUE)}
@@ -71,7 +67,7 @@ for(file in smFiles){
     for(sc in scen){
       cat(sc, file =report,append=TRUE)  
       cat("\n", file =report,append=TRUE)
-      inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
+      inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "_", year,"/", file, ".csv", sep = "")
       
       if(i == 1){
         in1 <- read.csv(inFile)
@@ -102,8 +98,8 @@ for(file in yrFiles){
   for(year in years){
     cat(year, file =report,append=TRUE)
     cat("\n", file =report,append=TRUE)
-    inFile1 = paste(newFolName, year, "/Database/output_data/post_processing_100", "/", file, "_", year, ".csv", sep = "")
-    inFile2 = paste(newFolName, year, "/Database/output_data/post_processing_200", "/", file, "_", year, ".csv", sep = "")
+    inFile1 = paste(newFolName, year, "/Database/output_data/post_processing_100_",year, "/", file, ".csv", sep = "")
+    inFile2 = paste(newFolName, year, "/Database/output_data/post_processing_200_", year, "/", file, ".csv", sep = "")
     in1 <- read.csv(inFile1)
     in2 <- read.csv(inFile2)
     resp = all.equal(in1, in2)
@@ -115,46 +111,32 @@ for(file in yrFiles){
 }
 
 #3. Copy data to final location####
-print("COPYING & RENNAMING DATA")
-cat("COPYING & RENNAMING DATA \n", file=report,append=TRUE)
+print("COPYING DATA")
+cat("COPYING DATA \n", file=report,append=TRUE)
 
 #--Move Files
-#Files that are the same all years, all scenarios, go in 'Skim_Output' with amended name to remove year
-year = min(years)
-sc = 100
-for(file in smFiles){
-  inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
-  file.copy(inFile, outDir)
-  
-  currentName = paste(outDir,"/", file, "_", year, ".csv", sep = "")
-  
-  yrFlag = paste("_", year, sep = "")
-  newName = str_split_i(file, yrFlag, 1)
-  newFile = paste(outDir, "/",newName, ".csv", sep = "")
-  
-  file.rename(from = currentName, to = newFile)
-  
+for(year in years){
+  for (sc in scen){
+    inFolder = paste(newFolName, year, "/Database/output_data/post_processing_", sc, '_', year, sep = "")
+    
+    dir.create(file.path(outDir, basename(inFolder)), showWarnings = FALSE)
+    
+    # Get only top-level files
+    files <- list.files(inFolder, full.names = TRUE, recursive = FALSE)
+    files <- files[!file.info(files)$isdir]
+    
+    # Copy files into the new folder
+    file.copy(
+      from = files,
+      to = file.path(outDir, basename(inFolder))
+    )
+    
+    # Remove modepath costs from final group, this was just a QC file
+    file.remove(file.path(outDir, basename(inFolder), '/data_all_modepath_costs.csv'))
+    file.remove(file.path(outDir, basename(inFolder), '/port_summary_review.csv'))
+    
+  }
 }
 
-#Files that are the same all scenarios, different years, go in 'Skim_Output'
-for(file in yrFiles){
-  for(year in years){
-    inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
-    file.copy(inFile, outDir)
-  }
-  
-  
-}
 
-for(file in scFiles){
-  for(year in years){
-    for(sc in scen){
-      if(sc == 100){od = out100}else{od = out200}
-      inFile = paste(newFolName, year, "/Database/output_data/post_processing_", sc, "/", file, "_", year, ".csv", sep = "")
-      file.copy(inFile, od)
-    }
-  }
-  
-  
-}
 

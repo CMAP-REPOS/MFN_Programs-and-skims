@@ -3,13 +3,13 @@ import sys, os
 import pandas as pd, numpy as np
 
 
-year=sys.argv[1]				          ##-- Flag Year 
-scenario = sys.argv[2]
+YEAR=sys.argv[1]				          ##-- Flag Year 
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()           ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')          ##-- Database/input_data/post_processing
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + "_" + YEAR)        ##-- Database/output_data/post_processing
 
 ##-- Inputs 
 pth_hwydist= os.path.join(inDir + "/hwydist_pk" )           ##-- AM Peak skimmed miles 
@@ -22,9 +22,9 @@ pth_emp= os.path.join(inDir + "/subzn_emp.csv")             ##-- subzone total e
 pth_corresp= os.path.join(inDir + "/sz_zn09_meso.csv")      ##-- subzone-zone-mesozone correspondence file 
 
 ##-- Outputs 
-outSkims= os.path.join(outDir + "/cmap_data_zone_skims_" + year + ".csv")            ##-- New output file of Zonal skims
-outCentroids= os.path.join(outDir + "/cmap_data_zone_centroids_" + year + ".csv")    ##-- New output file of CMAP zone centroid coordinates
-outEmp= os.path.join(outDir + "/cmap_data_zone_employment_" + year + ".csv")         ##-- New output file of CMAP zonal employment 
+outSkims= os.path.join(outDir + "/cmap_data_zone_skims.csv")            ##-- New output file of Zonal skims
+outCentroids= os.path.join(outDir + "/cmap_data_zone_centroids.csv")    ##-- New output file of CMAP zone centroid coordinates
+outEmp= os.path.join(outDir + "/cmap_data_zone_employment.csv")         ##-- New output file of CMAP zonal employment 
 
 # ---------------------------------------------------------------
 # Import Data

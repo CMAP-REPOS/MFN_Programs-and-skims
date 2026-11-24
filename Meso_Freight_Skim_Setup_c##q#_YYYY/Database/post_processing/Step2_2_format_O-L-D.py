@@ -10,25 +10,25 @@ import pandas as pd, numpy as np
 # Set Paths and Constants
 # ---------------------------------------------------------------
 ##-- System inputs
-year=sys.argv[1]      ##-- Skim year
-scenario = sys.argv[2]
+YEAR=sys.argv[1]      ##-- Skim year
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()       ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')    ##-- Database/input_data/post_processing
-inDir2 = os.path.join(databaseDir + '/output_data/' + scenario)             ##-- Database/output_data/skim
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+inDir2 = os.path.join(databaseDir + '/output_data/' + SCENARIO)             ##-- Database/output_data/skim
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO+ "_" + YEAR)        ##-- Database/output_data/post_processing
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_CCdist= os.path.join(inDir2 + "/CCdist.txt")               ##-- Highway centroid connector length
-pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
-pth_skims=os.path.join(outTempDir + "/allSkims_" + year+".csv")
+pth_gcd= os.path.join(outDir + "/data_mesozone_gcd.csv")              ##-- GCD file created during STEP1
+pth_skims=os.path.join(outTempDir + "/allSkims.csv")
 
 ##-- Outputs
-outOLD= os.path.join(outTempDir + "/all_O-L-D_" + year + ".csv")        ##-- New output file of modepath skim costs and times 
-outEmSkim= os.path.join(outTempDir + "/emskim_" + year + ".csv")
+outOLD= os.path.join(outTempDir + "/all_O-L-D.csv")        ##-- New output file of modepath skim costs and times 
+outEmSkim= os.path.join(outTempDir + "/emskim.csv")
 
 ##-- Variables
 ExtDrayFor=100     ##-- Assume fixed drayage at each foreign destination country 

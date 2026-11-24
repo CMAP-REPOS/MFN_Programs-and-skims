@@ -10,13 +10,13 @@ import pandas as pd, numpy as np
 # DEFINE PATHS AND CONSTANTS
 # ---------------------------------------------------------------
 ##-- System inputs
-year=sys.argv[1]     ##-- Skim yearv
-scenario = sys.argv[2]
+YEAR=sys.argv[1]     ##-- Skim yearv
+SCENARIO = sys.argv[2]
 
 ##-- File directories
 databaseDir = os.getcwd()       ##-- Database     
 inDir = os.path.join(databaseDir + '/input_data/post_processing')    ##-- Database/input_data/post_processing
-outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + scenario)        ##-- Database/output_data/post_processing
+outDir = os.path.join(databaseDir + '/output_data/post_processing' + "_" + SCENARIO + '_' + YEAR)        ##-- Database/output_data/post_processing
 outTempDir = os.path.join(outDir + '/tempOut/')
 
 ##-- Inputs 
@@ -24,12 +24,12 @@ pth_frair= os.path.join(inDir + "/domestic_airports.csv")      ##-- Top 30 US ai
 pth_nodeznmeso= os.path.join(databaseDir + "/input_data/constants/node_zone_meso.yaml")   ##-- Zone and node ranges by mode and region (CMAP, logistics, non-CMAP)
 pth_charges= os.path.join(databaseDir + "/input_data/constants/charges.yaml")             ##-- Handling charges, linehaul charges, and surcharges constants
 pth_sptime= os.path.join(databaseDir + "/input_data/constants/speeds_and_time.yaml")      ##-- Speeds (MPH), handling time (hours), and dwell time at interchanges (hours) as constants
-pth_gcd= os.path.join(outDir + "/data_mesozone_gcd_" + year + ".csv")              ##-- GCD file created during STEP1
-pth_skims = os.path.join(outTempDir + '/all_O-L-D_' + year + ".csv")
+pth_gcd= os.path.join(outDir + "/data_mesozone_gcd.csv")              ##-- GCD file created during STEP1
+pth_skims = os.path.join(outTempDir + '/all_O-L-D.csv')
 
 ##-- Outputs
-outAdjSkims= os.path.join(outTempDir + "/skims_adjAir_" + year + ".csv")        ##-- New output file of modepath skim costs and times 
-outRailGCD= os.path.join(outTempDir + "/railGCD_" + year + ".csv")        ##-- New output file of modepath skim costs and times 
+outAdjSkims= os.path.join(outTempDir + "/skims_adjAir.csv")        ##-- New output file of modepath skim costs and times 
+outRailGCD= os.path.join(outTempDir + "/railGCD.csv")        ##-- New output file of modepath skim costs and times 
 
 ##-- Variables
 ExtDrayDom=50      ##-- Assume fixed drayage at each U.S. zone outside CMAP 
@@ -37,7 +37,7 @@ ExtDrayFor=100     ##-- Assume fixed drayage at each foreign destination country
 seed=998          ##-- Seed value for random function to choose best port 
 
 ##-- Set Seed
-random.seed(seed) 
+rng = np.random.default_rng(42)
 
 # ---------------------------------------------------------------
 # IMPORT DATA
@@ -223,7 +223,7 @@ temp = temp[temp.groupby(['origin','destination'])['GenCostAir'].rank() <= 5].re
 def pps_sample(group):
     origin, destination = group.name
     probs = group['FrgnAirTons'] / group['FrgnAirTons'].sum()       ##-- Normalize FrgnAirTons to sum to 1 to get sampling probabilities  
-    sampled_index = np.random.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
+    sampled_index = rng.choice(group.index, size=1, p=probs)  ##-- Randomly choose 1 row index using probabilities
     
     result = group.loc[sampled_index].copy()
     result['origin'] = origin
