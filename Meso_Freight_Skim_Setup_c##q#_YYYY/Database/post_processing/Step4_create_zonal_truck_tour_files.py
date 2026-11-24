@@ -18,7 +18,6 @@ pth_hwytmop= os.path.join(inDir + "/hwytime_op")            ##-- Midday skimmed 
 pth_znsqmi= os.path.join(inDir + "/zcentroid_sqmi.txt")     ##-- zonal area
 pth_znx= os.path.join(inDir + "/zcentroid_xcoord.txt")      ##-- zone x-coordinate
 pth_zny= os.path.join(inDir + "/zcentroid_ycoord.txt")      ##-- zone y-coordinate 
-pth_emp= os.path.join(inDir + "/subzn_emp.csv")             ##-- subzone total employment 
 pth_corresp= os.path.join(inDir + "/sz_zn09_meso.csv")      ##-- subzone-zone-mesozone correspondence file 
 
 ##-- Outputs 
@@ -38,7 +37,6 @@ in_znsqmi = pd.read_csv(pth_znsqmi, sep = ' all', skiprows = 5, header=None, eng
 in_znx = pd.read_csv(pth_znx, sep = ' all:', skiprows = 3, header=None, engine='python')        ##-- zone x-coordinate
 in_zny = pd.read_csv(pth_zny,  sep = ':', skiprows = 3, header=None, engine='python')           ##-- zone y-coordinate 
 
-in_emp = pd.read_csv(pth_emp)           ##-- subzone total employment 
 in_corresp = pd.read_csv(pth_corresp)   ##-- subzone-zone-mesozone correspondence file 
 
 # ----------------------------------------------------------------------------
@@ -86,15 +84,6 @@ zncoords['stop_zone']=zncoords['zone']                          ##-- Create new 
 zncoords=zncoords[['stop_zone', 'x_coord', 'y_coord']]          ##-- Select columns
 zncoords=zncoords.sort_values('stop_zone')                      ##-- Sort by zone
 zncoords.to_csv(outCentroids, index=False)                      ##-- Export as csv, outSkims
-
-# ---------------------------------------------------------------
-# Format and export zone employment data 
-# ---------------------------------------------------------------
-empMeso = pd.merge(in_emp, in_corresp, how='left', on=['zone09', 'subzone09'])      ##-- Combine employment data and correspondance file to attach zone-mesozone
-empAgg = empMeso.groupby(['zone09', 'mesozone']).agg({'i18':'sum'}).reset_index()   ##-- Summarize select link volumes, hbw volumes, and hbs volumes
-empAgg.columns = ['Zone', 'mesozone', 'totalemp']                                   ##-- Select Columns
-empAgg=empAgg.sort_values('Zone')                                                   ##-- Sort by zone
-empAgg.to_csv(outEmp, index=False)                                                ##-- Export as csv, outSkims
 
 # ----------------------------------------------------------------------------
 #  Format skim data
