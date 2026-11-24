@@ -86,22 +86,6 @@ def main():
                     export_format="PROMPT_DATA_FORMAT",
                     skip_default_values=True,
                     full_matrix_line_format="ONE_ENTRY_PER_LINE")
-
-    # 2. OBTAIN SUBZONE EMPLOYMENT FROM cmap_trip-based_model/Database/tg/fortran/ATTR_IN.TXT
-    # Create dictionary to define correspondance between TBM scenarios and Freight Skim years
-    scen_year_corr = {100:[2019], 200: [2026], 300: [2030], 400: [2032], 500: [2035], 600: [2040], 700: [2045], 800: [2050]}
-    output_years = scen_year_corr[scenario]
-
-    # Format subzone employment by attaching zone
-    out_emp = pd.merge(in_ATTR, in_crosswalk, left_on='subzone', right_on='subzone09', how='left')
-    out_emp = out_emp[['zone09', 'subzone09', 'totalEmp']].copy()
-    out_emp.rename(columns={'totalEmp':'i18'}, inplace=True)
-
-    # Export subzone employment
-    for yr in output_years:
-        output_nm = outputDir + "/subzn_emp" + str(yr) + ".csv" 
-        out_emp.to_csv(output_nm)  
-
     
 if __name__ == '__main__':
     main()
