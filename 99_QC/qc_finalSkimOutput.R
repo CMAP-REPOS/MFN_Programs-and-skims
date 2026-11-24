@@ -14,13 +14,13 @@ package.check <- lapply(
 #--Define paths and create folders####
 args = commandArgs(trailingOnly=T)
 newConf = args[1]
-print(getwd())
 setupName1 = "Model_Setups"
 setupName = "Model_Setups/Meso_Freight_Skim_Setup_"
 newFolName = paste(setupName,newConf, "_", sep = "")
 
 outDir = "Skim_Output"
 report = paste(outDir, "/qc_finalSkimReport.txt", sep = "")
+urbansim_dir = paste0('V:/Secure/Master_Freight/UrbanSim_Inputs/Output_', newConf)
 
 #--Delete Output Folder if it exists
 if(file.exists(outDir) == TRUE){unlink(outDir, recursive = TRUE)}
@@ -54,6 +54,7 @@ smFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_centroids", "data_mesozone
             "data_mesozone_gcd")
 yrFiles = c("cmap_data_zone_employment", "cmap_data_zone_skims", "data_mesozone_skims")
 scFiles = c("cmap_data_truck_IE_poe", "data_modepath_miles", "data_modepath_skims", "data_modepath_ports", "data_modepath_airports")
+urbanSimFiles = c('cmap_data_zone_employment', 'data_hh', 'data_mesozone_emprankings')
 
 #2. Compare within new run####
 #--Confirm universal data is consistent across folders####
@@ -126,6 +127,8 @@ for(year in years){
     }else{
       use_year = year
     }
+    
+    ##-- Move freight skim data
     inFolder = paste(newFolName, use_year, "/Database/output_data/post_processing_", sc, '_', use_year, sep = "")
     
     # Get only top-level files
@@ -152,6 +155,20 @@ for(year in years){
     pth2 = file.path(outDir, basename(inFolder), '/port_summary_review.csv')
     if(file.exists(pth1)){file.remove(pth1)}
     if(file.exists(pth2)){file.remove(pth2)}
+    
+    ##-- Add urbansim data
+    urbanSimFiles
+    urbansim_dir
+    for(file in urbanSimFiles){
+      full_name = paste0(urbansim_dir, '/', file, "_", year, ".csv")
+      
+      file.copy(from = full_name, to = outPth)
+      
+      current_name = paste0(outPth, '/', file, "_", year, ".csv")
+      final_name = paste0(outPth, '/', file, ".csv")
+      file.rename(current_name, final_name)
+      
+    }
     
     
   }
