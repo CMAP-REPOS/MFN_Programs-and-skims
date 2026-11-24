@@ -10,7 +10,7 @@
 
 # =======================================================================
 	## --> Update this information <-- ##
-conformity = 'c25q4'                                      ##-- Conformity
+conformity = 'c26q2'                                      ##-- Conformity
 factor2060 = 0.99                                   ##-- 2060 employment factor (in lieu of a formal process)
 scenario_list = list(
   '100'= '2019',
@@ -115,21 +115,28 @@ empCats = c("num_jobs_sector_11","num_jobs_sector_21","num_jobs_sector_22","num_
 qc <- data.table(COUNTY=numeric(),total_jobs=numeric())     ##-- empty data.table
 
 yr_counter = 1
-for (i in 1:length(conformityFolders)) {
-  print(i)
-    cat("    -----", scenLabel[i], "-----    ", fill=T)
-    file1 = file.path(tbmFolder,conformityFolders[i],"cmap_trip-based_model","Database","tg","UrbanSim_inputs",paste0(tgFiles[yr_counter],".csv"))
+for (i in (1:(length(conformityFolders)+1))) {
+    if (scenLabel[i]=="2060") {
+      i2 = i-1
+      yr_counter = yr_counter-2
+    }
+  else{
+    i2 = i
+  }
+  
+    cat("    -----", scenLabel[i2], "-----    ", fill=T)
+    file1 = file.path(tbmFolder,conformityFolders[i2],"cmap_trip-based_model","Database","tg","UrbanSim_inputs",paste0(tgFiles[yr_counter],".csv"))
     cmap <- fread(file1)
     cmap = cmap[subzone_id <= max7maz]		##-- limit to CMAP 7-county subzones
     cat(" ->", format(nrow(cmap), big.mark=",", scientific=F), "records in", file1, "with", ncol(cmap), "columns", fill=T)
     #
-    file2 = file.path(tbmFolder,conformityFolders[i],"cmap_trip-based_model","Database","tg","UrbanSim_inputs",paste0(tgFiles[yr_counter+1],".csv"))
+    file2 = file.path(tbmFolder,conformityFolders[i2],"cmap_trip-based_model","Database","tg","UrbanSim_inputs",paste0(tgFiles[yr_counter+1],".csv"))
     extn <- fread(file2)
     cat(" ->", format(nrow(extn), big.mark=",", scientific=F), "records in", file2, "with", ncol(extn), "columns", fill=T)
     cmap <- rbindlist(list(cmap,extn), use.names=T, fill=T)
     #
     ## -- Read file and create full subzone template -- ##
-    file3 = file.path(tbmFolder,conformityFolders[i],"cmap_trip-based_model","Database","tg","fortran","GEOG_IN.TXT")
+    file3 = file.path(tbmFolder,conformityFolders[i2],"cmap_trip-based_model","Database","tg","fortran","GEOG_IN.TXT")
     geog <- fread(file3)
     setnames(geog, c("V1","V2"), c("subzone_id","COUNTY"))
     geog <- geog[, list(subzone_id,COUNTY)]
@@ -149,7 +156,7 @@ for (i in 1:length(conformityFolders)) {
                     num_jobs_sector_81=sum(num_jobs_sector_81,na.rm=T), num_jobs_sector_92=sum(num_jobs_sector_92,na.rm=T)), by=.(subzone_id)][order(subzone_id)]
     #--------------------------------------------------------------------------------------------------------------------------------
     ### --- Adjust 2060 employment --- ###
-    if (scenLabel[i]=="2060") {
+    if (scenLabel[i2]=="2060") {
         cmap2 <- cmap1[, lapply(.SD, "*", factor2060), .SDcols=empCats]
         cmap2 <- cmap2[,(empCats) := round(.SD,0), .SDcols=empCats]
         cmap2 <- cmap2[, total_jobs := rowSums(.SD), .SDcols=empCats]
@@ -299,6 +306,18 @@ for (i in 1:length(conformityFolders)) {
                 median(empSum$rank81), "maximum value=", max(empSum$rank81), fill=T)
     cat("   -> QC rank92:", nrow(empSum[is.na(rank92)]), "records have no values; minimum value=", min(empSum$rank92), "median value=",
                 median(empSum$rank92), "maximum value=", max(empSum$rank92), fill=T)    
+    
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Create household file
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    hh_zn <- cmap %>% 
+      left_join(corresp, by = 'subzone_id') %>%
+      summarize(hh = sum(total_households), 
+                .by = 'Zone')
+    file2name = paste0("data_hh_",scenLabel[i],".csv")
+    fwrite(hh_zn, file=file.path(outputFolder,file2name))
+    
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     yr_counter =yr_counter+2
 }
 
