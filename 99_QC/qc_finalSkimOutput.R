@@ -44,6 +44,10 @@ years <- regmatches(
   unique() |>
   sort()
 
+# add 2060 to list
+if(!('2060' %in% years)){
+  years <- c(years, '2060')
+}
 
 scen = c(100, 200)
 smFiles = c("cmap_data_truck_EE_poe", "cmap_data_zone_centroids", "data_mesozone_centroids",
@@ -114,29 +118,42 @@ for(file in yrFiles){
 print("COPYING DATA")
 cat("COPYING DATA \n", file=report,append=TRUE)
 
-#--Move Files
+#--Move Files from skims
 for(year in years){
   for (sc in scen){
-    inFolder = paste(newFolName, year, "/Database/output_data/post_processing_", sc, '_', year, sep = "")
-    
-    dir.create(file.path(outDir, basename(inFolder)), showWarnings = FALSE)
+    if(year == '2060'){
+      use_year = 2050
+    }else{
+      use_year = year
+    }
+    inFolder = paste(newFolName, use_year, "/Database/output_data/post_processing_", sc, '_', use_year, sep = "")
     
     # Get only top-level files
     files <- list.files(inFolder, full.names = TRUE, recursive = FALSE)
     files <- files[!file.info(files)$isdir]
     
+    if(year == '2060'){
+      outPth = file.path(paste0(outDir, '/post_processing_', sc, "_", year))
+      dir.create(outPth, showWarnings = FALSE)
+    }else{
+      outPth = file.path(outDir, basename(inFolder))
+      dir.create(outPth, showWarnings = FALSE)
+    }
+    
+    
     # Copy files into the new folder
     file.copy(
       from = files,
-      to = file.path(outDir, basename(inFolder))
+      to = outPth
     )
     
     # Remove modepath costs from final group, this was just a QC file
-    file.remove(file.path(outDir, basename(inFolder), '/data_all_modepath_costs.csv'))
-    file.remove(file.path(outDir, basename(inFolder), '/port_summary_review.csv'))
+    pth1 = file.path(outDir, basename(inFolder), '/data_all_modepath_costs.csv')
+    pth2 = file.path(outDir, basename(inFolder), '/port_summary_review.csv')
+    if(file.exists(pth1)){file.remove(pth1)}
+    if(file.exists(pth2)){file.remove(pth2)}
+    
     
   }
 }
-
-
 
